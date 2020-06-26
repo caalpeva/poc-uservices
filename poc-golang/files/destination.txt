@@ -1,0 +1,3 @@
+Esto es una prueba para copia de ficheros.
+Esto es una segunda línea.
+Y esto una tercera línea.
