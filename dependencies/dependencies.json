@@ -1,0 +1,6 @@
+{
+  "dependencies":
+  [
+    { "account": "caalpeva", "name": "poc-bash", "version": "master", "source": "includes", "destination": "includes" }
+  ]
+}
