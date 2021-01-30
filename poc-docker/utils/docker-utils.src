@@ -1,0 +1,41 @@
+#!/bin/echo "source me !"
+
+DIR=$(dirname $(readlink -f $0))
+
+source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+
+##############################
+#  DOCKER AUXILIARY METHODS  #
+##############################
+
+function docker_utils::showContainersByPrefix {
+  docker ps -a | head -1
+  docker ps -a | grep $1
+}
+
+function docker_utils::getContainerLongIdByName() {
+  docker inspect --format="{{.Id}}" $1
+}
+
+function docker_utils::getRunningContainerIdsByPrefix {
+  xtrace on
+  docker ps -qf "name=^$1*"
+  xtrace off
+}
+
+function docker_utils::getExitedContainerIdsByPrefix {
+  xtrace on
+  docker ps -q \
+    --filter "status=exited" \
+    --filter "name=^$1*"
+  xtrace off   
+}
+
+function docker_utils::getAllContainerIdsByPrefix {
+  #docker ps --format 'CONTAINER ID : {{.ID}} | Name: {{.Names}} | Image:  {{.Image}} |  Ports: {{.Ports}}'
+  xtrace on
+  docker ps -aqf "name=^$1*"
+  xtrace off
+}
+
