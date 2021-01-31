@@ -67,16 +67,6 @@ function executeContainers {
 function startContainers {
   print_info "Start containers..."
   containers=$(docker_utils::getExitedContainerIdsByPrefix ${CONTAINER_PREFIX})
-
-  # args=("$@") 
-  # get number of elements 
-  # ELEMENTS=${#args[@]} 
-  # echo each element in array  
-  # for loop 
-  # for (( i=0;i<$ELEMENTS;i++)); do 
-  # echo ${args[${i}]} 
-
-
   for containerId in ${containers}
   do
     xtrace on
