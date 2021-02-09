@@ -39,3 +39,19 @@ function docker_utils::getAllContainerIdsByPrefix {
   xtrace off
 }
 
+function docker_utils::removeAllContainers {
+  docker rm -f $(docker ps -aq)
+}
+
+function docker_utils::getIpAddressFromContainer {
+  xtrace on
+  docker inspect -f "{{ .NetworkSettings.IPAddress }}" $1
+  xtrace off
+}
+
+function docker_utils::getFirstHostPortFromContainerData {
+  xtrace on
+  docker inspect --format "{{ (index (index .NetworkSettings.Ports \"$2/tcp\") 0).HostPort }}" $1
+  xtrace off
+}
+
