@@ -1,0 +1,59 @@
+#!/bin/echo "source me !"
+
+#############
+# VARIABLES #
+#############
+
+SCRIPT_NAME=$(basename $0)
+INTERACTIVE_MODE=false
+
+#############
+# FUNCTIONS #
+#############
+
+function usage() {
+  cat << EOF
+Usage: $SCRIPT_NAME [ -h | -i ]
+    Options help:
+    -h:  Shows option help 
+    -i:  Allows the user to perform the execution step by step 
+EOF
+  exit ${1:-1}
+}
+
+function checkArguments() {
+  print_info "Checking $# arguments..."
+  if [ $# -gt 1 ]; then
+    echo -e "\n$SCRIPT_NAME: Illegal number of parameters\n"
+    usage
+  fi
+
+  # Parse the options
+  while getopts "hi" option; do
+    case $option in
+      h) usage 0
+         ;;
+      i) INTERACTIVE_MODE=true
+         ;;
+      ?) #echo -e "\n$SCRIPT_NAME: Invalid command line option [$OPTARG]\n"
+         usage
+         ;;
+    esac
+  done
+}
+
+# Check interactive mode
+function checkInteractiveMode() {
+ print_info "Checking interactive mode..."
+  if [ $INTERACTIVE_MODE = true ]; then
+    echo "Press ENTER to continue, CTRL-C to abort ..."
+    read dummy
+  fi
+}
+
+# Set terminal signals
+function setTerminalSignals() {
+  print_info "Setting terminal signals..."
+  trap handleTermSignal INT QUIT TERM KILL
+}
+
