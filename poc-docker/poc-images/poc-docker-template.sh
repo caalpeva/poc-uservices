@@ -2,15 +2,15 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
+source "${DIR}/../utils/docker-utils.src"
 
 #############
 # VARIABLES #
 #############
 
-CONTAINER_PREFIX="poc_ubuntu_top$(date '+%Y%m%d')"
-CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
 
 #############
 # FUNCTIONS #
@@ -33,40 +33,18 @@ function cleanup() {
   print_debug "Cleaning environment..."
 }
 
-
-function executeContainers() {
-  print_info "Execute containers..."  
-  xtrace on
-  docker run -dit \
-    --name ${CONTAINER1_NAME} \
-    ubuntu /usr/bin/top -b
-
-  docker run -dit \
-    --name ${CONTAINER3_NAME} \
-    ubuntu /usr/bin/top -b
-
-  docker run -dit \
-    --rm \
-    --name ${CONTAINER2_NAME} \
-    ubuntu /usr/bin/top -b
-  
-  docker run -dit \
-    --rm \
-    --name ${CONTAINER4_NAME} \
-    ubuntu /usr/bin/top -b
-
-  xtrace off
-}
-
 function main() {
   print_debug "$(basename $0) [PID = $$]"
   checkArguments $@
 
   initialize 
-  checkInteractiveMode
 
   print_done "Poc completed successfully "
   exit 0
 }
+
+#############
+# EXECUTION #
+#############
 
 main $@

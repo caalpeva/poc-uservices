@@ -1,9 +1,6 @@
 #!/bin/echo "source me !"
-
-DIR=$(dirname $(readlink -f $0))
-
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+# Requires: /../../dependencies/downloads/poc-bash-master/includes/print-utils.src
+# 	    /../../dependencies/downloads/poc-bash-master/includes/trace-utils.src
 
 ##############################
 #  DOCKER AUXILIARY METHODS  #

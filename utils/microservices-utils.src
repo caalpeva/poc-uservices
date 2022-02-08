@@ -6,6 +6,7 @@
 
 SCRIPT_NAME=$(basename $0)
 INTERACTIVE_MODE=false
+SKIP_CLEANUP_MODE=false
 
 #############
 # FUNCTIONS #
@@ -13,27 +14,26 @@ INTERACTIVE_MODE=false
 
 function usage() {
   cat << EOF
-Usage: $SCRIPT_NAME [ -h | -i ]
+Usage: $SCRIPT_NAME [ -h | -i | -s ]
     Options help:
     -h:  Shows option help 
-    -i:  Allows the user to perform the execution step by step 
+    -i:  Allows the user to perform the execution step by step
+    -s:  Skip cleanup
 EOF
   exit ${1:-1}
 }
 
 function checkArguments() {
   print_debug "Checking arguments ($#)..."
-  if [ $# -gt 1 ]; then
-    echo -e "\n$SCRIPT_NAME: Illegal number of parameters\n"
-    usage
-  fi
-
+  
   # Parse the options
-  while getopts "hi" option; do
+  while getopts "his" option; do
     case $option in
       h) usage 0
          ;;
       i) INTERACTIVE_MODE=true
+         ;;
+      s) SKIP_CLEANUP_MODE=true
          ;;
       ?) #echo -e "\n$SCRIPT_NAME: Invalid command line option [$OPTARG]\n"
          usage
@@ -48,6 +48,14 @@ function checkInteractiveMode() {
   if [ $INTERACTIVE_MODE = true ]; then
     echo "Press ENTER to continue, CTRL-C to abort ..."
     read dummy
+  fi
+}
+
+# Check cleanup mode
+function checkCleanupMode() {
+  #print_debug "Checking cleanup mode..."
+  if [ $SKIP_CLEANUP_MODE = false ]; then
+	cleanup
   fi
 }
 
