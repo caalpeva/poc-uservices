@@ -33,42 +33,7 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  removeImages $IMAGE_PHP $IMAGE_PHP_APACHE
-}
-
-
-function downloadDockerImage() {
-  local option=${2:-}
-  print_info "Download docker image: $1"
-  xtrace on
-  docker pull $1 $option
-  xtrace off
-  checkInteractiveMode
-}
-
-function showDockerHistoryUsage() {
-  print_info "Show docker history usage"  
-  xtrace on
-  docker history --help
-  xtrace off
-  checkInteractiveMode
-}
-
-function showImageHistory() {
-  local option=${2:-}
-  print_info "Show docker image history: $1"
-  xtrace on
-  docker history $1 $option
-  xtrace off
-  checkInteractiveMode
-}
-
-function removeImages() {
-  print_info "Remove images: $@"
-  xtrace on
-  docker rmi $@
-  xtrace off
-  checkInteractiveMode
+  docker_utils::removeImages $IMAGE_PHP $IMAGE_PHP_APACHE
 }
 
 function main() {
@@ -76,11 +41,11 @@ function main() {
   checkArguments $@
   initialize
 
-  downloadDockerImage $IMAGE_PHP
-  downloadDockerImage $IMAGE_PHP_APACHE
+  docker_utils::pullImage $IMAGE_PHP
+  docker_utils::pullImage $IMAGE_PHP_APACHE
   
-  showImageHistory $IMAGE_PHP
-  showImageHistory $IMAGE_PHP_APACHE
+  docker_utils::getImageHistory $IMAGE_PHP
+  docker_utils::getImageHistory $IMAGE_PHP_APACHE
 
   checkCleanupMode
   print_done "Poc completed successfully "

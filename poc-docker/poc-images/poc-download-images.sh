@@ -34,42 +34,7 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  removeImages $IMAGE_ALPINE $IMAGE_ALPINE_3_7 $IMAGE_ALPINE_3_8
-}
-
-
-function showDockerPullUsage() {
-  print_info "Show docker pull usage"  
-  xtrace on
-  docker pull --help
-  xtrace off
-  checkInteractiveMode
-}
-
-function downloadDockerImage() {
-  local option=${2:-}
-  print_info "Download docker image: $1"
-  xtrace on
-  docker pull $1 $option
-  xtrace off
-  checkInteractiveMode
-}
-
-function showImageHistory() {
-  local option=${2:-}
-  print_info "Show docker image history: $1"
-  xtrace on
-  docker history $1 $option
-  xtrace off
-  checkInteractiveMode
-}
-
-function removeImages() {
-  print_info "Remove images: $@"
-  xtrace on
-  docker rmi $@
-  xtrace off
-  checkInteractiveMode
+  docker_utils::removeImages $IMAGE_ALPINE $IMAGE_ALPINE_3_7 $IMAGE_ALPINE_3_8
 }
 
 function main() {
@@ -77,16 +42,16 @@ function main() {
   checkArguments $@
 
   initialize
-  showDockerPullUsage
+  docker_utils::showPullUsage
 
-  downloadDockerImage $IMAGE_ALPINE
-  showImageHistory $IMAGE_ALPINE
+  docker_utils::pullImage $IMAGE_ALPINE
+  docker_utils::getImageHistory $IMAGE_ALPINE
 
-  downloadDockerImage $IMAGE_ALPINE_3_7
-  showImageHistory $IMAGE_ALPINE_3_7
+  docker_utils::pullImage $IMAGE_ALPINE_3_7
+  docker_utils::getImageHistory $IMAGE_ALPINE_3_7
 
-  downloadDockerImage $IMAGE_ALPINE_3_8 "-q"
-  showImageHistory $IMAGE_ALPINE_3_7
+  docker_utils::pullImage $IMAGE_ALPINE_3_8 "-q"
+  docker_utils::getImageHistory $IMAGE_ALPINE_3_7
   
   checkCleanupMode
   print_done "Poc completed successfully "

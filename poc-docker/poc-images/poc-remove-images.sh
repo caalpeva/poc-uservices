@@ -42,12 +42,14 @@ function main() {
   checkArguments $@
 
   initialize
-  docker_utils::showImagesUsage
-  docker_utils::getImages
 
   docker_utils::pullImage $IMAGE_ALPINE
   docker_utils::pullImage $IMAGE_UBUNTU
   docker_utils::pullImage $IMAGE_HTTPD
+  docker_utils::getImages "-a"
+  docker_utils::getImages "-aq"
+
+  docker_utils::removeAllImages
   docker_utils::getImages
   
   checkCleanupMode

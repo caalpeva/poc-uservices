@@ -32,33 +32,7 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  removeImages $IMAGE
-}
-
-
-function showDockerImageList() {
-  local option=${1:-}
-  print_info "Show docker images"  
-  xtrace on
-  docker images $option
-  xtrace off
-  checkInteractiveMode
-}
-
-function createImageFromDockerfile() {
-  print_info "Create image from Dockerfile"  
-  xtrace on
-  docker build -t $1 $2
-  xtrace off
-  checkInteractiveMode
-}
-
-function removeImages() {
-  print_info "Remove images: $@"
-  xtrace on
-  docker rmi $@
-  xtrace off
-  checkInteractiveMode
+  docker_utils::removeImages $IMAGE
 }
 
 function main() {
@@ -66,15 +40,15 @@ function main() {
   checkArguments $@
   initialize
 
-  showDockerImageList
-  createImageFromDockerfile $IMAGE $DIR
+  docker_utils::getImages
+  docker_utils::createImageFromDockerfile $IMAGE $DIR
 
-  showDockerImageList
+  docker_utils::getImages
   echo -e "The images that appear with labels <none>:<none> when executing the docker images command are dangling images."
   echo -e "These images should be deleted to free up space because they will no longer be used."
   checkInteractiveMode
 
-  showDockerImageList "-a"
+  docker_utils::getImages "-a"
   echo -e "The images that appear with labels <none>:<none> when executing the docker images -a command are intermediate images."
   echo -e "Intermediate images are generated every time a new image is created from a dockerfile."
   echo -e "These images can only be deleted when the image on which they depend is eliminated."

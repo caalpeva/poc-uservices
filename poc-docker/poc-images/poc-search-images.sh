@@ -35,38 +35,14 @@ function cleanup() {
   print_debug "Cleaning environment..."
 }
 
-
-function showDockerSearchUsage() {
-  print_info "Show docker search usage"  
-  xtrace on
-  docker search --help
-  xtrace off
-  checkInteractiveMode
-}
-
-function searchDockerImage() {
-  print_info "Search docker image: $1"
-  xtrace on
-  docker search $1 --limit 5
-  xtrace off
-  checkInteractiveMode
-}
-
-function searchDockerOfficialImage() {
-  print_info "Search docker official image: $1"
-  xtrace on
-  docker search --filter is-official=true $1
-  xtrace off
-}
-
 function main() {
   print_debug "$(basename $0) [PID = $$]"
   checkArguments $@
 
   initialize
-  showDockerSearchUsage
-  searchDockerImage "alpine"
-  searchDockerOfficialImage "alpine"
+  docker_utils::showSearchUsage
+  docker_utils::searchImages "alpine"
+  docker_utils::searchOfficialImage "alpine"
 
   checkCleanupMode
   print_done "Poc completed successfully "

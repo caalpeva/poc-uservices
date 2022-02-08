@@ -1,9 +1,112 @@
 #!/bin/echo "source me !"
 # Requires: /../../dependencies/downloads/poc-bash-master/includes/print-utils.src
 # 	    /../../dependencies/downloads/poc-bash-master/includes/trace-utils.src
+#           /../../utils/microservices-utils.src
+
+##########################
+#  BASIC DOCKER METHODS  #
+##########################
+
+function docker_utils::showSearchUsage() {
+  print_info "Show docker search usage"  
+  xtrace on
+  docker search --help
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::searchImages() {
+  print_info "Search docker image: $1"
+  xtrace on
+  docker search $1 --limit 5
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::searchOfficialImage() {
+  print_info "Search docker official image: $1"
+  xtrace on
+  docker search --filter is-official=true $1
+  xtrace off
+}
+
+function docker_utils::showPullUsage() {
+  print_info "Show docker pull usage"  
+  xtrace on
+  docker pull --help
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::pullImage() {
+  local option=${2:-}
+  print_info "Download docker image: $1"
+  xtrace on
+  docker pull $1 $option
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::showHistoryUsage() {
+  print_info "Show docker history usage"  
+  xtrace on
+  docker history --help
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::getImageHistory() {
+  local option=${2:-}
+  print_info "Show docker image history: $1"
+  xtrace on
+  docker history $1 $option
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::showImagesUsage() {
+  print_info "Show docker images usage"  
+  xtrace on
+  docker images --help
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::getImages() {
+  local option=${1:-}
+  print_info "Show docker images"  
+  xtrace on
+  docker images $option
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::createImageFromDockerfile() {
+  print_info "Create image from Dockerfile"  
+  xtrace on
+  docker build -t $1 $2
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::removeImages() {
+  print_info "Remove images: $*"
+  xtrace on
+  docker rmi $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::removeAllImages() {
+  print_info "Removing all images..."
+  xtrace on
+  docker rmi $(docker images -aq)
+  xtrace off
+  checkInteractiveMode
+}
 
 ##############################
-#  DOCKER AUXILIARY METHODS  #
+#  AUXILIARY DOCKER METHODS  #
 ##############################
 
 function docker_utils::showContainersByPrefix {
