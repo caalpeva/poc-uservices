@@ -1,0 +1,31 @@
+[36m2022-02-08 17:17:56,627 [DEBUG] poc-search-images.sh [PID = 18945][0m
+[36m2022-02-08 17:17:56,629 [DEBUG] Checking arguments (1)...[0m
+[33m2022-02-08 17:17:56,632 [INFO] Preparing poc environment...[0m
+[33m2022-02-08 17:17:56,637 [INFO] Setting terminal signals...[0m
+[36m2022-02-08 17:17:56,639 [DEBUG] Cleaning environment...[0m
+[33m2022-02-08 17:17:56,640 [INFO] Show docker search usage[0m
++ docker search --help
+
+Usage:  docker search [OPTIONS] TERM
+
+Search the Docker Hub for images
+
+Options:
+  -f, --filter filter   Filter output based on conditions provided
+      --format string   Pretty-print search using a Go template
+      --limit int       Max number of search results (default 25)
+      --no-trunc        Don't truncate output
+[33m2022-02-08 17:17:56,866 [INFO] Search docker image: alpine[0m
++ docker search alpine --limit 5
+NAME                         DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
+alpine                       A minimal Docker image based on Alpine Linux…   8434      [OK]       
+anapsix/alpine-java          Oracle Java 8 (and 7) with GLIBC 2.28 over A…   478                  [OK]
+alpine/git                   A  simple git container running in alpine li…   194                  [OK]
+yobasystems/alpine-mariadb   MariaDB running on Alpine Linux [docker] [am…   106                  [OK]
+byrnedo/alpine-curl          Alpine linux with curl installed and set as …   35                   [OK]
+[33m2022-02-08 17:17:57,499 [INFO] Search docker official image: alpine[0m
++ docker search --filter is-official=true alpine
+NAME      DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
+alpine    A minimal Docker image based on Alpine Linux…   8434      [OK]       
+[36m2022-02-08 17:17:58,158 [DEBUG] Cleaning environment...[0m
+[32m2022-02-08 17:17:58,159 [DONE] Poc completed successfully [0m

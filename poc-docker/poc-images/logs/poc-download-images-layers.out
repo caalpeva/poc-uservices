@@ -1,0 +1,190 @@
+[36m2022-02-08 17:20:33,852 [DEBUG] poc-download-images-layers.sh [PID = 19369][0m
+[36m2022-02-08 17:20:33,854 [DEBUG] Checking arguments (2)...[0m
+[33m2022-02-08 17:20:33,855 [INFO] Preparing poc environment...[0m
+[33m2022-02-08 17:20:33,857 [INFO] Setting terminal signals...[0m
+[36m2022-02-08 17:20:33,859 [DEBUG] Cleaning environment...[0m
+[33m2022-02-08 17:20:33,867 [INFO] Remove images: php[0m
++ docker rmi php php:apache
+Untagged: php:latest
+Untagged: php@sha256:f1d66b530e99d2e3c2ea302523c5a10ae9e666ddb5ceaacb7dda0af20c7976d7
+Deleted: sha256:5a1c7b10c43ef6263388350e08e516253a5a5dc5479ba76ff674e7685a51fab7
+Deleted: sha256:609b5a592460cb9f69ef2f61b2134266bdcf061e4203d942903fd6dfc89c69b8
+Deleted: sha256:af9abc4fe0f50859d24e4dba5a8b7e55593d2982868962c1f16bd694f99c64c0
+Deleted: sha256:b91f582ddab27a28f46365fa0a2692d649e58cca2a5bd7ea82dd91ad81f0bf48
+Deleted: sha256:81581553db0203900ed602cad211440c0cfb6517501aba7492928d3ef15d8fdb
+Deleted: sha256:de7b2d59000089cd238238c740c6211b0bcf0e89c4d097954c7284931c76d53f
+Untagged: php:apache
+Untagged: php@sha256:6db15b73781c2caf1ce974a4b6f8e29b8abc3a3dded82289a5797059d380bd49
+Deleted: sha256:a3e1df81efc8ec43da639b1cb92db472d2057b07c66e6cce62c99b0c96cea781
+Deleted: sha256:2d8d20461b0d1403d6c0d48161ccf5bc61290b31760d6bdaaa1db577d47ed797
+Deleted: sha256:be0ece4ca7c75a7192bd022ad7d5f71021839caa8cb3258aeb0cee6688825411
+Deleted: sha256:0515b01c61b1f35221701249c3905982aef9e8204918889197077a248bcacfb2
+Deleted: sha256:04821be1c1329ca05b29aa1a21d365123dfa1ca9e60000940cf5beed457ce96a
+Deleted: sha256:6e67678764305c11bbb18b1505cd599627f332f0d18f4a3f315bcb882c25cc8a
+Deleted: sha256:cf47f20f230bcc545d6061ac2196d56c964d8efd13aa80686d3a274a17486066
+Deleted: sha256:c184aeb8f36b7ef2ed0affb145a550c420d6a54483d3e8f658861f223f70b9d9
+Deleted: sha256:6f549e139df57621cca4b412fdc0baf08bba8f74a8195a0d5eab248f3494b3ed
+Deleted: sha256:9fa765b0eff3f10d733d998e3fec335bf7d8ad3e6a86939389c0622b11040209
+Deleted: sha256:0f9afd7a5ebdae33f357119da609fe150a0197e584d7fe5f6d4f9d5386e5351b
+Deleted: sha256:f3beb158606604e0b8264109cb5f0fdde00af23698a42b5bc9f8f8a8d56e7b34
+Deleted: sha256:2629ef3e2048889e91ca0133a43eb26db1b2de74dbb0e4135c457279b41c6403
+Deleted: sha256:7d0ebbe3f5d26c1b5ec4d5dbb6fe3205d7061f9735080b0162d550530328abd6
+[33m2022-02-08 17:20:35,087 [INFO] Download docker image: php[0m
++ docker pull php
+Using default tag: latest
+latest: Pulling from library/php
+5eb5b503b376: Pulling fs layer
+8b1ad84cf101: Pulling fs layer
+38c937dadeb7: Pulling fs layer
+6a2f1dc96e59: Pulling fs layer
+09f78174268e: Pulling fs layer
+789f1e9593c6: Pulling fs layer
+cefa19191812: Pulling fs layer
+6773fb0526e7: Pulling fs layer
+e0dc0a9c3fe9: Pulling fs layer
+6a2f1dc96e59: Waiting
+09f78174268e: Waiting
+789f1e9593c6: Waiting
+cefa19191812: Waiting
+6773fb0526e7: Waiting
+e0dc0a9c3fe9: Waiting
+8b1ad84cf101: Verifying Checksum
+8b1ad84cf101: Download complete
+6a2f1dc96e59: Verifying Checksum
+6a2f1dc96e59: Download complete
+09f78174268e: Verifying Checksum
+09f78174268e: Download complete
+789f1e9593c6: Verifying Checksum
+789f1e9593c6: Download complete
+cefa19191812: Verifying Checksum
+cefa19191812: Download complete
+6773fb0526e7: Verifying Checksum
+6773fb0526e7: Download complete
+5eb5b503b376: Verifying Checksum
+5eb5b503b376: Download complete
+e0dc0a9c3fe9: Verifying Checksum
+e0dc0a9c3fe9: Download complete
+5eb5b503b376: Pull complete
+38c937dadeb7: Verifying Checksum
+38c937dadeb7: Download complete
+8b1ad84cf101: Pull complete
+38c937dadeb7: Pull complete
+6a2f1dc96e59: Pull complete
+09f78174268e: Pull complete
+789f1e9593c6: Pull complete
+cefa19191812: Pull complete
+6773fb0526e7: Pull complete
+e0dc0a9c3fe9: Pull complete
+Digest: sha256:f1d66b530e99d2e3c2ea302523c5a10ae9e666ddb5ceaacb7dda0af20c7976d7
+Status: Downloaded newer image for php:latest
+docker.io/library/php:latest
+[33m2022-02-08 17:21:14,269 [INFO] Download docker image: php:apache[0m
++ docker pull php:apache
+apache: Pulling from library/php
+5eb5b503b376: Already exists
+8b1ad84cf101: Already exists
+38c937dadeb7: Already exists
+6a2f1dc96e59: Already exists
+f8c3f82c39d4: Pulling fs layer
+90fc6462bd8e: Pulling fs layer
+c670d99116c9: Pulling fs layer
+7417340f9ffb: Pulling fs layer
+934cb07dd1ba: Pulling fs layer
+eb65be9d9b71: Pulling fs layer
+f184af839cf9: Pulling fs layer
+94bc7f9d05e0: Pulling fs layer
+79fa6524e676: Pulling fs layer
+7417340f9ffb: Waiting
+934cb07dd1ba: Waiting
+eb65be9d9b71: Waiting
+f184af839cf9: Waiting
+94bc7f9d05e0: Waiting
+79fa6524e676: Waiting
+90fc6462bd8e: Verifying Checksum
+90fc6462bd8e: Download complete
+c670d99116c9: Verifying Checksum
+c670d99116c9: Download complete
+934cb07dd1ba: Verifying Checksum
+934cb07dd1ba: Download complete
+7417340f9ffb: Verifying Checksum
+7417340f9ffb: Download complete
+eb65be9d9b71: Verifying Checksum
+eb65be9d9b71: Download complete
+f8c3f82c39d4: Verifying Checksum
+f8c3f82c39d4: Download complete
+f184af839cf9: Verifying Checksum
+f184af839cf9: Download complete
+94bc7f9d05e0: Verifying Checksum
+94bc7f9d05e0: Download complete
+79fa6524e676: Verifying Checksum
+79fa6524e676: Download complete
+f8c3f82c39d4: Pull complete
+90fc6462bd8e: Pull complete
+c670d99116c9: Pull complete
+7417340f9ffb: Pull complete
+934cb07dd1ba: Pull complete
+eb65be9d9b71: Pull complete
+f184af839cf9: Pull complete
+94bc7f9d05e0: Pull complete
+79fa6524e676: Pull complete
+Digest: sha256:6db15b73781c2caf1ce974a4b6f8e29b8abc3a3dded82289a5797059d380bd49
+Status: Downloaded newer image for php:apache
+docker.io/library/php:apache
+[33m2022-02-08 17:21:31,151 [INFO] Show docker image history: php[0m
++ docker history php
+IMAGE          CREATED       CREATED BY                                      SIZE      COMMENT
+5a1c7b10c43e   13 days ago   /bin/sh -c #(nop)  CMD ["php" "-a"]             0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENTRYPOINT ["docker-php-e…   0B        
+<missing>      13 days ago   /bin/sh -c docker-php-ext-enable sodium         17B       
+<missing>      13 days ago   /bin/sh -c #(nop) COPY multi:a00980ff863125d…   6.86kB    
+<missing>      13 days ago   /bin/sh -c set -eux;   savedAptMark="$(apt-m…   121MB     
+<missing>      13 days ago   /bin/sh -c #(nop) COPY file:ce57c04b70896f77…   587B      
+<missing>      13 days ago   /bin/sh -c set -eux;   savedAptMark="$(apt-m…   12.9MB    
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_SHA256=6b448242fd…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_URL=https://www.p…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_VERSION=8.1.2        0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV GPG_KEYS=528995BFEDFB…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_LDFLAGS=-Wl,-O1 -…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_CPPFLAGS=-fstack-…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_CFLAGS=-fstack-pr…   0B        
+<missing>      13 days ago   /bin/sh -c set -eux;  mkdir -p "$PHP_INI_DIR…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_INI_DIR=/usr/loca…   0B        
+<missing>      13 days ago   /bin/sh -c set -eux;  apt-get update;  apt-g…   269MB     
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHPIZE_DEPS=autoconf …   0B        
+<missing>      13 days ago   /bin/sh -c set -eux;  {   echo 'Package: php…   46B       
+<missing>      13 days ago   /bin/sh -c #(nop)  CMD ["bash"]                 0B        
+<missing>      13 days ago   /bin/sh -c #(nop) ADD file:90495c24c897ec479…   80.4MB    
+[33m2022-02-08 17:21:31,337 [INFO] Show docker image history: php:apache[0m
++ docker history php:apache
+IMAGE          CREATED       CREATED BY                                      SIZE      COMMENT
+a3e1df81efc8   13 days ago   /bin/sh -c #(nop)  CMD ["apache2-foreground"]   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  EXPOSE 80                    0B        
+<missing>      13 days ago   /bin/sh -c #(nop) WORKDIR /var/www/html         0B        
+<missing>      13 days ago   /bin/sh -c #(nop) COPY file:e3123fcb6566efa9…   1.35kB    
+<missing>      13 days ago   /bin/sh -c #(nop)  STOPSIGNAL SIGWINCH          0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENTRYPOINT ["docker-php-e…   0B        
+<missing>      13 days ago   /bin/sh -c docker-php-ext-enable sodium         17B       
+<missing>      13 days ago   /bin/sh -c #(nop) COPY multi:ee8b9bb4e448c5d…   6.87kB    
+<missing>      13 days ago   /bin/sh -c set -eux;   savedAptMark="$(apt-m…   67.3MB    
+<missing>      13 days ago   /bin/sh -c #(nop) COPY file:ce57c04b70896f77…   587B      
+<missing>      13 days ago   /bin/sh -c set -eux;   savedAptMark="$(apt-m…   13MB      
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_SHA256=6b448242fd…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_URL=https://www.p…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_VERSION=8.1.2        0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV GPG_KEYS=528995BFEDFB…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_LDFLAGS=-Wl,-O1 -…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_CPPFLAGS=-fstack-…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_CFLAGS=-fstack-pr…   0B        
+<missing>      13 days ago   /bin/sh -c {   echo '<FilesMatch \.php$>';  …   237B      
+<missing>      13 days ago   /bin/sh -c a2dismod mpm_event && a2enmod mpm…   68B       
+<missing>      13 days ago   /bin/sh -c set -eux;  apt-get update;  apt-g…   47.5MB    
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV APACHE_ENVVARS=/etc/a…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV APACHE_CONFDIR=/etc/a…   0B        
+<missing>      13 days ago   /bin/sh -c set -eux;  mkdir -p "$PHP_INI_DIR…   0B        
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHP_INI_DIR=/usr/loca…   0B        
+<missing>      13 days ago   /bin/sh -c set -eux;  apt-get update;  apt-g…   269MB     
+<missing>      13 days ago   /bin/sh -c #(nop)  ENV PHPIZE_DEPS=autoconf …   0B        
+<missing>      13 days ago   /bin/sh -c set -eux;  {   echo 'Package: php…   46B       
+<missing>      13 days ago   /bin/sh -c #(nop)  CMD ["bash"]                 0B        
+<missing>      13 days ago   /bin/sh -c #(nop) ADD file:90495c24c897ec479…   80.4MB    
+[32m2022-02-08 17:21:31,434 [DONE] Poc completed successfully [0m

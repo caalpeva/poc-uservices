@@ -11,8 +11,8 @@ source "${DIR}/../utils/docker-utils.src"
 # VARIABLES #
 #############
 
-CONTAINER_PREFIX="poc_ubuntu_top$(date '+%Y%m%d')"
-CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
+IMAGE_PHP="php"
+IMAGE_PHP_APACHE="$IMAGE_PHP:apache"
 
 #############
 # FUNCTIONS #
@@ -33,6 +33,7 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
+  removeImages $IMAGE_PHP $IMAGE_PHP_APACHE
 }
 
 
@@ -62,16 +63,24 @@ function showImageHistory() {
   checkInteractiveMode
 }
 
+function removeImages() {
+  print_info "Remove images: $@"
+  xtrace on
+  docker rmi $@
+  xtrace off
+  checkInteractiveMode
+}
+
 function main() {
   print_debug "$(basename $0) [PID = $$]"
   checkArguments $@
-
   initialize
-  local image="php"
-  downloadDockerImage $image
-  downloadDockerImage "$image:apache"
-  showImageHistory $image
-  showImageHistory "$image:apache"
+
+  downloadDockerImage $IMAGE_PHP
+  downloadDockerImage $IMAGE_PHP_APACHE
+  
+  showImageHistory $IMAGE_PHP
+  showImageHistory $IMAGE_PHP_APACHE
 
   checkCleanupMode
   print_done "Poc completed successfully "

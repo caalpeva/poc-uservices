@@ -11,8 +11,9 @@ source "${DIR}/../utils/docker-utils.src"
 # VARIABLES #
 #############
 
-CONTAINER_PREFIX="poc_ubuntu_top$(date '+%Y%m%d')"
-CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
+IMAGE_ALPINE="alpine"
+IMAGE_ALPINE_3_7="$IMAGE_ALPINE:3.7"
+IMAGE_ALPINE_3_8="$IMAGE_ALPINE:3.8"
 
 #############
 # FUNCTIONS #
@@ -33,6 +34,7 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
+  removeImages $IMAGE_ALPINE $IMAGE_ALPINE_3_7 $IMAGE_ALPINE_3_8
 }
 
 
@@ -62,6 +64,14 @@ function showImageHistory() {
   checkInteractiveMode
 }
 
+function removeImages() {
+  print_info "Remove images: $@"
+  xtrace on
+  docker rmi $@
+  xtrace off
+  checkInteractiveMode
+}
+
 function main() {
   print_debug "$(basename $0) [PID = $$]"
   checkArguments $@
@@ -69,13 +79,14 @@ function main() {
   initialize
   showDockerPullUsage
 
-  local image="alpine"
-  downloadDockerImage $image
-  showImageHistory $image
-  downloadDockerImage "$image:3.7"
-  showImageHistory "$image:3.7"
-  downloadDockerImage "$image:3.8" "-q"
-  showImageHistory "$image:3.8"
+  downloadDockerImage $IMAGE_ALPINE
+  showImageHistory $IMAGE_ALPINE
+
+  downloadDockerImage $IMAGE_ALPINE_3_7
+  showImageHistory $IMAGE_ALPINE_3_7
+
+  downloadDockerImage $IMAGE_ALPINE_3_8 "-q"
+  showImageHistory $IMAGE_ALPINE_3_7
   
   checkCleanupMode
   print_done "Poc completed successfully "
