@@ -153,6 +153,14 @@ function docker_utils::getAllContainerIdsByPrefix {
   xtrace off
 }
 
+function docker_utils::showLogs() {
+  xtrace on
+  docker logs $1
+  xtrace off
+
+  checkInteractiveMode
+}
+
 function docker_utils::removeContainersOneByOne() {
   echo "Containers: $*"
   if [ $# -gt 0 ]
@@ -190,5 +198,25 @@ function docker_utils::getFirstHostPortFromContainerData {
   xtrace on
   docker inspect --format "{{ (index (index .NetworkSettings.Ports \"$2/tcp\") 0).HostPort }}" $1
   xtrace off
+}
+
+function docker_utils::attachContainer() {
+  xtrace on
+  docker attach $1
+  xtrace off
+}
+
+function docker_utils::execContainer() {
+  xtrace on
+  docker exec $1 $2
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::execContainerWithTty() {
+  xtrace on
+  docker exec -it $1 $2
+  xtrace off
+  checkInteractiveMode
 }
 
