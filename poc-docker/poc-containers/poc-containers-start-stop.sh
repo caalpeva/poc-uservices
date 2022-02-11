@@ -2,22 +2,25 @@
 
 DIR=$(dirname $(readlink -f $0))
 
+source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../utils/microservices-utils.src"
 source "${DIR}/../utils/docker-utils.src"
 
-CONTAINER_PREFIX="poc_ubuntu_top$(date '+%Y%m%d')"
+#CONTAINER_PREFIX="poc_ubuntu_top_$(date '+%Y%m%d')"
+CONTAINER_PREFIX="poc_ubuntu_top"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
 CONTAINER2_NAME="${CONTAINER_PREFIX}_2"
 CONTAINER3_NAME="${CONTAINER_PREFIX}_3"
 CONTAINER4_NAME="${CONTAINER_PREFIX}_4"
 
-
-function initialize {
+function initialize() {
   print_info "Preparing poc environment..."
-  trap handleTermSignal INT QUIT TERM KILL
+  setTerminalSignals
   cleanup
 }
 
-function handleTermSignal {
+function handleTermSignal() {
   xtrace off
   print_warn "Handling termination signal..."
   cleanup
@@ -25,19 +28,9 @@ function handleTermSignal {
 }
 
 function cleanup {  
+  print_debug "Cleaning environment..."   
   containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  echo "Containers: ${containers[@]}"
-  echo "Count: ${#containers[@]}"
-  if [ ${#containers[@]} -gt 0 ]
-  then
-    print_debug "Se necesita limpiar"
-    for containerId in ${containers[@]}
-    do
-      xtrace on
-      docker rm -f $containerId
-      xtrace off
-    done
-  fi
+  docker_utils::removeContainers ${containers[*]}
 }
 
 function executeContainers {
@@ -48,12 +41,12 @@ function executeContainers {
     ubuntu /usr/bin/top -b
 
   docker run -dit \
-    --name ${CONTAINER3_NAME} \
+    --rm \
+    --name ${CONTAINER2_NAME} \
     ubuntu /usr/bin/top -b
 
   docker run -dit \
-    --rm \
-    --name ${CONTAINER2_NAME} \
+    --name ${CONTAINER3_NAME} \
     ubuntu /usr/bin/top -b
   
   docker run -dit \
@@ -89,9 +82,10 @@ function stopContainers {
 
 function main {
   print_info "$(basename $0) [PID = $$]"
+  checkArguments $@
   initialize
-  executeContainers
 
+  executeContainers
   print_info "Check containers status..."
   docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
   stopContainers
@@ -103,12 +97,7 @@ function main {
   print_info "Check containers status after startup..."
   docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
 
-  print_info "Cleanup containers..."
-  cleanup
-
-  print_info "Check containers status after cleanup..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
-
+  checkCleanupMode
   print_done "Poc completed successfully "
   exit 0
 }

@@ -109,9 +109,23 @@ function docker_utils::removeAllImages() {
 #  AUXILIARY DOCKER METHODS  #
 ##############################
 
-function docker_utils::showContainersByPrefix {
-  docker ps -a | head -1
+function docker_utils::getContainerStatus() {
+  xtrace on
+  docker ps -a
+  xtrace off
+}
+
+function docker_utils::getContainerStatusByPrefix() {
+  xtrace on
   docker ps -a | grep $1
+  xtrace off
+}
+
+function docker_utils::showContainersByPrefix {
+  status=$(docker_utils::getContainerStatusByPrefix $1)
+  docker ps -a | head -1
+  echo "$status"
+  checkInteractiveMode
 }
 
 function docker_utils::getContainerLongIdByName() {
@@ -137,6 +151,29 @@ function docker_utils::getAllContainerIdsByPrefix {
   xtrace on
   docker ps -aqf "name=^$1*"
   xtrace off
+}
+
+function docker_utils::removeContainersOneByOne() {
+  echo "Containers: $*"
+  if [ $# -gt 0 ]
+  then
+    for containerId in $@
+    do
+      xtrace on
+      docker rm -f $containerId
+      xtrace off
+    done
+  fi
+}
+
+function docker_utils::removeContainers() {
+  echo "Containers: $*"
+  if [ $# -gt 0 ]
+  then
+      xtrace on
+      docker rm -f $*
+      xtrace off
+  fi
 }
 
 function docker_utils::removeAllContainers {
