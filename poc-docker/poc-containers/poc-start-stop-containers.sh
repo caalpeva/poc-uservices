@@ -7,7 +7,6 @@ source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils
 source "${DIR}/../../utils/microservices-utils.src"
 source "${DIR}/../utils/docker-utils.src"
 
-#CONTAINER_PREFIX="poc_ubuntu_top_$(date '+%Y%m%d')"
 CONTAINER_PREFIX="poc_ubuntu_top"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
 CONTAINER2_NAME="${CONTAINER_PREFIX}_2"
@@ -27,14 +26,14 @@ function handleTermSignal() {
   exit 1
 }
 
-function cleanup {  
-  print_debug "Cleaning environment..."   
+function cleanup {
+  print_debug "Cleaning environment..."
   containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
   docker_utils::removeContainers ${containers[*]}
 }
 
 function executeContainers {
-  print_info "Execute containers..."  
+  print_info "Execute containers..."
   xtrace on
   docker run -dit \
     --name ${CONTAINER1_NAME} \
@@ -48,7 +47,7 @@ function executeContainers {
   docker run -dit \
     --name ${CONTAINER3_NAME} \
     ubuntu /usr/bin/top -b
-  
+
   docker run -dit \
     --rm \
     --name ${CONTAINER4_NAME} \

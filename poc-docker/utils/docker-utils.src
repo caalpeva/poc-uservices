@@ -8,7 +8,7 @@
 ##########################
 
 function docker_utils::showSearchUsage() {
-  print_info "Show docker search usage"  
+  print_info "Show docker search usage"
   xtrace on
   docker search --help
   xtrace off
@@ -31,7 +31,7 @@ function docker_utils::searchOfficialImage() {
 }
 
 function docker_utils::showPullUsage() {
-  print_info "Show docker pull usage"  
+  print_info "Show docker pull usage"
   xtrace on
   docker pull --help
   xtrace off
@@ -48,7 +48,7 @@ function docker_utils::pullImage() {
 }
 
 function docker_utils::showHistoryUsage() {
-  print_info "Show docker history usage"  
+  print_info "Show docker history usage"
   xtrace on
   docker history --help
   xtrace off
@@ -65,7 +65,7 @@ function docker_utils::getImageHistory() {
 }
 
 function docker_utils::showImagesUsage() {
-  print_info "Show docker images usage"  
+  print_info "Show docker images usage"
   xtrace on
   docker images --help
   xtrace off
@@ -74,7 +74,7 @@ function docker_utils::showImagesUsage() {
 
 function docker_utils::getImages() {
   local option=${1:-}
-  print_info "Show docker images"  
+  print_info "Show docker images"
   xtrace on
   docker images $option
   xtrace off
@@ -82,7 +82,7 @@ function docker_utils::getImages() {
 }
 
 function docker_utils::createImageFromDockerfile() {
-  print_info "Create image from Dockerfile"  
+  print_info "Create image from Dockerfile"
   xtrace on
   docker build -t $1 $2
   xtrace off
@@ -101,6 +101,13 @@ function docker_utils::removeAllImages() {
   print_info "Removing all images..."
   xtrace on
   docker rmi $(docker images -aq)
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::copyFiles() {
+  xtrace on
+  docker cp $1 $2
   xtrace off
   checkInteractiveMode
 }
@@ -143,7 +150,7 @@ function docker_utils::getExitedContainerIdsByPrefix {
   docker ps -q \
     --filter "status=exited" \
     --filter "name=^$1*"
-  xtrace off   
+  xtrace off
 }
 
 function docker_utils::getAllContainerIdsByPrefix {
@@ -219,4 +226,3 @@ function docker_utils::execContainerWithTty() {
   xtrace off
   checkInteractiveMode
 }
-
