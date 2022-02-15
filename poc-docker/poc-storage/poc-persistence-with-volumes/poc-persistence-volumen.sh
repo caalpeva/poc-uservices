@@ -2,10 +2,10 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../../utils/microservices-utils.src"
+source "${DIR}/../../utils/docker-utils.src"
 
 CONTAINER_PREFIX="poc_nginx"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"

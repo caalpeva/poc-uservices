@@ -207,6 +207,14 @@ function docker_utils::getFirstHostPortFromContainerData {
   xtrace off
 }
 
+function docker_utils::getContainerMounts() {
+  print_info "Checking mounts from container $1..."
+  xtrace on
+  docker inspect -f '{{ json .Mounts }}' $1
+  xtrace off
+  checkInteractiveMode
+}
+
 function docker_utils::attachContainer() {
   xtrace on
   docker attach $1
@@ -225,4 +233,28 @@ function docker_utils::execContainerWithTty() {
   docker exec -it $1 $2
   xtrace off
   checkInteractiveMode
+}
+
+function docker_utils::checkUrl  {
+  command="curl $1"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
+function docker_utils::checkHttpServerAvailability  {
+  declare -i result=0
+  print_info "Check that the Http server from $1 is available..."
+  print_debug "Extract host port from container data..."
+  port=$(docker_utils::getFirstHostPortFromContainerData $1 ${CONTAINER_HTTP_PORT})
+
+  docker_utils::checkUrl "http://localhost:${port}"
+  if [ $? -ne 0 ]
+  then
+    print_error "Http server from $1 is not available"
+    result=1
+  fi
+
+  checkInteractiveMode
+  return $result
 }
