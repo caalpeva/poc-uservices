@@ -16,8 +16,9 @@ VOLUMEN_NAME="mysql_data"
 
 MYSQL_ROOT_PASSWORD="root"
 MYSQL_DATABASE="CYCLING"
-MYSQL_USER="user"
-MYSQL_PASSWORD="password"
+
+TIMEOUT_SECS=90 # Set timeout in seconds
+INTERVAL_SECS=5   # Set interval (duration) in seconds
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -37,6 +38,61 @@ function cleanup {
   containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
   docker_utils::removeContainers ${containers[*]}
   docker_utils::removeVolumes ${VOLUMEN_NAME}
+}
+
+function checkMysqlAvailable() {
+  isTraceEnabled=${1:-false}
+  if [ $isTraceEnabled = true ]; then
+      xtrace on
+  fi
+
+  docker exec -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
+  ${CONTAINER1_NAME} mysql -uroot -p${MYSQL_ROOT_PASSWORD} \
+  -e "SELECT 1 FROM DUAL" > /dev/null 2>&1
+  # ${CONTAINER1_NAME} mysql -e "SELECT CURDATE()"
+
+  result=$?
+  xtrace off
+  return $result
+}
+
+function waitForMysqlAvailable() {
+  checkMysqlAvailable true
+  local isMysqlAvailable=$?
+
+  print_warn "Waiting for available mysql server..."
+  local endTime=$(( $(date +%s) + $TIMEOUT_SECS )) # Calculate end time.
+  while [ $isMysqlAvailable != 0 -a $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
+    sleep $INTERVAL_SECS
+    checkMysqlAvailable
+    isMysqlAvailable=$?
+  done
+
+  return $isMysqlAvailable
+}
+
+function showTableContents {
+  xtrace on
+  docker exec -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
+  ${CONTAINER1_NAME} mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
+  -e "select * from TEAM"
+
+  docker exec -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
+  ${CONTAINER1_NAME} mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
+  -e "select * from RIDER" 2>&1
+  xtrace off
+
+  checkInteractiveMode
+}
+
+function updateDatabase {
+  xtrace on
+  docker exec -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
+  ${CONTAINER1_NAME} mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
+  -e "source /update.sql"
+  xtrace off
+
+  checkInteractiveMode
 }
 
 function executeContainers {
@@ -73,24 +129,16 @@ function main {
   docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
   docker_utils::getContainerMounts ${CONTAINER1_NAME}
 
-  print_info "Run command in the same running container with tty..."
-  print_debug "Use the shell for example to execute:\n\tmysql -u root -p \t# (password = ${MYSQL_ROOT_PASSWORD})"
-  print_info "-Type exit or press CTRL+D to exit and stop the container"
-  print_info "-Press CTRL+P+Q to keep the container in background"
-  docker_utils::execContainerWithTty ${CONTAINER1_NAME} "/bin/bash"
+  print_info "Check mysql server availability"
+  waitForMysqlAvailable
+  if [ $? -ne 0 ]; then
+    print_error "Timeout. Mysql server unavailable"
+    exit 0
+  fi
 
-  xtrace on
-  docker exec -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
-  -e MYSQL_DATABASE=${MYSQL_DATABASE} \
-  -e MYSQL_USER=root \
-  -e MYSQL_PASSWORD=root \
-  ${CONTAINER1_NAME} "mysql  ${MYSQL_DATABASE} <<< source /update.sql"
-  docker exec -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
-  -e MYSQL_DATABASE=${MYSQL_DATABASE} \
-  -e MYSQL_USER=root \
-  -e MYSQL_PASSWORD=root \
-  ${CONTAINER1_NAME} mysql ${MYSQL_DATABASE} <<< "select * from TEAM"
-  xtrace off
+  showTableContents
+  updateDatabase
+  showTableContents
 
   print_info "Check containers status again..."
   docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
