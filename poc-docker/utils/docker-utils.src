@@ -1,6 +1,7 @@
 #!/bin/echo "source me !"
 # Requires: /../../dependencies/downloads/poc-bash-master/includes/print-utils.src
 # 	    /../../dependencies/downloads/poc-bash-master/includes/trace-utils.src
+#       /../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src
 #           /../../utils/microservices-utils.src
 
 ##########################
