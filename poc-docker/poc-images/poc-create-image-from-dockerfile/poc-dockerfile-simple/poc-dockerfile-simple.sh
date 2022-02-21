@@ -2,16 +2,19 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/docker-utils.src"
-source "${DIR}/../../../utils/microservices-utils.src"
+source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../../utils/docker-utils.src"
+source "${DIR}/../../../../utils/microservices-utils.src"
 
 #############
 # VARIABLES #
 #############
 
-IMAGE="ubuntu-git:1.0"
+IMAGE="poc-ubuntu-git:1.0"
+
+CONTAINER_PREFIX="poc_ubuntu_git"
+CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
 
 #############
 # FUNCTIONS #
@@ -32,7 +35,19 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
+  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker_utils::removeContainers ${containers[*]}
   docker_utils::removeImages $IMAGE
+}
+
+function executeContainer {
+  print_info "Run container..."
+  xtrace on
+  docker run \
+    --name ${CONTAINER1_NAME} \
+    ${IMAGE}
+
+  xtrace off
 }
 
 function main() {
@@ -52,6 +67,9 @@ function main() {
   echo -e "The images that appear with labels <none>:<none> when executing the docker images -a command are intermediate images."
   echo -e "Intermediate images are generated every time a new image is created from a dockerfile."
   echo -e "These images can only be deleted when the image on which they depend is eliminated."
+  checkInteractiveMode
+
+  executeContainer
   checkInteractiveMode
 
   checkCleanupMode
