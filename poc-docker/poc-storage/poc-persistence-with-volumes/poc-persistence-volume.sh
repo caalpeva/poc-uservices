@@ -18,6 +18,8 @@ VOLUMEN_NAME="mysql_data"
 
 MYSQL_ROOT_PASSWORD="root"
 MYSQL_DATABASE="CYCLING"
+MYSQL_USER="user"
+MYSQL_PASSWORD="password"
 
 TIMEOUT_SECS=90 # Set timeout in seconds
 INTERVAL_SECS=5   # Set interval (duration) in seconds
@@ -48,8 +50,7 @@ function checkMysqlAvailable() {
       xtrace on
   fi
 
-  docker exec -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
-  $1 mysql -uroot -p${MYSQL_ROOT_PASSWORD} \
+  docker exec $1 mysql -uroot -p${MYSQL_ROOT_PASSWORD} \
   -e "SELECT 1 FROM DUAL" > /dev/null 2>&1
   # ${CONTAINER1_NAME} mysql -e "SELECT CURDATE()"
 
@@ -74,12 +75,10 @@ function waitForMysqlAvailable() {
 
 function showDatabase {
   xtrace on
-  docker exec -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
-  $1 mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
+  docker exec $1 mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
   --table -e "select * from TEAM"
 
-  docker exec -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
-  $1 mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
+  docker exec $1 mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
   --table -e "select * from RIDER"
   xtrace off
   sleep 1
@@ -89,8 +88,7 @@ function showDatabase {
 
 function updateDatabase {
   xtrace on
-  docker exec -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
-  $1 mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
+  docker exec $1 mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
   -e "source /update.sql"
   xtrace off
   sleep 1
@@ -105,6 +103,8 @@ function executeContainer {
     --name $1 \
     -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
     -e MYSQL_DATABASE=${MYSQL_DATABASE} \
+    -e MYSQL_USER=${MYSQL_USER} \
+    -e MYSQL_PASSWORD=${MYSQL_PASSWORD} \
     -p ${HOST_PORT}:${CONTAINER_PORT} \
     -v ${VOLUMEN_NAME}:/var/lib/mysql \
     -v ${DIR}/scripts/initial:/docker-entrypoint-initdb.d \
