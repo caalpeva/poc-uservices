@@ -82,6 +82,19 @@ function docker_utils::getImages() {
   checkInteractiveMode
 }
 
+function docker_utils::getImagesByPrefix() {
+  xtrace on
+  docker images | grep $1
+  xtrace off
+}
+
+function docker_utils::showImagesByPrefix {
+  status=$(docker_utils::getImagesByPrefix $1)
+  docker images | head -1
+  echo "$status"
+  checkInteractiveMode
+}
+
 function docker_utils::createImageFromDockerfile() {
   print_info "Create image from Dockerfile"
   xtrace on
