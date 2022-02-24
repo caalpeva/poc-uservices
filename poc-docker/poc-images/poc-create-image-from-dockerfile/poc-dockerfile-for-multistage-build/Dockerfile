@@ -1,6 +1,8 @@
 FROM maven:3.5-alpine AS builder
 
-COPY app-maven-basic /app
+LABEL version="1.0" maintainer="<kalpeva@gmail.com>"
+
+COPY app-maven /app
 WORKDIR /app
 
 RUN mvn package

@@ -1,5 +1,6 @@
 FROM ubuntu:latest
-MAINTAINER "prueba@prueba.es"
+
+LABEL version="1.0" maintainer="<kalpeva@gmail.com>"
 
 # install git
 RUN apt-get update && \

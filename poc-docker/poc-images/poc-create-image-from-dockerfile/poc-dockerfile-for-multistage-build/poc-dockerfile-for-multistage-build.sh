@@ -11,10 +11,10 @@ source "${DIR}/../../../../utils/microservices-utils.src"
 # VARIABLES #
 #############
 
-IMAGE="poc-app-maven-basic:1.0"
+IMAGE="poc-app-maven:1.0"
 IMAGE_BUILDER="poc-maven-builder:1.0"
 
-CONTAINER_PREFIX="poc_app_maven_basic"
+CONTAINER_PREFIX="poc_app_maven"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
 
 #############
