@@ -264,6 +264,20 @@ function docker_utils::removeVolumes() {
   xtrace off
 }
 
+function docker_utils::createNetwork() {
+  local options=$1
+  local name=$2
+  xtrace on
+  docker network create $options $name
+  xtrace off
+}
+
+function docker_utils::removeNetwork() {
+  xtrace on
+  docker network rm $*
+  xtrace off
+}
+
 function docker_utils::execContainer() {
   xtrace on
   docker exec $1 $2
