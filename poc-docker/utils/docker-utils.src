@@ -39,6 +39,15 @@ function docker_utils::showPullUsage() {
   checkInteractiveMode
 }
 
+function docker_utils::getNetworkList() {
+  print_info "Show docker networks"
+  xtrace on
+  docker network ls
+  xtrace off
+  checkInteractiveMode
+}
+
+
 function docker_utils::pullImage() {
   local option=${2:-}
   print_info "Download docker image: $1"
@@ -269,6 +278,24 @@ function docker_utils::execContainerWithTty() {
   checkInteractiveMode
 }
 
+function docker_utils::execContainerPing() {
+  from=$1
+  to=$2
+  command="docker exec $from ping $to -c 3"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
+function docker_utils::execContainerPingAsRoot() {
+  from=$1
+  to=$2
+  command="docker exec -u root $from ping $to -c 3"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
 function docker_utils::checkUrl  {
   command="curl $1"
   echo "+ $command"
@@ -291,4 +318,11 @@ function docker_utils::checkHttpServerAvailability  {
 
   checkInteractiveMode
   return $result
+}
+
+function docker_utils::networkInspect() {
+  xtrace on
+  docker network inspect $1 | grep -iE 'subnet|gateway'
+  xtrace off
+  checkInteractiveMode
 }
