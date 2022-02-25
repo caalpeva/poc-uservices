@@ -227,9 +227,17 @@ function docker_utils::removeAllContainers {
 }
 
 function docker_utils::getIpAddressFromContainer {
-  xtrace on
-  docker inspect -f "{{ .NetworkSettings.IPAddress }}" $1
-  xtrace off
+  local container=$1
+  local network=$2
+  if [ -z $network ]; then
+    xtrace on
+    docker inspect -f "{{ .NetworkSettings.IPAddress }}" $container
+    xtrace off
+  else
+    xtrace on
+    docker inspect -f "{{ .NetworkSettings.Networks.$network.IPAddress }}" $container
+    xtrace off
+  fi
 }
 
 function docker_utils::getFirstHostPortFromContainerData {

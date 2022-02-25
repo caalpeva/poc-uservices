@@ -66,7 +66,9 @@ function main {
   CONTAINER2_IP_ADDRESS=$(docker_utils::getIpAddressFromContainer ${CONTAINER2_NAME})
   echo ${CONTAINER2_IP_ADDRESS}
 
-  echo -e "The containers on the default bridge network can only access other containers \non the same network through their IP addresses or using the --link option considered legacy."
+  echo -e "### NOTE ###"
+  echo -e "The containers on the default bridge network can only access other containers \non the same network through their IP addresses or using the --link option, which is considered legacy."
+  echo -e "############"
   checkInteractiveMode
 
   print_info "Check connection from ${CONTAINER1_NAME} to ${CONTAINER2_NAME} by ip address"

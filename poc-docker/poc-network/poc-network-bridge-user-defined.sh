@@ -40,17 +40,17 @@ function cleanup {
 
 function executeMysqlContainer {
   print_info "Execute container ${CONTAINER_MYSQL} with MySQL server"
+  print_debug "With ip address assigned"
   xtrace on
   docker run -d \
     --name ${CONTAINER_MYSQL} \
-    --network ${NETWORK_NAME}\
+    --network ${NETWORK_NAME} \
+    --ip 180.128.10.50 \
     -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
     -v ${DIR}/scripts/initial:/docker-entrypoint-initdb.d \
     mysql:5.7.28
 
   xtrace off
-
-  docker_utils::getContainerMounts ${CONTAINER_MYSQL}
 }
 
 function executePhpMyAdminContainer {
@@ -84,7 +84,18 @@ function main {
   print_info "Check containers status..."
   docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
 
-  echo -e "The containers on the default bridge network can only access other containers \non the same network through their IP addresses or using the --link option considered legacy."
+  docker inspect poc_network_mysql -f "{{ .NetworkSettings.Networks.poc_network.IPAddress }}"
+  print_info "Get ip address from containers"
+  MYSQL_IP_ADDRESS=$(docker_utils::getIpAddressFromContainer ${CONTAINER_MYSQL} ${NETWORK_NAME})
+  echo ${MYSQL_IP_ADDRESS}
+
+  PHPMYADMIN_IP_ADDRESS=$(docker_utils::getIpAddressFromContainer ${CONTAINER_PHPMYADMIN} ${NETWORK_NAME})
+  echo ${PHPMYADMIN_IP_ADDRESS}
+
+  echo -e "### NOTE ###"
+  echo -e "User defined bridges provide automatic DNS resolution between containers on the same network."
+  echo -e "############"
+  checkInteractiveMode
 
   print_info "Install network utils in container ${CONTAINER_PHPMYADMIN}"
   xtrace on
@@ -102,6 +113,7 @@ function main {
 
   checkInteractiveMode
   print_info "Check /etc/hosts file from ${CONTAINER_PHPMYADMIN}"
+  print_debug "No line added in /etc/hosts because network uses DNS and containers can resolve each other by name "
   docker_utils::execContainer ${CONTAINER_PHPMYADMIN} "cat /etc/hosts"
 
   print_info "Check that the ${CONTAINER_PHPMYADMIN} container can connect to the ${CONTAINER_MYSQL} container."

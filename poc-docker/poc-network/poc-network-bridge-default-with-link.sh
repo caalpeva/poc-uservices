@@ -82,7 +82,9 @@ function main {
   MYSQL_IP_ADDRESS=$(docker_utils::getIpAddressFromContainer ${CONTAINER_MYSQL})
   echo ${MYSQL_IP_ADDRESS}
 
+  echo -e "### NOTE ###"
   echo -e "The containers on the default bridge network can only access other containers \non the same network through their IP addresses or using the --link option considered legacy."
+  echo -e "############"
   checkInteractiveMode
 
   print_info "Check connection from ${CONTAINER_ADMINER} to ${CONTAINER_MYSQL} by ip address"
