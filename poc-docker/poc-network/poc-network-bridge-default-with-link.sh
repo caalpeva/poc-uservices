@@ -68,6 +68,12 @@ function main {
   checkArguments $@
   initialize
 
+  print_box "DEFAULT BRIDGE NETWORK" \
+    "" \
+    " - The containers on the default bridge network can only access other containers" \
+    "   on the same network through their IP addresses or using the --link option, which is considered legacy."
+  checkInteractiveMode
+
   docker_utils::getNetworkList
   print_info "Show network data: $NETWORK_NAME"
   docker_utils::networkInspect $NETWORK_NAME
@@ -81,10 +87,6 @@ function main {
   print_info "Get ip address from containers"
   MYSQL_IP_ADDRESS=$(docker_utils::getIpAddressFromContainer ${CONTAINER_MYSQL})
   echo ${MYSQL_IP_ADDRESS}
-
-  echo -e "### NOTE ###"
-  echo -e "The containers on the default bridge network can only access other containers \non the same network through their IP addresses or using the --link option considered legacy."
-  echo -e "############"
   checkInteractiveMode
 
   print_info "Check connection from ${CONTAINER_ADMINER} to ${CONTAINER_MYSQL} by ip address"

@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:20.04
 
 LABEL version="1.0" maintainer="<kalpeva@gmail.com>"
 

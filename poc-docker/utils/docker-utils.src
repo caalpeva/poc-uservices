@@ -348,3 +348,19 @@ function docker_utils::networkInspect() {
   xtrace off
   checkInteractiveMode
 }
+
+function docker_utils::connectToNetwork() {
+  local network=$1
+  local container=$2
+  xtrace on
+  docker network connect $network $container
+  xtrace off
+}
+
+function docker_utils::disconnectToNetwork() {
+  local network=$1
+  local container=$2
+  xtrace on
+  docker network disconnect $network $container
+  xtrace off
+}

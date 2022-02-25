@@ -71,6 +71,13 @@ function main {
   checkArguments $@
   initialize
 
+  print_box "USER-DEFINED BRIDGE NETWORK" \
+    "" \
+    " - Provide automatic DNS resolution between containers on the same network." \
+    " - Provide better isolation in which only containers attached to that network are able to communicate." \
+    " - Containers can be attached and detached from user-defined networks on the fly."
+  checkInteractiveMode
+
   print_info "Create ${NETWORK_NAME} network"
   docker_utils::createNetwork "--subnet 180.128.10.0/24 --gateway 180.128.10.1 -d bridge" ${NETWORK_NAME}
 
@@ -86,15 +93,8 @@ function main {
 
   docker inspect poc_network_mysql -f "{{ .NetworkSettings.Networks.poc_network.IPAddress }}"
   print_info "Get ip address from containers"
-  MYSQL_IP_ADDRESS=$(docker_utils::getIpAddressFromContainer ${CONTAINER_MYSQL} ${NETWORK_NAME})
-  echo ${MYSQL_IP_ADDRESS}
-
-  PHPMYADMIN_IP_ADDRESS=$(docker_utils::getIpAddressFromContainer ${CONTAINER_PHPMYADMIN} ${NETWORK_NAME})
-  echo ${PHPMYADMIN_IP_ADDRESS}
-
-  echo -e "### NOTE ###"
-  echo -e "User defined bridges provide automatic DNS resolution between containers on the same network."
-  echo -e "############"
+  echo $(docker_utils::getIpAddressFromContainer ${CONTAINER_MYSQL} ${NETWORK_NAME})
+  echo $(docker_utils::getIpAddressFromContainer ${CONTAINER_PHPMYADMIN} ${NETWORK_NAME})
   checkInteractiveMode
 
   print_info "Install network utils in container ${CONTAINER_PHPMYADMIN}"

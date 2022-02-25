@@ -59,18 +59,18 @@ function main() {
   docker_utils::createImageFromDockerfile $IMAGE $DIR
 
   docker_utils::getImages
-  echo -e "### NOTE ###"
-  echo -e "The images that appear with labels <none>:<none> when executing the docker images command are dangling images."
-  echo -e "These images should be deleted to free up space because they will no longer be used."
-  echo -e "############"
+  print_box "DANGLING IMAGES" \
+    "" \
+    " - The images that appear with labels <none>:<none> when executing the docker images command are dangling images." \
+    " - These images should be deleted to free up space because they will no longer be used."
   checkInteractiveMode
 
   docker_utils::getImages "-a"
-  echo -e "### NOTE ###"
-  echo -e "The images that appear with labels <none>:<none> when executing the docker images -a command are intermediate images."
-  echo -e "Intermediate images are generated every time a new image is created from a dockerfile."
-  echo -e "These images can only be deleted when the image on which they depend is eliminated."
-  echo -e "############"
+  print_box "INTERMEDIATE IMAGES" \
+    "" \
+    " - The images that appear with labels <none>:<none> when executing the docker images -a command are intermediate images." \
+    " - Intermediate images are generated every time a new image is created from a dockerfile." \
+    " - These images can only be deleted when the image on which they depend is eliminated."
   checkInteractiveMode
 
   executeContainer

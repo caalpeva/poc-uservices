@@ -51,6 +51,12 @@ function main {
   checkArguments $@
   initialize
 
+  print_box "DEFAULT BRIDGE NETWORK" \
+  "" \
+  " - The containers on the default bridge network can only access other containers" \
+  "   on the same network through their IP addresses or using the --link option, which is considered legacy."
+  checkInteractiveMode
+
   docker_utils::getNetworkList
   print_info "Show network data: $NETWORK_NAME"
   docker_utils::networkInspect $NETWORK_NAME
@@ -65,10 +71,6 @@ function main {
 
   CONTAINER2_IP_ADDRESS=$(docker_utils::getIpAddressFromContainer ${CONTAINER2_NAME})
   echo ${CONTAINER2_IP_ADDRESS}
-
-  echo -e "### NOTE ###"
-  echo -e "The containers on the default bridge network can only access other containers \non the same network through their IP addresses or using the --link option, which is considered legacy."
-  echo -e "############"
   checkInteractiveMode
 
   print_info "Check connection from ${CONTAINER1_NAME} to ${CONTAINER2_NAME} by ip address"
@@ -87,7 +89,7 @@ function main {
   fi
 
   checkInteractiveMode
-  print_info "Check connection from ${CONTAINER1_NAME} to ${CONTAINER2_NAME} by name"
+  print_info "Check no connection from ${CONTAINER1_NAME} to ${CONTAINER2_NAME} by name"
   docker_utils::execContainerPing ${CONTAINER1_NAME} ${CONTAINER2_NAME}
   if [ $? -eq 0 ]; then
     print_error "Poc completed with failure"
@@ -95,7 +97,7 @@ function main {
   fi
 
   checkInteractiveMode
-  print_info "Check connection from ${CONTAINER2_NAME} to ${CONTAINER1_NAME} by name"
+  print_info "Check no connection from ${CONTAINER2_NAME} to ${CONTAINER1_NAME} by name"
   docker_utils::execContainerPing ${CONTAINER2_NAME} ${CONTAINER1_NAME}
   if [ $? -eq 0 ]; then
     print_error "Poc completed with failure"
