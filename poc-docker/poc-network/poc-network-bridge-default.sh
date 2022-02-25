@@ -11,7 +11,7 @@ CONTAINER_PREFIX="poc_alpine"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
 CONTAINER2_NAME="${CONTAINER_PREFIX}_2"
 
-NETWORK_NAME="bridge"
+DEFAULT_NETWORK="bridge"
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -58,8 +58,8 @@ function main {
   checkInteractiveMode
 
   docker_utils::getNetworkList
-  print_info "Show network data: $NETWORK_NAME"
-  docker_utils::networkInspect $NETWORK_NAME
+  print_info "Show network data: $DEFAULT_NETWORK"
+  docker_utils::networkInspect $DEFAULT_NETWORK
 
   executeContainers
   print_info "Check containers status..."

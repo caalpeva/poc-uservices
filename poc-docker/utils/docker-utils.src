@@ -364,3 +364,13 @@ function docker_utils::disconnectToNetwork() {
   docker network disconnect $network $container
   xtrace off
 }
+
+function docker_utils::showNetworkInterfaces() {
+  container=$1
+  xtrace on
+  docker exec $container hostname
+  docker exec $container ip addr
+  docker exec $container ip route
+  xtrace off
+  checkInteractiveMode
+}
