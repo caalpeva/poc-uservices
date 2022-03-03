@@ -1,0 +1,12 @@
+version: '3'
+services:
+  machine1:
+    image: alpine
+    container_name: poc_alpine_1
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+  machine2:
+    image: alpine
+    container_name: poc_alpine_2
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
