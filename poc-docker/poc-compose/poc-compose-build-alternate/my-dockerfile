@@ -1,0 +1,9 @@
+FROM alpine:latest
+
+LABEL version="1.0" maintainer="<kalpeva@gmail.com>"
+
+# install tree
+RUN apk update && \
+    apk add tree
+
+ENTRYPOINT ["tree"]

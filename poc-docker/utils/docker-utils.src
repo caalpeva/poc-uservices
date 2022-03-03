@@ -377,7 +377,7 @@ function docker_utils::showNetworkInterfaces() {
 
 function docker_utils::composeUp() {
   xtrace on
-  docker-compose up -d
+  docker-compose up -d $@
   xtrace off
 }
 

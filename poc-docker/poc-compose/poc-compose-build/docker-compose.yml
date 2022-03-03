@@ -1,0 +1,8 @@
+version: "3"
+services:
+  machine:
+    image: alpine-nano
+    build: .
+    container_name: poc_alpine_build
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t

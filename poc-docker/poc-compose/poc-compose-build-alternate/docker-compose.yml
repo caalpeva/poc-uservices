@@ -1,0 +1,10 @@
+version: "3"
+services:
+  machine:
+    image: alpine-tree
+    build:
+      context: .
+      dockerfile: my-dockerfile
+    container_name: poc_alpine_build_alternate
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
