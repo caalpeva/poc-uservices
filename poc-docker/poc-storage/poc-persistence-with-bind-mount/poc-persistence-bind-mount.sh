@@ -69,7 +69,7 @@ function main {
   docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
   docker_utils::getContainerMounts ${CONTAINER1_NAME}
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME}
+  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
   isHttpServer1Available=$?
 
   if [ $isHttpServer1Available -ne 0 ]; then
@@ -85,7 +85,7 @@ function main {
   xtrace off
   checkInteractiveMode
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME}
+  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
   isHttpServer1Available=$?
 
   if [ $isHttpServer1Available -ne 0 ]; then

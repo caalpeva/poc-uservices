@@ -60,10 +60,10 @@ function main {
   print_info "Check containers status..."
   docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME}
+  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
   isHttpServer1Available=$?
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER2_NAME}
+  docker_utils::checkHttpServerAvailability ${CONTAINER2_NAME} ${CONTAINER_HTTP_PORT}
   isHttpServer2Available=$?
 
   if [ $isHttpServer1Available -ne 0 -o $isHttpServer2Available -ne 0 ]; then

@@ -1,0 +1,10 @@
+version: "3"
+services:
+  machine:
+    image: alpine
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    container_name: poc_alpine_environment
+    environment:
+      - "APP_NAME=poc_app"
+      - "APP_PATH=${HOME}/poc_app"

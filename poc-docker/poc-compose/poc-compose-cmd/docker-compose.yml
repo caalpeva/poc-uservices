@@ -1,0 +1,8 @@
+version: "3"
+services:
+  web:
+    image: centos:7
+    container_name: poc-centos
+    command: python -m SimpleHTTPServer 8080
+    ports:
+      - "8080:8080"

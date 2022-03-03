@@ -329,7 +329,7 @@ function docker_utils::checkHttpServerAvailability  {
   declare -i result=0
   print_info "Check that the Http server from $1 is available..."
   print_debug "Extract host port from container data..."
-  port=$(docker_utils::getFirstHostPortFromContainerData $1 ${CONTAINER_HTTP_PORT})
+  port=$(docker_utils::getFirstHostPortFromContainerData $1 $2)
 
   docker_utils::checkUrl "http://localhost:${port}"
   if [ $? -ne 0 ]
@@ -373,4 +373,16 @@ function docker_utils::showNetworkInterfaces() {
   docker exec $container ip route
   xtrace off
   checkInteractiveMode
+}
+
+function docker_utils::composeUp() {
+  xtrace on
+  docker-compose up -d
+  xtrace off
+}
+
+function docker_utils::composeDown() {
+  xtrace on
+  docker-compose down $@
+  xtrace off
 }
