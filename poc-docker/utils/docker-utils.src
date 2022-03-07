@@ -318,6 +318,18 @@ function docker_utils::execContainerPingAsRoot() {
   return $?
 }
 
+function docker_utils::startContainers() {
+  xtrace on
+  docker start $@
+  xtrace off
+}
+
+function docker_utils::stopContainers() {
+  xtrace on
+  docker stop $@
+  xtrace off
+}
+
 function docker_utils::checkUrl  {
   command="curl $1"
   echo "+ $command"
@@ -340,6 +352,23 @@ function docker_utils::checkHttpServerAvailability  {
 
   checkInteractiveMode
   return $result
+}
+
+function docker_utils::pushImage() {
+  xtrace on
+  docker push $1
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::tagImage() {
+  local localImage=$1
+  local newLocalImage=$2
+
+  xtrace on
+  docker tag $localImage $newLocalImage
+  xtrace off
+  checkInteractiveMode
 }
 
 function docker_utils::networkInspect() {

@@ -11,14 +11,14 @@ source "${DIR}/../../../utils/microservices-utils.src"
 # VARIABLES #
 #############
 
-IMAGE="poc-ubuntu-utils"
+IMAGE="poc-ubuntu-curl"
 SNAPSHOT="1.0-snapshot"
 TAG="1.0"
 
-CONTAINER_PREFIX="poc_ubuntu_utils"
+CONTAINER_PREFIX="poc_ubuntu_curl"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
 
-DOCKER_USERNAME="NONE"
+REGISTRY_URL="localhost:5000"
 
 #############
 # FUNCTIONS #
@@ -41,21 +41,30 @@ function cleanup() {
   print_debug "Cleaning environment..."
   containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
   docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeImages "$IMAGE:$TAG" "$IMAGE:$SNAPSHOT"
+  docker_utils::removeImages "$IMAGE:$SNAPSHOT" "$REGISTRY_URL/$IMAGE:$TAG"
 }
 
-function dockerLogin() {
-  read -p "Username: " DOCKER_USERNAME
+function executeRegistryContainer() {
   xtrace on
-  docker login --username $DOCKER_USERNAME
+  docker run -d \
+    --restart always \
+    --name ${CONTAINER1_NAME} \
+    -p 5000:5000 \
+    -v $PWD/data/:/var/lib/registry \
+    registry:2
   xtrace off
-  checkInteractiveMode
 }
 
 function main() {
   print_debug "$(basename $0) [PID = $$]"
   checkArguments $@
   initialize
+
+  print_info "Execute registry container"
+  executeRegistryContainer
+
+  print_info "Check containers status again..."
+  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
 
   print_info "Filter images by name"
   docker_utils::showImagesByPrefix $IMAGE
@@ -64,17 +73,25 @@ function main() {
   print_info "Filter images by name"
   docker_utils::showImagesByPrefix $IMAGE
 
-  print_info "Login with your Docker ID to push images to Docker Hub"
-  dockerLogin
-
-  print_info "Retag image for Docker Hub with username"
-  docker_utils::tagImage "$IMAGE:$SNAPSHOT" "$DOCKER_USERNAME/$IMAGE:$TAG"
+  print_info "Retag image for local registry"
+  docker_utils::tagImage "$IMAGE:$SNAPSHOT" "$REGISTRY_URL/$IMAGE:$TAG"
 
   print_info "Filter images by name"
   docker_utils::showImagesByPrefix $IMAGE
 
-  print_info "Push image to Docker Hub"
-  docker_utils::pushImage "$DOCKER_USERNAME/$IMAGE:$TAG"
+  print_info "Push image to local registry"
+  docker_utils::pushImage "$REGISTRY_URL/$IMAGE:$TAG"
+
+  docker_utils::removeImages "$IMAGE:$SNAPSHOT" "$REGISTRY_URL/$IMAGE:$TAG"
+
+  print_info "Filter images by name"
+  docker_utils::showImagesByPrefix $IMAGE
+
+  print_info "Pull image from local registry"
+  docker_utils::pullImage "$REGISTRY_URL/$IMAGE:$TAG"
+
+  print_info "Filter images by name"
+  docker_utils::showImagesByPrefix $IMAGE
 
   checkCleanupMode
   print_done "Poc completed successfully "

@@ -61,9 +61,7 @@ function startContainers {
   containers=$(docker_utils::getExitedContainerIdsByPrefix ${CONTAINER_PREFIX})
   for containerId in ${containers}
   do
-    xtrace on
-    docker start ${containerId}
-    xtrace off
+    docker_utils::startContainers ${containerId}
   done
 }
 
@@ -73,9 +71,7 @@ function stopContainers {
 
   for containerId in ${containers}
   do
-    xtrace on
-    docker stop ${containerId}
-    xtrace off
+    docker_utils::stopContainers ${containerId}
   done
 }
 

@@ -1,1 +1,4 @@
 dependencies/downloads/**
+poc-docker/poc-images/poc-push-images-to-registry-alternate/data/**
+poc-docker/poc-images/poc-push-images-to-registry-alternate/backups/**
+
