@@ -27,21 +27,21 @@ def extract_file(filename, destination):
 
     with ZipFile(filename, 'r') as file:
     	file.extractall(destination)
-	file.close()
+    file.close()
 
 data = read_dependencies()
 for dependency in data["dependencies"]:
     account = dependency['account']
     name = dependency['name']
-    
+
     version = DEFAULT_VERSION
     if 'version' in dependency:
         version = dependency['version']
 
     destination = dependency['destination']
-    
+
     url = BASE_URL + account + '/' + name + '/archive/' + version + '.zip'
-    file = download_file(url)   
+    file = download_file(url)
     print("Dependency downloaded: " + file + " version " + version)
 
     directory = WORKSPACE_DIR + '/downloads/'
