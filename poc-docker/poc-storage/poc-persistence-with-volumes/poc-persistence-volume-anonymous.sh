@@ -14,7 +14,6 @@ CONTAINER2_NAME="${CONTAINER_PREFIX}_2"
 
 CONTAINER_PORT="3306"
 HOST_PORT="3306"
-VOLUMEN_NAME="mysql_data"
 
 MYSQL_ROOT_PASSWORD="root"
 MYSQL_DATABASE="CYCLING"
@@ -41,7 +40,7 @@ function cleanup {
   print_debug "Cleaning environment..."
   containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
   docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeVolumes ${VOLUMEN_NAME}
+  docker_utils::removeVolumes $(docker volume list -q)
 }
 
 function checkMysqlAvailable() {
@@ -106,7 +105,6 @@ function executeContainer {
     -e MYSQL_USER=${MYSQL_USER} \
     -e MYSQL_PASSWORD=${MYSQL_PASSWORD} \
     -p ${HOST_PORT}:${CONTAINER_PORT} \
-    -v ${VOLUMEN_NAME}:/var/lib/mysql \
     -v ${DIR}/scripts/initial:/docker-entrypoint-initdb.d \
     -v ${DIR}/scripts/update.sql:/update.sql:ro \
     mysql:5.7.28
@@ -142,8 +140,8 @@ function main {
   checkArguments $@
   initialize
 
-  print_info "Create ${VOLUMEN_NAME} volumen"
-  docker_utils::createVolume ${VOLUMEN_NAME}
+  print_info "List volumes"
+  docker_utils::listVolumes
 
   # Se crea el primer contenedor con mysql server
   executeContainerAndShowDatabase ${CONTAINER1_NAME}
@@ -153,13 +151,23 @@ function main {
   print_info "Show database after update data"
   showDatabase ${CONTAINER1_NAME}
 
-  print_info "Remove container ${CONTAINER1_NAME} but keep ${VOLUMEN_NAME} volume"
+  print_info "Remove container ${CONTAINER1_NAME} but keep anonymous volume"
   docker_utils::removeContainers ${CONTAINER1_NAME}
+  print_info "List volumes"
+  docker_utils::listVolumes
   print_info "Check containers status again"
   docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
 
   # Se crea el segundo contenedor con mysql server
   executeContainerAndShowDatabase ${CONTAINER2_NAME}
+
+  print_info "List volumes"
+  docker_utils::listVolumes
+
+  print_box "ANONYMOUS VOLUMES" \
+    "" \
+    " - As a different anonymous volume is used in each container, the information is not persisted between containers"
+  checkInteractiveMode
 
   checkCleanupMode
   print_done "Poc completed successfully"

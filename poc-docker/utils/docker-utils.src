@@ -271,9 +271,15 @@ function docker_utils::attachContainer() {
   xtrace off
 }
 
-function docker_utils::createVolumen() {
+function docker_utils::createVolume() {
   xtrace on
   docker volume create $1
+  xtrace off
+}
+
+function docker_utils::listVolumes() {
+  xtrace on
+  docker volume list
   xtrace off
 }
 
