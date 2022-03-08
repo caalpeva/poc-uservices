@@ -23,18 +23,18 @@ function handleTermSignal() {
   exit 1
 }
 
-function cleanup {  
-  print_debug "Cleaning environment..."   
+function cleanup {
+  print_debug "Cleaning environment..."
   containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
   docker_utils::removeContainers ${containers[*]}
 }
 
 function executeContainer {
-  print_info "Run container with simple command..."  
+  print_info "Run container with simple command..."
   xtrace on
   docker run --name ${CONTAINER1_NAME} \
     alpine cat /etc/os-release
-  
+
   xtrace off
 }
 
@@ -42,7 +42,7 @@ function main {
   print_info "$(basename $0) [PID = $$]"
   checkArguments $@
   initialize
-  
+
   executeContainer
   print_info "Check containers status..."
   docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}

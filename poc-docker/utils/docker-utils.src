@@ -107,7 +107,7 @@ function docker_utils::showImagesByPrefix {
 function docker_utils::createImageFromDockerfile() {
   print_info "Create image from Dockerfile"
   xtrace on
-  docker build -t $1 $2
+  docker build -t $@
   xtrace off
   checkInteractiveMode
 }
@@ -125,7 +125,6 @@ function docker_utils::removeImages() {
   xtrace on
   docker rmi $@
   xtrace off
-  checkInteractiveMode
 }
 
 function docker_utils::removeAllImages() {
@@ -195,8 +194,6 @@ function docker_utils::showLogs() {
   xtrace on
   docker logs $1
   xtrace off
-
-  checkInteractiveMode
 }
 
 function docker_utils::removeContainersOneByOne() {
@@ -238,6 +235,20 @@ function docker_utils::getIpAddressFromContainer {
     docker inspect -f "{{ .NetworkSettings.Networks.$network.IPAddress }}" $container
     xtrace off
   fi
+}
+
+function docker_utils::getRestartCountFromContainer {
+  local container=$1
+  xtrace on
+  docker inspect -f "{{ .RestartCount }}" $container
+  xtrace off
+}
+
+function docker_utils::getContainerStatus {
+  local container=$1
+  xtrace on
+  docker inspect -f "{{ .State.Status }}" $container
+  xtrace off
 }
 
 function docker_utils::getFirstHostPortFromContainerData {
