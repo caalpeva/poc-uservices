@@ -1,10 +1,16 @@
 version: "3"
 services:
-  machine:
-    image: alpine
+  machine1:
     container_name: poc_alpine_environment
+    image: alpine
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     environment:
       - "APP_NAME=poc_app"
       - "APP_PATH=${HOME}/poc_app"
+  machine2:
+    container_name: poc_alpine_environment_file
+    image: alpine
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    env_file: common.env

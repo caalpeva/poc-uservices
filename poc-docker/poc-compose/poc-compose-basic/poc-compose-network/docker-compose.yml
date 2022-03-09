@@ -10,3 +10,13 @@ services:
     container_name: poc_alpine_2
     stdin_open: true # docker run -i
     tty: true        # docker run -t
+  machine3:
+    image: alpine
+    container_name: poc_alpine_3
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+  machine4:
+    image: alpine
+    container_name: poc_alpine_4
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t

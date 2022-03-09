@@ -2,10 +2,11 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../../utils/microservices-utils.src"
-source "${DIR}/../../utils/docker-utils.src"
+source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../../../utils/microservices-utils.src"
+source "${DIR}/../../../utils/docker-utils.src"
+source "${DIR}/../../../utils/docker-compose.src"
 
 CONTAINER_NAME="poc-centos"
 CONTAINER_HTTP_PORT="8080"
@@ -25,7 +26,7 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  docker_utils::composeDown
+  docker_compose::down
 }
 
 function main {
@@ -34,10 +35,10 @@ function main {
   initialize
 
   print_info "Execute docker-compose"
-  docker_utils::composeUp
+  docker_compose::up
 
   print_info "Check containers status..."
-  docker_utils::showContainersByPrefix ${CONTAINER_NAME}
+  docker_compose::ps
 
   docker_utils::checkHttpServerAvailability ${CONTAINER_NAME} ${CONTAINER_HTTP_PORT}
   if [ $? -ne 0 ]; then

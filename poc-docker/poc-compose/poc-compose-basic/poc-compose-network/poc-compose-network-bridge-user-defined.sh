@@ -2,10 +2,11 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../../utils/microservices-utils.src"
-source "${DIR}/../../utils/docker-utils.src"
+source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../../../utils/microservices-utils.src"
+source "${DIR}/../../../utils/docker-utils.src"
+source "${DIR}/../../../utils/docker-compose.src"
 
 CONTAINER_PREFIX="poc_alpine"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
@@ -26,7 +27,7 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  docker_utils::composeDown
+  docker_compose::down
 }
 
 function main {
@@ -42,10 +43,10 @@ function main {
   checkInteractiveMode
 
   print_info "Execute docker-compose"
-  docker_utils::composeUp
+  docker_compose::up
 
   print_info "Check containers status..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker_compose::ps ${CONTAINER_PREFIX}
 
   print_info "Check connection from ${CONTAINER1_NAME} to ${CONTAINER2_NAME} by name"
   docker_utils::execContainerPingAsRoot ${CONTAINER1_NAME} ${CONTAINER2_NAME}

@@ -420,15 +420,3 @@ function docker_utils::showNetworkInterfaces() {
   xtrace off
   checkInteractiveMode
 }
-
-function docker_utils::composeUp() {
-  xtrace on
-  docker-compose up -d $@
-  xtrace off
-}
-
-function docker_utils::composeDown() {
-  xtrace on
-  docker-compose down $@
-  xtrace off
-}

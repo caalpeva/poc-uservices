@@ -1,8 +1,0 @@
-version: "3"
-services:
-  machine:
-    image: alpine
-    container_name: poc_alpine_environment_file
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
-    env_file: common.env

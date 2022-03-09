@@ -1,0 +1,52 @@
+version: '3'
+services:
+  apache:
+    container_name: poc_lamp_apache
+    image: ubuntu-apache
+    build:
+      context: .
+      dockerfile: apache-dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./webapp/src:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - frontend-network
+      - backend-network
+
+  mysql:
+    container_name: poc_lamp_mysql
+    image: mysql:5.7.28
+    #command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=SIMPSONS
+      - MYSQL_USER=lamp_user
+      - MYSQL_PASSWORD=lamp_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+    networks:
+      - backend-network
+
+  phpmyadmin:
+    container_name: poc_lamp_phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=mysql
+    depends_on:
+      - mysql
+    networks:
+      - frontend-network
+      - backend-network
+
+volumes:
+  mysql_data:
+
+networks:
+  frontend-network:
+  backend-network:
