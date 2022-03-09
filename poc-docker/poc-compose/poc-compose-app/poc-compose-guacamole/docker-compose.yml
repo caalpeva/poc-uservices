@@ -1,0 +1,51 @@
+version: '3'
+services:
+  db:
+    container_name: poc_guacamole_db
+    image: mysql:5.7
+    env_file: common.env
+    volumes:
+      - $PWD/conf/init-db.sql:/docker-entrypoint-initdb.d/initdb.sql
+      - guacamole-data:/var/lib/mysql
+    networks:
+      - network
+  daemon:
+    container_name: poc_guacamole_daemon
+    image: guacamole/guacd
+    networks:
+      - network
+    depends_on:
+      - db
+  web:
+    container_name: poc_guacamole_web
+    image: guacamole/guacamole
+    env_file: common.env
+    networks:
+      - network
+    restart: always
+    depends_on:
+      - daemon
+  proxy:
+    container_name: poc_guacamole_proxy
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - $PWD/conf/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - network
+    restart: always
+    depends_on:
+      - web
+  machine_ssh:
+    container_name: poc_centos_server_ssh
+    image: centos-ssh
+    build:
+      context: .
+      dockerfile: centos-ssh-dockerfile
+    networks:
+      - network
+volumes:
+  guacamole-data:
+networks:
+  network:

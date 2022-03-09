@@ -1,0 +1,9 @@
+FROM centos:7
+
+RUN yum -y install openssh-server sudo && \
+  /usr/bin/ssh-keygen -A
+
+RUN useradd guacamole
+WORKDIR /home/guacamole
+
+CMD /usr/sbin/sshd -D
