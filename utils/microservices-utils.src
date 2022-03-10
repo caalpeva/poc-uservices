@@ -16,7 +16,7 @@ function usage() {
   cat << EOF
 Usage: $SCRIPT_NAME [ -h | -i | -s ]
     Options help:
-    -h:  Shows option help 
+    -h:  Shows option help
     -i:  Allows the user to perform the execution step by step
     -s:  Skip cleanup
 EOF
@@ -25,7 +25,7 @@ EOF
 
 function checkArguments() {
   print_debug "Checking arguments ($#)..."
-  
+
   # Parse the options
   while getopts "his" option; do
     case $option in
@@ -65,3 +65,9 @@ function setTerminalSignals() {
   trap handleTermSignal INT QUIT TERM KILL
 }
 
+function evalCommand  {
+  command=$1
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
