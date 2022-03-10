@@ -1,0 +1,14 @@
+FROM centos:7
+
+ARG NEWUSER
+ARG NEWUSER_PASSWORD
+
+RUN yum -y install openssh-server && \
+  /usr/bin/ssh-keygen -A
+
+RUN useradd ${NEWUSER} && \
+  echo ${NEWUSER_PASSWORD} | passwd ${NEWUSER} --stdin
+
+WORKDIR /home/guacamole
+
+CMD /usr/sbin/sshd -D

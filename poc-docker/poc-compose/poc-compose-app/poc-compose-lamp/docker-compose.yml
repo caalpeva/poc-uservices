@@ -5,7 +5,7 @@ services:
     image: ubuntu-apache
     build:
       context: .
-      dockerfile: apache-dockerfile
+      dockerfile: dockerfile-apache
     ports:
       - "80:80"
     volumes:

@@ -23,14 +23,14 @@ function handleTermSignal() {
   exit 1
 }
 
-function cleanup {  
-  print_debug "Cleaning environment..."   
+function cleanup {
+  print_debug "Cleaning environment..."
   containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
   docker_utils::removeContainers ${containers[*]}
 }
 
 function executeContainers {
-  print_info "Run containers..."  
+  print_info "Run containers..."
   xtrace on
   docker run -dit \
     --name ${CONTAINER1_NAME} \

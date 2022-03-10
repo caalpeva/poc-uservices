@@ -40,7 +40,7 @@ function main {
   docker_compose::ps
 
   print_info "Execute command in container"
-  docker_utils::execContainerWithTty ${CONTAINER_NAME} "tree -L 1"
+  docker_utils::execContainer ${CONTAINER_NAME} "tree -L 1"
   if [ $? -ne 0 ]; then
     print_error "Poc completed with failure"
     exit 1

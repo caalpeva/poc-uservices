@@ -1,7 +1,7 @@
 version: '3'
 services:
   db:
-    container_name: poc_guacamole_db
+    container_name: poc_guacamole_mysql
     image: mysql:5.7
     env_file: common.env
     volumes:
@@ -11,14 +11,14 @@ services:
       - network
   daemon:
     container_name: poc_guacamole_daemon
-    image: guacamole/guacd
+    image: guacamole/guacd:1.2.0
     networks:
       - network
     depends_on:
       - db
   web:
     container_name: poc_guacamole_web
-    image: guacamole/guacamole
+    image: guacamole/guacamole:1.2.0
     env_file: common.env
     networks:
       - network
@@ -37,14 +37,6 @@ services:
     restart: always
     depends_on:
       - web
-  machine_ssh:
-    container_name: poc_centos_server_ssh
-    image: centos-ssh
-    build:
-      context: .
-      dockerfile: centos-ssh-dockerfile
-    networks:
-      - network
 volumes:
   guacamole-data:
 networks:

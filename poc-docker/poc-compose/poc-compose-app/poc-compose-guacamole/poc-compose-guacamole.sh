@@ -10,12 +10,18 @@ source "${DIR}/../../../utils/docker-utils.src"
 source "${DIR}/../../../utils/docker-compose.src"
 
 PROJECT_NAME="poc_guacamole"
+NETWORK_NAME="${PROJECT_NAME}_network"
+IMAGE="centos-server-ssh"
 
-CONTAINER_PREFIX="poc_lamp"
+CONTAINER_PREFIX="poc_guacamole"
 CONTAINER_MYSQL="${CONTAINER_PREFIX}_mysql"
+CONTAINER_SSH="${CONTAINER_PREFIX}_server_ssh"
 
 MYSQL_ROOT_PASSWORD="root"
-MYSQL_DATABASE="SIMPSONS"
+MYSQL_DATABASE="guacamole_db"
+
+SSH_SERVER_USER="guacamole"
+SSH_SERVER_PASSWORD="1234"
 
 TIMEOUT_SECS=90 # Set timeout in seconds
 INTERVAL_SECS=5   # Set interval (duration) in seconds
@@ -35,7 +41,10 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
+  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_SSH}))
+  docker_utils::removeContainers ${containers[*]}
   docker_compose::downWithProjectName $PROJECT_NAME -v
+  docker_utils::removeImages $IMAGE
 }
 
 function checkMysqlAvailable() {
@@ -67,21 +76,33 @@ function waitForMysqlAvailable() {
   return $isMysqlAvailable
 }
 
-function showDatabase {
+function executeSshServerContainer {
+  print_info "Execute SSH server container in same network"
   xtrace on
-  docker exec $1 mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
-  --table -e "select * from CHARACTERS"
+  docker run -dit \
+    --name ${CONTAINER_SSH} \
+    --restart always \
+    --network $NETWORK_NAME \
+    ${IMAGE}
 
   xtrace off
-  sleep 1
-
-  checkInteractiveMode
 }
 
 function main {
   print_info "$(basename $0) [PID = $$]"
   checkArguments $@
   initialize
+
+  print_box "GUACAMOLE" \
+    "" \
+    " - Guacamole is a web manager for ssh connections." \
+    " - For this test to work correctly it is necessary to install the sshpass tool."
+  checkInteractiveMode
+
+  docker_utils::createImageFromDockerfile $IMAGE \
+    "--build-arg NEWUSER=$SSH_SERVER_USER" \
+    "--build-arg NEWUSER_PASSWORD=$SSH_SERVER_PASSWORD" \
+    "--file dockerfile-server-ssh" $DIR
 
   print_info "Execute docker-compose"
   docker_compose::upWithProjectName $PROJECT_NAME
@@ -99,12 +120,34 @@ function main {
     exit 1
   fi
 
-  print_info "Show database"
-  showDatabase $CONTAINER_MYSQL
+  executeSshServerContainer
+  print_info "Create file in ssh server container"
+  xtrace on
+  docker exec $CONTAINER_SSH sh -c "echo \"hello\" > test.txt"
+  xtrace off
+  checkInteractiveMode
 
-  print_info "Check container connections: apache and phpmyadmin"
-  print_debug "Interactive with apache in http://localhost:80 to manage characters"
-  print_debug "Verify user data with phpmyadmin in http://localhost:8080"
+  print_info "Get ip address from ssh server container"
+  SSH_SERVER_IP=$(docker_utils::getIpAddressFromContainer ${CONTAINER_SSH} "${NETWORK_NAME}")
+  echo ${SSH_SERVER_IP}
+  checkInteractiveMode
+
+  print_info "Check ssh connection to ssh server container from localhost"
+  print_debug "Do not enter any passwd, press 3 times enter"
+  evalCommand "ssh ${SSH_SERVER_IP} -o \"StrictHostKeyChecking no\""
+
+  print_debug "You need to install the sshpass tool"
+  evalCommand "sshpass -p $SSH_SERVER_PASSWORD ssh $SSH_SERVER_USER@${SSH_SERVER_IP} \"whoami && pwd && cat test.txt\""
+  if [ $? -ne 0 ]; then
+    print_error "Error connecting via ssh."
+    exit 1
+  fi
+
+  checkInteractiveMode
+  print_info "Check ssh conection via guacamole web"
+  print_debug "Interactive with guacamole in http://localhost:80 with credentials (guacadmin/guacadmin)"
+  print_debug "Create SSH connection with ip $SSH_SERVER_IP and port 22 and credentias ($SSH_SERVER_USER/$SSH_SERVER_PASSWORD)"
+  print_debug "Verify the test.txt file created"
   checkInteractiveMode
 
   checkCleanupMode
