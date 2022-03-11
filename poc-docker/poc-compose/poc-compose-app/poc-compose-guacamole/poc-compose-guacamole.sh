@@ -78,7 +78,7 @@ function waitForMysqlAvailable() {
 
 function extractSqlScriptFromGuacamoleContainer {
   print_info "Extract sql for mysql from guacamole container"
-  evalCommand "docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --mysql > $DIR/conf/init-db.sql"
+  evalCommand "docker run --rm guacamole/guacamole:1.2.0 /opt/guacamole/bin/initdb.sh --mysql > $DIR/conf/init-db.sql"
 }
 
 function executeSshServerContainer {
