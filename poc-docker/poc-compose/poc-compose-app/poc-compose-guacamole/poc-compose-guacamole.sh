@@ -76,6 +76,11 @@ function waitForMysqlAvailable() {
   return $isMysqlAvailable
 }
 
+function extractSqlScriptFromGuacamoleContainer {
+  print_info "Extract sql for mysql from guacamole container"
+  evalCommand "docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --mysql > $DIR/conf/init-db.sql"
+}
+
 function executeSshServerContainer {
   print_info "Execute SSH server container in same network"
   xtrace on
@@ -93,6 +98,14 @@ function main {
   checkArguments $@
   initialize
 
+  extractSqlScriptFromGuacamoleContainer
+  if [ $? -ne 0 ]; then
+    print_error "Error extracting sql script."
+    exit 1
+  fi
+  checkInteractiveMode
+  exit 0
+
   print_box "GUACAMOLE" \
     "" \
     " - Guacamole is a web manager for ssh connections." \
@@ -103,6 +116,13 @@ function main {
     "--build-arg NEWUSER=$SSH_SERVER_USER" \
     "--build-arg NEWUSER_PASSWORD=$SSH_SERVER_PASSWORD" \
     "--file dockerfile-server-ssh" $DIR
+
+  extractSqlScriptFromGuacamoleContainer
+  if [ $? -ne 0 ]; then
+    print_error "Error extracting sql script."
+    exit 1
+  fi
+  checkInteractiveMode
 
   print_info "Execute docker-compose"
   docker_compose::upWithProjectName $PROJECT_NAME
