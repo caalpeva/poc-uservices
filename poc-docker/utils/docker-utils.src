@@ -420,3 +420,32 @@ function docker_utils::showNetworkInterfaces() {
   xtrace off
   checkInteractiveMode
 }
+
+function docker_utils::stats() {
+  container=$1
+  xtrace on
+  docker stats $container hostname
+  docker exec $container ip addr
+  docker exec $container ip route
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::stats() {
+  xtrace on
+  docker stats $@
+  xtrace off
+}
+
+function docker_utils::getStatsByPrefix() {
+  xtrace on
+  docker stats --no-stream | grep $1
+  xtrace off
+}
+
+function docker_utils::showStatsByPrefix {
+  stats=$(docker_utils::getStatsByPrefix $1)
+  docker stats --no-stream | head -1
+  echo "$stats"
+  checkInteractiveMode
+}
