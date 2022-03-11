@@ -98,18 +98,10 @@ function main {
   checkArguments $@
   initialize
 
-  extractSqlScriptFromGuacamoleContainer
-  if [ $? -ne 0 ]; then
-    print_error "Error extracting sql script."
-    exit 1
-  fi
-  checkInteractiveMode
-  exit 0
-
   print_box "GUACAMOLE" \
     "" \
-    " - Guacamole is a web manager for ssh connections." \
-    " - For this test to work correctly it is necessary to install the sshpass tool."
+    " - Guacamole is a web tool to manage ssh connections." \
+    " - For this test to work correctly it is necessary to install sshpass."
   checkInteractiveMode
 
   docker_utils::createImageFromDockerfile $IMAGE \
@@ -154,7 +146,7 @@ function main {
 
   print_info "Check ssh connection to ssh server container from localhost"
   print_debug "Do not enter any passwd, press 3 times enter"
-  evalCommand "ssh ${SSH_SERVER_IP} -o \"StrictHostKeyChecking no\""
+  evalCommand "ssh ${SSH_SERVER_IP} -o \"StrictHostKeyChecking no\" $SSH_SERVER_USER"
 
   print_debug "You need to install the sshpass tool"
   evalCommand "sshpass -p $SSH_SERVER_PASSWORD ssh $SSH_SERVER_USER@${SSH_SERVER_IP} \"whoami && pwd && cat test.txt\""
