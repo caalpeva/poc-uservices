@@ -1,0 +1,16 @@
+version: '3'
+services:
+  portainer:
+    container_name: poc_portainer
+    image: portainer/portainer:alpine
+    #command: -H tcp://<ip>:<port> # Remote docker
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Linux
+      - portainer_data:/data # Linux
+      #- \\.\pipe\docker_engine:\\.\pipe\docker_engine # Windows
+      #- portainer_data:C:\data # Windows
+
+volumes:
+  portainer_data:
