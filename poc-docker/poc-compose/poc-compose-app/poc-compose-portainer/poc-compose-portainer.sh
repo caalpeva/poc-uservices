@@ -37,6 +37,11 @@ function main {
   checkArguments $@
   initialize
 
+  print_box "PORTAINER" \
+    "" \
+    " - Portainer is a web tool to manage docker containers locally or remotely."
+  checkInteractiveMode
+
   print_info "Execute docker-compose"
   docker_compose::upWithProjectName $PROJECT_NAME
 

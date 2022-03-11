@@ -92,7 +92,7 @@ function main {
 
   print_info "Compare data from docker"
   xtrace on
-  docker info | grep -E "CPU|Memory"
+  docker info | grep -iE "cpu|memory"
   xtrace off
   checkInteractiveMode
 
