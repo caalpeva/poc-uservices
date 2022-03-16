@@ -142,6 +142,21 @@ function docker_utils::copyFiles() {
   checkInteractiveMode
 }
 
+function docker_utils::saveImage() {
+  xtrace on
+  docker save -o $1 $2
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker_utils::loadImage() {
+  xtrace on
+  docker load -i $1
+  xtrace off
+  checkInteractiveMode
+}
+
+
 ##############################
 #  AUXILIARY DOCKER METHODS  #
 ##############################
