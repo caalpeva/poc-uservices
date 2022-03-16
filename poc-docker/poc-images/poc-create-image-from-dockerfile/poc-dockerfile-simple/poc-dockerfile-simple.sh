@@ -4,7 +4,7 @@ DIR=$(dirname $(readlink -f $0))
 
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../../utils/docker-utils.src"
+source "${DIR}/../../../utils/docker.src"
 source "${DIR}/../../../../utils/microservices-utils.src"
 
 #############
@@ -35,9 +35,9 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeImages $IMAGE
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
+  docker::removeImages $IMAGE
 }
 
 function executeContainer {
@@ -55,17 +55,17 @@ function main() {
   checkArguments $@
   initialize
 
-  docker_utils::getImages
-  docker_utils::createImageFromDockerfile $IMAGE $DIR
+  docker::getImages
+  docker::createImageFromDockerfile $IMAGE $DIR
 
-  docker_utils::getImages
+  docker::getImages
   print_box "DANGLING IMAGES" \
     "" \
     " - The images that appear with labels <none>:<none> when executing the docker images command are dangling images." \
     " - These images should be deleted to free up space because they will no longer be used."
   checkInteractiveMode
 
-  docker_utils::getImages "-a"
+  docker::getImages "-a"
   print_box "INTERMEDIATE IMAGES" \
     "" \
     " - The images that appear with labels <none>:<none> when executing the docker images -a command are intermediate images." \

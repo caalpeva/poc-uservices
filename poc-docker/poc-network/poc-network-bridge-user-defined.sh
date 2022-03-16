@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../utils/docker.src"
 
 CONTAINER_PREFIX="poc_network"
 CONTAINER_MYSQL="${CONTAINER_PREFIX}_mysql"
@@ -33,9 +33,9 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeNetwork ${NETWORK_NAME}
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
+  docker::removeNetwork ${NETWORK_NAME}
 }
 
 function executeMysqlContainer {
@@ -79,22 +79,22 @@ function main {
   checkInteractiveMode
 
   print_info "Create ${NETWORK_NAME} network"
-  docker_utils::createNetwork "--subnet 180.128.10.0/24 --gateway 180.128.10.1 -d bridge" ${NETWORK_NAME}
+  docker::createNetwork "--subnet 180.128.10.0/24 --gateway 180.128.10.1 -d bridge" ${NETWORK_NAME}
 
-  docker_utils::getNetworkList
+  docker::getNetworkList
   print_info "Show network data: $NETWORK_NAME"
-  docker_utils::networkInspect $NETWORK_NAME
+  docker::networkInspect $NETWORK_NAME
 
   executeMysqlContainer
   executePhpMyAdminContainer
 
   print_info "Check containers status..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   docker inspect poc_network_mysql -f "{{ .NetworkSettings.Networks.poc_network.IPAddress }}"
   print_info "Get ip address from containers"
-  echo $(docker_utils::getIpAddressFromContainer ${CONTAINER_MYSQL} ${NETWORK_NAME})
-  echo $(docker_utils::getIpAddressFromContainer ${CONTAINER_PHPMYADMIN} ${NETWORK_NAME})
+  echo $(docker::getIpAddressFromContainer ${CONTAINER_MYSQL} ${NETWORK_NAME})
+  echo $(docker::getIpAddressFromContainer ${CONTAINER_PHPMYADMIN} ${NETWORK_NAME})
   checkInteractiveMode
 
   print_info "Install network utils in container ${CONTAINER_PHPMYADMIN}"
@@ -105,7 +105,7 @@ function main {
   checkInteractiveMode
 
   print_info "Check connection from ${CONTAINER_PHPMYADMIN} to ${CONTAINER_MYSQL} by name"
-  docker_utils::execContainerPingAsRoot ${CONTAINER_PHPMYADMIN} ${CONTAINER_MYSQL}
+  docker::execContainerPingAsRoot ${CONTAINER_PHPMYADMIN} ${CONTAINER_MYSQL}
   if [ $? -ne 0 ]; then
     print_error "Poc completed with failure"
     exit 1
@@ -114,7 +114,7 @@ function main {
   checkInteractiveMode
   print_info "Check /etc/hosts file from ${CONTAINER_PHPMYADMIN}"
   print_debug "No line added in /etc/hosts because network uses DNS and containers can resolve each other by name "
-  docker_utils::execContainer ${CONTAINER_PHPMYADMIN} "cat /etc/hosts"
+  docker::execContainer ${CONTAINER_PHPMYADMIN} "cat /etc/hosts"
 
   print_info "Check that the ${CONTAINER_PHPMYADMIN} container can connect to the ${CONTAINER_MYSQL} container."
   print_debug "Open a browser and access to http://localhost:${PHPMYADMIN_HOST_PORT}"

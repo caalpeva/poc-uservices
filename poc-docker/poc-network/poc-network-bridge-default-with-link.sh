@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../utils/docker.src"
 
 CONTAINER_PREFIX="poc_link"
 CONTAINER_MYSQL="${CONTAINER_PREFIX}_mysql"
@@ -33,8 +33,8 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
 }
 
 function executeMysqlContainer {
@@ -48,7 +48,7 @@ function executeMysqlContainer {
 
   xtrace off
 
-  docker_utils::getContainerMounts ${CONTAINER_MYSQL}
+  docker::getContainerMounts ${CONTAINER_MYSQL}
 }
 
 function executeAdminerContainer {
@@ -74,23 +74,23 @@ function main {
     "   on the same network through their IP addresses or using the --link option, which is considered legacy."
   checkInteractiveMode
 
-  docker_utils::getNetworkList
+  docker::getNetworkList
   print_info "Show network data: $NETWORK_NAME"
-  docker_utils::networkInspect $NETWORK_NAME
+  docker::networkInspect $NETWORK_NAME
 
   executeMysqlContainer
   executeAdminerContainer
 
   print_info "Check containers status..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   print_info "Get ip address from containers"
-  MYSQL_IP_ADDRESS=$(docker_utils::getIpAddressFromContainer ${CONTAINER_MYSQL})
+  MYSQL_IP_ADDRESS=$(docker::getIpAddressFromContainer ${CONTAINER_MYSQL})
   echo ${MYSQL_IP_ADDRESS}
   checkInteractiveMode
 
   print_info "Check connection from ${CONTAINER_ADMINER} to ${CONTAINER_MYSQL} by ip address"
-  docker_utils::execContainerPingAsRoot ${CONTAINER_ADMINER} ${MYSQL_IP_ADDRESS}
+  docker::execContainerPingAsRoot ${CONTAINER_ADMINER} ${MYSQL_IP_ADDRESS}
   if [ $? -ne 0 ]; then
     print_error "Poc completed with failure"
     exit 1
@@ -98,7 +98,7 @@ function main {
 
   checkInteractiveMode
   print_info "Check connection from ${CONTAINER_ADMINER} to ${CONTAINER_MYSQL} by name"
-  docker_utils::execContainerPingAsRoot ${CONTAINER_ADMINER} ${CONTAINER_MYSQL}
+  docker::execContainerPingAsRoot ${CONTAINER_ADMINER} ${CONTAINER_MYSQL}
   if [ $? -ne 0 ]; then
     print_error "Poc completed with failure"
     exit 1
@@ -106,7 +106,7 @@ function main {
 
   checkInteractiveMode
   print_info "Check /etc/hosts file from ${CONTAINER_ADMINER}"
-  docker_utils::execContainer ${CONTAINER_ADMINER} "cat /etc/hosts"
+  docker::execContainer ${CONTAINER_ADMINER} "cat /etc/hosts"
 
   print_info "Check that the ${CONTAINER_ADMINER} container can connect to the ${CONTAINER_MYSQL} container."
   print_debug "Open a browser and access to http://localhost:${ADMINER_HOST_PORT}"

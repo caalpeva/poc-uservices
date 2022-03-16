@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../utils/docker.src"
 
 CONTAINER_PREFIX="poc_ubuntu_top"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
@@ -28,8 +28,8 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
 }
 
 function executeContainers {
@@ -58,20 +58,20 @@ function executeContainers {
 
 function startContainers {
   print_info "Start containers..."
-  containers=$(docker_utils::getExitedContainerIdsByPrefix ${CONTAINER_PREFIX})
+  containers=$(docker::getExitedContainerIdsByPrefix ${CONTAINER_PREFIX})
   for containerId in ${containers}
   do
-    docker_utils::startContainers ${containerId}
+    docker::startContainers ${containerId}
   done
 }
 
 function stopContainers {
   print_info "Stop containers..."
-  containers=$(docker_utils::getRunningContainerIdsByPrefix ${CONTAINER_PREFIX})
+  containers=$(docker::getRunningContainerIdsByPrefix ${CONTAINER_PREFIX})
 
   for containerId in ${containers}
   do
-    docker_utils::stopContainers ${containerId}
+    docker::stopContainers ${containerId}
   done
 }
 
@@ -82,15 +82,15 @@ function main {
 
   executeContainers
   print_info "Check containers status..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
   stopContainers
 
   print_info "Check containers status after stopping..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
   startContainers
 
   print_info "Check containers status after startup..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   checkCleanupMode
   print_done "Poc completed successfully "

@@ -6,7 +6,7 @@ source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../utils/docker.src"
 
 IMAGE="mongo"
 
@@ -31,9 +31,9 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeImages $IMAGE
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
+  docker::removeImages $IMAGE
 }
 
 function executeContainers {
@@ -98,10 +98,10 @@ function main {
 
   executeContainers
   print_info "Check containers status"
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   print_info "Check containers stats"
-  docker_utils::showStatsByPrefix ${CONTAINER_PREFIX}
+  docker::showStatsByPrefix ${CONTAINER_PREFIX}
 
   checkCleanupMode
   print_done "Poc completed successfully "

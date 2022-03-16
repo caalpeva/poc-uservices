@@ -6,7 +6,7 @@ source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/print
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src"
 source "${DIR}/../../../../utils/microservices-utils.src"
-source "${DIR}/../../../utils/docker-utils.src"
+source "${DIR}/../../../utils/docker.src"
 source "${DIR}/../../../utils/docker-compose.src"
 
 PROJECT_NAME="poc_portainer"

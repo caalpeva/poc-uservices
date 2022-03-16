@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../utils/docker.src"
 
 #############
 # VARIABLES #
@@ -34,7 +34,7 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  docker_utils::removeImages $IMAGE_ALPINE $IMAGE_UBUNTU $IMAGE_HTTPD
+  docker::removeImages $IMAGE_ALPINE $IMAGE_UBUNTU $IMAGE_HTTPD
 }
 
 function main() {
@@ -43,14 +43,14 @@ function main() {
 
   initialize
 
-  docker_utils::pullImage $IMAGE_ALPINE
-  docker_utils::pullImage $IMAGE_UBUNTU
-  docker_utils::pullImage $IMAGE_HTTPD
-  docker_utils::getImages "-a"
-  docker_utils::getImages "-aq"
+  docker::pullImage $IMAGE_ALPINE
+  docker::pullImage $IMAGE_UBUNTU
+  docker::pullImage $IMAGE_HTTPD
+  docker::getImages "-a"
+  docker::getImages "-aq"
 
-  docker_utils::removeAllImages
-  docker_utils::getImages
+  docker::removeAllImages
+  docker::getImages
   
   checkCleanupMode
   print_done "Poc completed successfully "

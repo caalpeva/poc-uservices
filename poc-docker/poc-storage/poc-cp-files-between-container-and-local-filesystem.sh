@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../utils/docker.src"
 
 CONTAINER_PREFIX="poc_nginx"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
@@ -29,8 +29,8 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
 }
 
 function executeContainers {
@@ -52,9 +52,9 @@ function main {
 
   executeContainers
   print_info "Check containers status..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
+  docker::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
   isHttpServer1Available=$?
 
   if [ $isHttpServer1Available -ne 0 ]; then
@@ -63,7 +63,7 @@ function main {
   fi
 
   print_info "Copy welcome file from Http server container to local filesystem..."
-  docker_utils::copyFiles ${CONTAINER1_NAME}:/usr/share/nginx/html/index.html /tmp/$FILE_NAME
+  docker::copyFiles ${CONTAINER1_NAME}:/usr/share/nginx/html/index.html /tmp/$FILE_NAME
 
   print_info "Modify file $FILE_NAME..."
   textToReplace="Hello ${USER^},<br\/> Welcome"
@@ -74,9 +74,9 @@ function main {
   checkInteractiveMode
 
   print_info "Copy new welcome file from local filesystem to Http server container..."
-  docker_utils::copyFiles /tmp/$FILE_NAME ${CONTAINER1_NAME}:/usr/share/nginx/html/index.html
+  docker::copyFiles /tmp/$FILE_NAME ${CONTAINER1_NAME}:/usr/share/nginx/html/index.html
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
+  docker::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
   isHttpServer1Available=$?
 
   if [ $isHttpServer1Available -ne 0 ]; then

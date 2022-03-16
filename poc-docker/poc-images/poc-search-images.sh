@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../utils/docker.src"
 
 #############
 # VARIABLES #
@@ -40,9 +40,9 @@ function main() {
   checkArguments $@
 
   initialize
-  docker_utils::showSearchUsage
-  docker_utils::searchImages "alpine"
-  docker_utils::searchOfficialImage "alpine"
+  docker::showSearchUsage
+  docker::searchImages "alpine"
+  docker::searchOfficialImage "alpine"
 
   checkCleanupMode
   print_done "Poc completed successfully "

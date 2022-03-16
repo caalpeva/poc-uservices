@@ -6,7 +6,7 @@ source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-ut
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src"
 source "${DIR}/../../../utils/microservices-utils.src"
-source "${DIR}/../../utils/docker-utils.src"
+source "${DIR}/../../utils/docker.src"
 
 CONTAINER_PREFIX="poc_mysql"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
@@ -38,9 +38,9 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeVolumes $(docker volume list -q)
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
+  docker::removeVolumes $(docker volume list -q)
 }
 
 function checkMysqlAvailable() {
@@ -118,8 +118,8 @@ function executeContainer {
 function executeContainerAndShowDatabase {
   executeContainer $1
   print_info "Check containers status"
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
-  docker_utils::getContainerMounts $1
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::getContainerMounts $1
 
   print_info "Waiting for available mysql server..."
   waitForMysqlAvailable $1 &
@@ -141,7 +141,7 @@ function main {
   initialize
 
   print_info "List volumes"
-  docker_utils::listVolumes
+  docker::listVolumes
 
   # Se crea el primer contenedor con mysql server
   executeContainerAndShowDatabase ${CONTAINER1_NAME}
@@ -152,17 +152,17 @@ function main {
   showDatabase ${CONTAINER1_NAME}
 
   print_info "Remove container ${CONTAINER1_NAME} but keep anonymous volume"
-  docker_utils::removeContainers ${CONTAINER1_NAME}
+  docker::removeContainers ${CONTAINER1_NAME}
   print_info "List volumes"
-  docker_utils::listVolumes
+  docker::listVolumes
   print_info "Check containers status again"
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   # Se crea el segundo contenedor con mysql server
   executeContainerAndShowDatabase ${CONTAINER2_NAME}
 
   print_info "List volumes"
-  docker_utils::listVolumes
+  docker::listVolumes
 
   print_box "ANONYMOUS VOLUMES" \
     "" \

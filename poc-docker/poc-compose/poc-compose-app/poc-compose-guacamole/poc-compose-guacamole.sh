@@ -6,7 +6,7 @@ source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/print
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src"
 source "${DIR}/../../../../utils/microservices-utils.src"
-source "${DIR}/../../../utils/docker-utils.src"
+source "${DIR}/../../../utils/docker.src"
 source "${DIR}/../../../utils/docker-compose.src"
 
 PROJECT_NAME="poc_guacamole"
@@ -41,10 +41,10 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_SSH}))
-  docker_utils::removeContainers ${containers[*]}
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_SSH}))
+  docker::removeContainers ${containers[*]}
   docker_compose::downWithProjectName $PROJECT_NAME -v
-  docker_utils::removeImages $IMAGE
+  docker::removeImages $IMAGE
 }
 
 function checkMysqlAvailable() {
@@ -104,7 +104,7 @@ function main {
     " - For this test to work correctly it is necessary to install sshpass."
   checkInteractiveMode
 
-  docker_utils::createImageFromDockerfile $IMAGE \
+  docker::createImageFromDockerfile $IMAGE \
     "--build-arg NEWUSER=$SSH_SERVER_USER" \
     "--build-arg NEWUSER_PASSWORD=$SSH_SERVER_PASSWORD" \
     "--file dockerfile-server-ssh" $DIR
@@ -140,7 +140,7 @@ function main {
   checkInteractiveMode
 
   print_info "Get ip address from ssh server container"
-  SSH_SERVER_IP=$(docker_utils::getIpAddressFromContainer ${CONTAINER_SSH} "${NETWORK_NAME}")
+  SSH_SERVER_IP=$(docker::getIpAddressFromContainer ${CONTAINER_SSH} "${NETWORK_NAME}")
   echo ${SSH_SERVER_IP}
   checkInteractiveMode
 

@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/network-utils.src"
-source "${DIR}/../../utils/docker-utils.src"
+source "${DIR}/../../utils/docker.src"
 source "${DIR}/../../../utils/microservices-utils.src"
 
 #############
@@ -54,9 +54,9 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeImages "$REGISTRY_URL/$IMAGE:$TAG"
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
+  docker::removeImages "$REGISTRY_URL/$IMAGE:$TAG"
   copyDefaultConfigFile
   restartDocker
 }
@@ -120,42 +120,42 @@ function main() {
   executeRegistryContainer
 
   print_info "Check containers status again..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE
+  docker::showImagesByPrefix $IMAGE
 
-  docker_utils::pullImage "$IMAGE:latest"
+  docker::pullImage "$IMAGE:latest"
 
   print_info "Retag image for local registry"
-  docker_utils::tagImage "$IMAGE:latest" "$REGISTRY_URL/$IMAGE:$TAG"
+  docker::tagImage "$IMAGE:latest" "$REGISTRY_URL/$IMAGE:$TAG"
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE
+  docker::showImagesByPrefix $IMAGE
 
   print_info "Check that push image to local registry fails"
-  docker_utils::pushImage "$REGISTRY_URL/$IMAGE:$TAG"
+  docker::pushImage "$REGISTRY_URL/$IMAGE:$TAG"
 
   print_info "Stop container"
-  docker_utils::stopContainers ${CONTAINER1_NAME}
+  docker::stopContainers ${CONTAINER1_NAME}
   checkInteractiveMode
 
   print_info "Check containers status again..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   enableInsecureModeForIp
   restartDocker
   checkInteractiveMode
 
   print_info "Start container"
-  docker_utils::startContainers ${CONTAINER1_NAME}
+  docker::startContainers ${CONTAINER1_NAME}
   checkInteractiveMode
 
   print_info "Check containers status again..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   print_info "Check that push image to local registry works"
-  docker_utils::pushImage "$REGISTRY_URL/$IMAGE:$TAG"
+  docker::pushImage "$REGISTRY_URL/$IMAGE:$TAG"
 
   checkCleanupMode
   print_done "Poc completed successfully "

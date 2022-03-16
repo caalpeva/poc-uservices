@@ -6,7 +6,7 @@ source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-ut
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src"
 source "${DIR}/../../../utils/microservices-utils.src"
-source "${DIR}/../../utils/docker-utils.src"
+source "${DIR}/../../utils/docker.src"
 
 IMAGE_PREFIX="poc-centos-exit-code"
 IMAGE_EXIT_SUCCESS="$IMAGE_PREFIX:success"
@@ -37,35 +37,35 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeImages $IMAGE_EXIT_SUCCESS $IMAGE_EXIT_FAILURE
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
+  docker::removeImages $IMAGE_EXIT_SUCCESS $IMAGE_EXIT_FAILURE
 }
 
 function checkContainerStatus {
   local container=$1
-  docker_utils::showLogs $container
-  echo "Status: $(docker_utils::getContainerStatus $container)"
-  echo "RestartCount: $(docker_utils::getRestartCountFromContainer $container)"
+  docker::showLogs $container
+  echo "Status: $(docker::getContainerStatus $container)"
+  echo "RestartCount: $(docker::getRestartCountFromContainer $container)"
   checkInteractiveMode
 }
 
 function startContainers {
   print_info "Start containers..."
-  containers=$(docker_utils::getExitedContainerIdsByPrefix ${CONTAINER_PREFIX})
+  containers=$(docker::getExitedContainerIdsByPrefix ${CONTAINER_PREFIX})
   for containerId in ${containers}
   do
-    docker_utils::startContainers ${containerId}
+    docker::startContainers ${containerId}
   done
 }
 
 function stopContainers {
   print_info "Stop containers..."
-  containers=$(docker_utils::getRunningContainerIdsByPrefix ${CONTAINER_PREFIX})
+  containers=$(docker::getRunningContainerIdsByPrefix ${CONTAINER_PREFIX})
 
   for containerId in ${containers}
   do
-    docker_utils::stopContainers ${containerId}
+    docker::stopContainers ${containerId}
   done
 }
 
@@ -130,13 +130,13 @@ function main {
   checkInteractiveMode
 
   print_info "Show images by prefix"
-  docker_utils::getImagesByPrefix $IMAGE_PREFIX
+  docker::getImagesByPrefix $IMAGE_PREFIX
 
-  docker_utils::createImageFromDockerfile $IMAGE_EXIT_SUCCESS "--build-arg EXIT_CODE=0" $DIR
-  docker_utils::createImageFromDockerfile $IMAGE_EXIT_FAILURE "--build-arg EXIT_CODE=1" $DIR
+  docker::createImageFromDockerfile $IMAGE_EXIT_SUCCESS "--build-arg EXIT_CODE=0" $DIR
+  docker::createImageFromDockerfile $IMAGE_EXIT_FAILURE "--build-arg EXIT_CODE=1" $DIR
 
   print_info "Show images by prefix"
-  docker_utils::getImagesByPrefix $IMAGE_PREFIX
+  docker::getImagesByPrefix $IMAGE_PREFIX
   checkInteractiveMode
 
   executeContainers
@@ -145,7 +145,7 @@ function main {
   PID=$!
   showProgressBar $PID
   wait $PID
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   print_info "Check container status without restart"
   checkContainerStatus ${CONTAINER1_NAME}
@@ -167,7 +167,7 @@ function main {
 
   stopContainers
   print_info "Check containers status after stopping..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
   restartDocker
 
   print_info "Check containers status after docker daemon restarted..."
@@ -175,7 +175,7 @@ function main {
   PID=$!
   showProgressBar $PID
   wait $PID
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   print_info "Check container with restart policy always, it was restarted"
   checkContainerStatus ${CONTAINER2_NAME}

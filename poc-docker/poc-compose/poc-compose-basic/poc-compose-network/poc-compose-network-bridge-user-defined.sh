@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../../../utils/microservices-utils.src"
-source "${DIR}/../../../utils/docker-utils.src"
+source "${DIR}/../../../utils/docker.src"
 source "${DIR}/../../../utils/docker-compose.src"
 
 CONTAINER_PREFIX="poc_alpine"
@@ -49,7 +49,7 @@ function main {
   docker_compose::ps ${CONTAINER_PREFIX}
 
   print_info "Check connection from ${CONTAINER1_NAME} to ${CONTAINER2_NAME} by name"
-  docker_utils::execContainerPingAsRoot ${CONTAINER1_NAME} ${CONTAINER2_NAME}
+  docker::execContainerPingAsRoot ${CONTAINER1_NAME} ${CONTAINER2_NAME}
   if [ $? -ne 0 ]; then
     print_error "Poc completed with failure"
     exit 1
@@ -58,7 +58,7 @@ function main {
   checkInteractiveMode
   print_info "Check /etc/hosts file from ${CONTAINER1_NAME}"
   print_debug "No line added in /etc/hosts because network uses DNS and containers can resolve each other by name "
-  docker_utils::execContainer ${CONTAINER1_NAME} "cat /etc/hosts"
+  docker::execContainer ${CONTAINER1_NAME} "cat /etc/hosts"
 
   checkCleanupMode
   print_done "Poc completed successfully "

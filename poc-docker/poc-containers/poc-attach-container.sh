@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../utils/docker.src"
 
 CONTAINER_PREFIX="poc_ubuntu_top"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
@@ -25,8 +25,8 @@ function handleTermSignal() {
 
 function cleanup {  
   print_debug "Cleaning environment..."   
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
 }
 
 function executeContainers {
@@ -46,15 +46,15 @@ function main {
 
   executeContainers
   print_info "Check containers status..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   print_info "Attach container..."
   print_info "-Press CTRL+C to interrupt the program the and stop the container"
   print_info "-Press CTRL+P+Q to keep the container in background"
-  docker_utils::attachContainer ${CONTAINER1_NAME}
+  docker::attachContainer ${CONTAINER1_NAME}
 
   print_info "Check containers status again..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   checkCleanupMode
   print_done "Poc completed successfully "

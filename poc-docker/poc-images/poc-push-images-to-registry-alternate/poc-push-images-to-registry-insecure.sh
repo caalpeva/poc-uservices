@@ -4,7 +4,7 @@ DIR=$(dirname $(readlink -f $0))
 
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/docker-utils.src"
+source "${DIR}/../../utils/docker.src"
 source "${DIR}/../../../utils/microservices-utils.src"
 
 #############
@@ -39,9 +39,9 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeImages "$IMAGE:$SNAPSHOT" "$REGISTRY_URL/$IMAGE:$TAG"
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
+  docker::removeImages "$IMAGE:$SNAPSHOT" "$REGISTRY_URL/$IMAGE:$TAG"
 }
 
 function executeRegistryContainer() {
@@ -64,34 +64,34 @@ function main() {
   executeRegistryContainer
 
   print_info "Check containers status again..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE
-  docker_utils::createImageFromDockerfile "$IMAGE:$SNAPSHOT" $DIR
+  docker::showImagesByPrefix $IMAGE
+  docker::createImageFromDockerfile "$IMAGE:$SNAPSHOT" $DIR
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE
+  docker::showImagesByPrefix $IMAGE
 
   print_info "Retag image for local registry"
-  docker_utils::tagImage "$IMAGE:$SNAPSHOT" "$REGISTRY_URL/$IMAGE:$TAG"
+  docker::tagImage "$IMAGE:$SNAPSHOT" "$REGISTRY_URL/$IMAGE:$TAG"
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE
+  docker::showImagesByPrefix $IMAGE
 
   print_info "Push image to local registry"
-  docker_utils::pushImage "$REGISTRY_URL/$IMAGE:$TAG"
+  docker::pushImage "$REGISTRY_URL/$IMAGE:$TAG"
 
-  docker_utils::removeImages "$IMAGE:$SNAPSHOT" "$REGISTRY_URL/$IMAGE:$TAG"
+  docker::removeImages "$IMAGE:$SNAPSHOT" "$REGISTRY_URL/$IMAGE:$TAG"
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE
+  docker::showImagesByPrefix $IMAGE
 
   print_info "Pull image from local registry"
-  docker_utils::pullImage "$REGISTRY_URL/$IMAGE:$TAG"
+  docker::pullImage "$REGISTRY_URL/$IMAGE:$TAG"
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE
+  docker::showImagesByPrefix $IMAGE
 
   checkCleanupMode
   print_done "Poc completed successfully "

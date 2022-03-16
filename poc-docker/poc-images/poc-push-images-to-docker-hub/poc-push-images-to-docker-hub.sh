@@ -4,7 +4,7 @@ DIR=$(dirname $(readlink -f $0))
 
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/docker-utils.src"
+source "${DIR}/../../utils/docker.src"
 source "${DIR}/../../../utils/microservices-utils.src"
 
 #############
@@ -39,9 +39,9 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeImages "$IMAGE:$TAG" "$IMAGE:$SNAPSHOT"
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
+  docker::removeImages "$IMAGE:$TAG" "$IMAGE:$SNAPSHOT"
 }
 
 function dockerLogin() {
@@ -58,23 +58,23 @@ function main() {
   initialize
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE
-  docker_utils::createImageFromDockerfile "$IMAGE:$SNAPSHOT" $DIR
+  docker::showImagesByPrefix $IMAGE
+  docker::createImageFromDockerfile "$IMAGE:$SNAPSHOT" $DIR
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE
+  docker::showImagesByPrefix $IMAGE
 
   print_info "Login with your Docker ID to push images to Docker Hub"
   dockerLogin
 
   print_info "Retag image for Docker Hub with username"
-  docker_utils::tagImage "$IMAGE:$SNAPSHOT" "$DOCKER_USERNAME/$IMAGE:$TAG"
+  docker::tagImage "$IMAGE:$SNAPSHOT" "$DOCKER_USERNAME/$IMAGE:$TAG"
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE
+  docker::showImagesByPrefix $IMAGE
 
   print_info "Push image to Docker Hub"
-  docker_utils::pushImage "$DOCKER_USERNAME/$IMAGE:$TAG"
+  docker::pushImage "$DOCKER_USERNAME/$IMAGE:$TAG"
 
   checkCleanupMode
   print_done "Poc completed successfully "

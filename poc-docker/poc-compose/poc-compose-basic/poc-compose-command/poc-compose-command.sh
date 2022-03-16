@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../../../utils/microservices-utils.src"
-source "${DIR}/../../../utils/docker-utils.src"
+source "${DIR}/../../../utils/docker.src"
 source "${DIR}/../../../utils/docker-compose.src"
 
 CONTAINER_NAME="poc-centos"
@@ -40,7 +40,7 @@ function main {
   print_info "Check containers status..."
   docker_compose::ps
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER_NAME} ${CONTAINER_HTTP_PORT}
+  docker::checkHttpServerAvailability ${CONTAINER_NAME} ${CONTAINER_HTTP_PORT}
   if [ $? -ne 0 ]; then
     print_error "Poc completed with failure"
     exit 1

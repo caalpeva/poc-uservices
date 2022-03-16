@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../utils/docker.src"
 
 #############
 # VARIABLES #
@@ -34,7 +34,7 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  docker_utils::removeImages $IMAGE_ALPINE $IMAGE_ALPINE_3_7 $IMAGE_ALPINE_3_8
+  docker::removeImages $IMAGE_ALPINE $IMAGE_ALPINE_3_7 $IMAGE_ALPINE_3_8
 }
 
 function main() {
@@ -42,16 +42,16 @@ function main() {
   checkArguments $@
 
   initialize
-  docker_utils::showPullUsage
+  docker::showPullUsage
 
-  docker_utils::pullImage $IMAGE_ALPINE
-  docker_utils::getImageHistory $IMAGE_ALPINE
+  docker::pullImage $IMAGE_ALPINE
+  docker::getImageHistory $IMAGE_ALPINE
 
-  docker_utils::pullImage $IMAGE_ALPINE_3_7
-  docker_utils::getImageHistory $IMAGE_ALPINE_3_7
+  docker::pullImage $IMAGE_ALPINE_3_7
+  docker::getImageHistory $IMAGE_ALPINE_3_7
 
-  docker_utils::pullImage $IMAGE_ALPINE_3_8 "-q"
-  docker_utils::getImageHistory $IMAGE_ALPINE_3_7
+  docker::pullImage $IMAGE_ALPINE_3_8 "-q"
+  docker::getImageHistory $IMAGE_ALPINE_3_7
   
   checkCleanupMode
   print_done "Poc completed successfully "

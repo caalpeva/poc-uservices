@@ -4,7 +4,7 @@ DIR=$(dirname $(readlink -f $0))
 
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/docker-utils.src"
+source "${DIR}/../../utils/docker.src"
 source "${DIR}/../../../utils/microservices-utils.src"
 
 #############
@@ -45,9 +45,9 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
-  docker_utils::removeImages $IMAGE
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
+  docker::removeImages $IMAGE
   xtrace on
   rm -rf ${BACKUP_DIRECTORY}
   xtrace off
@@ -70,27 +70,27 @@ function main() {
   initialize
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE_PREFIX
-  docker_utils::createImageFromDockerfile $IMAGE $DIR
+  docker::showImagesByPrefix $IMAGE_PREFIX
+  docker::createImageFromDockerfile $IMAGE $DIR
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE_PREFIX
+  docker::showImagesByPrefix $IMAGE_PREFIX
 
   executeContainer
   checkInteractiveMode
 
   print_info "Save image to tar file"
-  docker_utils::saveImage $FILE_TAR $IMAGE
+  docker::saveImage $FILE_TAR $IMAGE
 
-  docker_utils::removeImages $IMAGE
+  docker::removeImages $IMAGE
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE_PREFIX
+  docker::showImagesByPrefix $IMAGE_PREFIX
 
   print_info "Load image from tar file"
-  docker_utils::loadImage $FILE_TAR
+  docker::loadImage $FILE_TAR
 
   print_info "Filter images by name"
-  docker_utils::showImagesByPrefix $IMAGE_PREFIX
+  docker::showImagesByPrefix $IMAGE_PREFIX
 
   executeContainer
   checkCleanupMode

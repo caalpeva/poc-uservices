@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../utils/docker-utils.src"
+source "${DIR}/../utils/docker.src"
 
 CONTAINER_PREFIX="poc_httpd"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
@@ -29,8 +29,8 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
 }
 
 function executeContainers {
@@ -58,12 +58,12 @@ function main {
 
   executeContainers
   print_info "Check containers status..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
+  docker::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
   isHttpServer1Available=$?
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER2_NAME} ${CONTAINER_HTTP_PORT}
+  docker::checkHttpServerAvailability ${CONTAINER2_NAME} ${CONTAINER_HTTP_PORT}
   isHttpServer2Available=$?
 
   if [ $isHttpServer1Available -ne 0 -o $isHttpServer2Available -ne 0 ]; then

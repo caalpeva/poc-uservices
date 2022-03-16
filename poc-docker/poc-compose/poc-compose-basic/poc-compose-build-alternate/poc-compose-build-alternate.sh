@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../../../utils/microservices-utils.src"
-source "${DIR}/../../../utils/docker-utils.src"
+source "${DIR}/../../../utils/docker.src"
 source "${DIR}/../../../utils/docker-compose.src"
 
 CONTAINER_NAME="poc_alpine_build_alternate"
@@ -40,7 +40,7 @@ function main {
   docker_compose::ps
 
   print_info "Execute command in container"
-  docker_utils::execContainer ${CONTAINER_NAME} "tree -L 1"
+  docker::execContainer ${CONTAINER_NAME} "tree -L 1"
   if [ $? -ne 0 ]; then
     print_error "Poc completed with failure"
     exit 1

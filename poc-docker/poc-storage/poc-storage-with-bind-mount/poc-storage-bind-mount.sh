@@ -5,7 +5,7 @@ DIR=$(dirname $(readlink -f $0))
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../../utils/microservices-utils.src"
-source "${DIR}/../../utils/docker-utils.src"
+source "${DIR}/../../utils/docker.src"
 
 CONTAINER_PREFIX="poc_nginx"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
@@ -39,8 +39,8 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  containers=($(docker_utils::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
-  docker_utils::removeContainers ${containers[*]}
+  containers=($(docker::getAllContainerIdsByPrefix ${CONTAINER_PREFIX}))
+  docker::removeContainers ${containers[*]}
   xtrace on
   rm -rf ${TMP_DIRECTORY}
   xtrace off
@@ -66,10 +66,10 @@ function main {
 
   executeContainers
   print_info "Check containers status..."
-  docker_utils::showContainersByPrefix ${CONTAINER_PREFIX}
-  docker_utils::getContainerMounts ${CONTAINER1_NAME}
+  docker::showContainersByPrefix ${CONTAINER_PREFIX}
+  docker::getContainerMounts ${CONTAINER1_NAME}
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
+  docker::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
   isHttpServer1Available=$?
 
   if [ $isHttpServer1Available -ne 0 ]; then
@@ -85,7 +85,7 @@ function main {
   xtrace off
   checkInteractiveMode
 
-  docker_utils::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
+  docker::checkHttpServerAvailability ${CONTAINER1_NAME} ${CONTAINER_HTTP_PORT}
   isHttpServer1Available=$?
 
   if [ $isHttpServer1Available -ne 0 ]; then
@@ -94,7 +94,7 @@ function main {
   fi
 
   print_info "Add file to container storage (rw)..."
-  docker_utils::copyFiles ${DIR}/webapps/logo.png ${CONTAINER1_NAME}:/usr/share/nginx/html
+  docker::copyFiles ${DIR}/webapps/logo.png ${CONTAINER1_NAME}:/usr/share/nginx/html
 
   checkCleanupMode
   print_done "Poc completed successfully"
