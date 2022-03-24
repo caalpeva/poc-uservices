@@ -1,4 +1,5 @@
 dependencies/downloads/**
 poc-docker/poc-images/poc-push-images-to-registry-alternate/data/**
 poc-docker/poc-images/poc-push-images-to-registry-alternate/backups/**
+poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/data/**
 
