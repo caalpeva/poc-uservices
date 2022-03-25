@@ -1,0 +1,21 @@
+FROM centos:7
+
+ARG NEWUSER
+ARG NEWUSER_PASSWORD
+
+RUN yum -y install openssh-server && \
+    /usr/bin/ssh-keygen -A
+
+RUN useradd ${NEWUSER} && \
+    echo ${NEWUSER_PASSWORD} | passwd ${NEWUSER} --stdin && \
+    mkdir /home/${NEWUSER}/.ssh && \
+    chmod 700 /home/${NEWUSER}/.ssh
+
+COPY ssh-keys/key.pub /home/${NEWUSER}/.ssh/authorized_keys
+
+RUN chown ${NEWUSER}:${NEWUSER} -R /home/${NEWUSER}/.ssh && \
+    chmod 600 /home/${NEWUSER}/.ssh/authorized_keys
+
+CMD /usr/sbin/sshd-keygen > /dev/null 2>&1
+
+CMD /usr/sbin/sshd -D

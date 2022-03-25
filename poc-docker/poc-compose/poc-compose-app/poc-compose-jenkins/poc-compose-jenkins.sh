@@ -10,14 +10,34 @@ source "${DIR}/../../../utils/docker.src"
 source "${DIR}/../../../utils/docker-compose.src"
 
 PROJECT_NAME="poc_jenkins"
+NETWORK_NAME="${PROJECT_NAME}_network"
+IMAGE="centos-server-ssh-with-keys"
 
-CONTAINER_PREFIX="poc_jenkins"
-CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
+CONTAINER_SSH="poc_machine_server_ssh"
+DATA_DIRECTORY="${DIR}/data"
+KEYS_DIRECTORY="${DIR}/ssh-keys"
+
+SSH_SERVER_USER="perico"
+SSH_SERVER_PASSWORD="1234"
 
 function initialize() {
   print_info "Preparing poc environment..."
   setTerminalSignals
   cleanup
+  print_debug "Creating data directory..."
+  xtrace on
+  if [ ! -d ${DATA_DIRECTORY} ]; then
+    xtrace on
+    mkdir ${DATA_DIRECTORY}
+    xtrace off
+  fi
+  xtrace off
+  print_debug "Creating ssh keys directory..."
+  if [ ! -d ${KEYS_DIRECTORY} ]; then
+    xtrace on
+    mkdir ${KEYS_DIRECTORY}
+    xtrace off
+  fi
 }
 
 function handleTermSignal() {
@@ -30,6 +50,10 @@ function handleTermSignal() {
 function cleanup {
   print_debug "Cleaning environment..."
   docker_compose::downWithProjectName $PROJECT_NAME
+  docker::removeImages $IMAGE
+  xtrace on
+  rm -rf ${KEYS_DIRECTORY}
+  xtrace off
 }
 
 function main {
@@ -42,14 +66,38 @@ function main {
     " - ."
   checkInteractiveMode
 
+  print_info "Generate ssh keys"
+  xtrace on
+  ssh-keygen -f ${KEYS_DIRECTORY}/key -m PEM -N ''
+  xtrace off
+  checkInteractiveMode
+
+  docker::createImageFromDockerfile $IMAGE \
+    "--build-arg NEWUSER=$SSH_SERVER_USER" \
+    "--build-arg NEWUSER_PASSWORD=$SSH_SERVER_PASSWORD" \
+    "--file dockerfile-server-ssh-with-keys" $DIR
+
   print_info "Execute docker-compose"
   docker_compose::upWithProjectName $PROJECT_NAME
 
   print_info "Check containers status..."
   docker_compose::psWithProjectName $PROJECT_NAME
 
+  print_info "Get ip address from ssh server container"
+  SSH_SERVER_IP=$(docker::getIpAddressFromContainer ${CONTAINER_SSH} "${NETWORK_NAME}")
+  echo ${SSH_SERVER_IP}
+  checkInteractiveMode
+
+  print_info "Check ssh connection with private key to ssh server container from localhost"
+  evalCommand "ssh -i $KEYS_DIRECTORY/key -o \"StrictHostKeyChecking no\" $SSH_SERVER_USER@${SSH_SERVER_IP} date"
+  if [ $? -ne 0 ]; then
+    print_error "Error connecting via ssh."
+    exit 1
+  fi
+
   print_info "Check connection of Jenkins container"
   print_debug "Interactive in http://localhost:8080 to manage jenkins jobs"
+  print_debug "Create SSH connection from jenkins with ${CONTAINER_SSH}, port 22, user $SSH_SERVER_USER and private key $KEYS_DIRECTORY/key"
   checkInteractiveMode
 
   checkCleanupMode

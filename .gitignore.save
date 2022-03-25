@@ -1,3 +1,0 @@
-dependencies/downloads/**
-poc-docker/poc-images/poc-push-images-to-registry-alternate/data/**
-disableInsecureModeToIp

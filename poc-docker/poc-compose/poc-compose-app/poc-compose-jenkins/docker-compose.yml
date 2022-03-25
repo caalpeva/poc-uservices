@@ -1,14 +1,19 @@
 version: '3'
 services:
   jenkins:
-    container_name: jenkins
+    container_name: poc_jenkins
     image: jenkins/jenkins
     ports:
       - "8080:8080"
     volumes:
       - $PWD/data:/var/jenkins_home
     networks:
-      - net
+      - network
+  machine_server_ssh:
+    container_name: poc_machine_server_ssh
+    image: centos-server-ssh-with-keys
+    networks:
+      - network
 
 networks:
-  net:
+  network:
