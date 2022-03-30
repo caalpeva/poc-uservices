@@ -6,12 +6,25 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - $PWD/data:/var/jenkins_home
+      - $PWD/jenkins:/var/jenkins_home
     networks:
       - network
   machine_server_ssh:
     container_name: poc_machine_server_ssh
     image: centos-server-ssh-with-keys
+    networks:
+      - network
+  machine_server_git:
+    container_name: poc_machine_server_git
+    hostname: gitlab.example.com
+    image: gitlab/gitlab-ce:12.6.8-ce.0
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - "$PWD/gitlab/config:/etc/gitlab"
+      - "$PWD/gitlab/logs:/var/log/gitlab"
+      - "$PWD/gitlab/data:/var/opt/gitlab"
     networks:
       - network
 
