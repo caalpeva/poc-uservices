@@ -2,18 +2,36 @@ version: '3'
 services:
   jenkins:
     container_name: poc_jenkins
-    image: jenkins/jenkins
+    #image: jenkins/jenkins
+    image: poc-jenkins:docker
+    build:
+      context: .
+      dockerfile: dockerfile-jenkins-with-docker
     ports:
       - "8080:8080"
     volumes:
       - $PWD/jenkins:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - network
+
+  machine_docker_registry:
+    container_name: poc_machine_docker_registry
+    image: registry:2
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - $PWD/docker-registry/:/var/lib/registry
+    networks:
+      - network
+
   machine_server_ssh:
     container_name: poc_machine_server_ssh
     image: centos-server-ssh-with-keys
     networks:
       - network
+
   machine_server_git:
     container_name: poc_machine_server_git
     hostname: gitlab.example.com
