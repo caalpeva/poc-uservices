@@ -13,8 +13,11 @@ PROJECT_NAME="poc_jenkins"
 NETWORK_NAME="${PROJECT_NAME}_network"
 IMAGE="centos-server-ssh-with-keys"
 
+CONTAINER_JENKINS="poc_jenkins"
 CONTAINER_SSH="poc_machine_server_ssh"
-DATA_DIRECTORY="${DIR}/data"
+JENKINS_DIRECTORY="${DIR}/jenkins"
+GITLAB_DIRECTORY="${DIR}/gitlab"
+DOCKER_REGISTRY_DIRECTORY="${DIR}/docker-registry"
 KEYS_DIRECTORY="${DIR}/ssh-keys"
 
 SSH_SERVER_USER="perico"
@@ -26,9 +29,21 @@ function initialize() {
   cleanup
   print_debug "Creating data directory..."
   xtrace on
-  if [ ! -d ${DATA_DIRECTORY} ]; then
+  if [ ! -d ${JENKINS_DIRECTORY} ]; then
     xtrace on
-    mkdir ${DATA_DIRECTORY}
+    mkdir ${JENKINS_DIRECTORY}
+    xtrace off
+  fi
+  xtrace on
+  if [ ! -d ${GITLAB_DIRECTORY} ]; then
+    xtrace on
+    mkdir ${GITLAB_DIRECTORY}
+    xtrace off
+  fi
+  xtrace on
+  if [ ! -d ${DOCKER_REGISTRY_DIRECTORY} ]; then
+    xtrace on
+    mkdir ${DOCKER_REGISTRY_DIRECTORY}
     xtrace off
   fi
   xtrace off
@@ -82,6 +97,9 @@ function main {
 
   print_info "Check containers status..."
   docker_compose::psWithProjectName $PROJECT_NAME
+
+  print_info "Change owner of docker volume"
+  docker::execContainerAsRoot $CONTAINER_JENKINS "chown jenkins /var/run/docker.sock"
 
   print_info "Get ip address from ssh server container"
   SSH_SERVER_IP=$(docker::getIpAddressFromContainer ${CONTAINER_SSH} "${NETWORK_NAME}")

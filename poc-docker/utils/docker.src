@@ -325,6 +325,13 @@ function docker::execContainer() {
   checkInteractiveMode
 }
 
+function docker::execContainerAsRoot() {
+  command="docker exec -u root $1 $2"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
 function docker::execContainerWithTty() {
   xtrace on
   docker exec -it $1 $2
