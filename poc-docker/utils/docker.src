@@ -326,10 +326,20 @@ function docker::execContainer() {
 }
 
 function docker::execContainerAsRoot() {
-  command="docker exec -u root $1 $2"
+  container=$1
+  shift
+  command="docker exec -u root $container $@"
   echo "+ $command"
   eval "$command"
   return $?
+}
+
+function docker::execContainerAsRootDos() {
+  container=$1
+  shift
+  xtrace on
+  docker exec -u root $container $@
+  xtrace off
 }
 
 function docker::execContainerWithTty() {

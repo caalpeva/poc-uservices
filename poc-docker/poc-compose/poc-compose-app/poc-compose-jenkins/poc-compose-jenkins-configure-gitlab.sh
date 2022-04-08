@@ -10,6 +10,7 @@ source "${DIR}/../../../utils/docker.src"
 source "${DIR}/../../../utils/docker-compose.src"
 
 GITLAB_DOMAIN="gitlab.example.com"
+CONTAINER_GITLAB="poc_machine_server_git"
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -54,8 +55,37 @@ function main {
   git add .
   git commit -m "Initial commit"
   git push -u origin master
+  cd -
   xtrace off
   checkInteractiveMode
+
+  print_info "Create gitlab hook to jenkins job"
+  print_debug "Find repository directory"
+  GIT_REPOSITORY_ROOT_DIR="/var/opt/gitlab/git-data/repositories/@hashed"
+  DIRECTORY=$(docker::execContainerAsRootDos $CONTAINER_GITLAB find $GIT_REPOSITORY_ROOT_DIR -type d -name "*.git" | grep -v wiki.git)
+  echo "Directory---> $DIRECTORY"
+  checkInteractiveMode
+
+  print_debug "Create custom_hooks directory"
+  docker::execContainerAsRootDos $CONTAINER_GITLAB mkdir -p $DIRECTORY/custom_hooks
+  checkInteractiveMode
+
+  print_debug "Copy postreceive script to custom_hooks directory"
+  docker::copyFiles hooks/post-receive $CONTAINER_GITLAB:$DIRECTORY/custom_hooks/post-receive
+
+  print_debug "Grant execution permissions to the script"
+  docker::execContainerAsRootDos $CONTAINER_GITLAB "chmod +x $DIRECTORY/custom_hooks/post-receive"
+  checkInteractiveMode
+
+  print_debug "Change script ownership to git user"
+  docker::execContainerAsRootDos $CONTAINER_GITLAB "chown git:git $DIRECTORY/custom_hooks/ -R"
+  checkInteractiveMode
+
+  print_info "Check that the gitlab hook works satisfactorily."
+  print_debug "Make any changes to the app and push to gitlab."
+  print_debug "Check that the execution of the job is triggered from gitlab."
+  checkInteractiveMode
+
 
   checkCleanupMode
   print_done "Poc completed successfully "
