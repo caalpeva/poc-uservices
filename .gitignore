@@ -5,4 +5,4 @@ poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/app/.git
 poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/docker-registry/**
 poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/jenkins/**
 poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/gitlab/**
-poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/ssh-keys/**
+poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/tmp/**

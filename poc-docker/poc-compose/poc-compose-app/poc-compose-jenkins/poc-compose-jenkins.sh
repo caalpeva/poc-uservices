@@ -18,7 +18,7 @@ CONTAINER_SSH="poc_machine_server_ssh"
 JENKINS_DIRECTORY="${DIR}/jenkins"
 GITLAB_DIRECTORY="${DIR}/gitlab"
 DOCKER_REGISTRY_DIRECTORY="${DIR}/docker-registry"
-KEYS_DIRECTORY="${DIR}/ssh-keys"
+TMP_DIRECTORY="${DIR}/tmp"
 
 SSH_SERVER_USER="perico"
 SSH_SERVER_PASSWORD="1234"
@@ -47,10 +47,10 @@ function initialize() {
     xtrace off
   fi
   xtrace off
-  print_debug "Creating ssh keys directory..."
-  if [ ! -d ${KEYS_DIRECTORY} ]; then
+  print_debug "Creating tmp directory..."
+  if [ ! -d ${TMP_DIRECTORY} ]; then
     xtrace on
-    mkdir ${KEYS_DIRECTORY}
+    mkdir ${TMP_DIRECTORY}
     xtrace off
   fi
 }
@@ -67,7 +67,7 @@ function cleanup {
   docker_compose::downWithProjectName $PROJECT_NAME
   docker::removeImages $IMAGE
   xtrace on
-  rm -rf ${KEYS_DIRECTORY}
+  rm -rf ${TMP_DIRECTORY}
   xtrace off
 }
 
@@ -83,7 +83,7 @@ function main {
 
   print_info "Generate ssh keys"
   xtrace on
-  ssh-keygen -f ${KEYS_DIRECTORY}/key -m PEM -N ''
+  ssh-keygen -f ${TMP_DIRECTORY}/key -m PEM -N ''
   xtrace off
   checkInteractiveMode
 
@@ -107,7 +107,7 @@ function main {
   checkInteractiveMode
 
   print_info "Check ssh connection with private key to ssh server container from localhost"
-  evalCommand "ssh -i $KEYS_DIRECTORY/key -o \"StrictHostKeyChecking no\" $SSH_SERVER_USER@${SSH_SERVER_IP} date"
+  evalCommand "ssh -i $TMP_DIRECTORY/key -o \"StrictHostKeyChecking no\" $SSH_SERVER_USER@${SSH_SERVER_IP} date"
   if [ $? -ne 0 ]; then
     print_error "Error connecting via ssh."
     exit 1
@@ -115,7 +115,7 @@ function main {
 
   print_info "Check connection of Jenkins container"
   print_debug "Interactive in http://localhost:8080 to manage jenkins jobs"
-  print_debug "Create SSH connection from jenkins with ${CONTAINER_SSH}, port 22, user $SSH_SERVER_USER and private key $KEYS_DIRECTORY/key"
+  print_debug "Create SSH connection from jenkins with ${CONTAINER_SSH}, port 22, user $SSH_SERVER_USER and private key $TMP_DIRECTORY/key"
   checkInteractiveMode
 
   checkCleanupMode
