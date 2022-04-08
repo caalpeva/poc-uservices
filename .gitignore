@@ -1,6 +1,7 @@
 dependencies/downloads/**
 poc-docker/poc-images/poc-push-images-to-registry-alternate/data/**
 poc-docker/poc-images/poc-push-images-to-registry-alternate/backups/**
+poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/app/.git
 poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/docker-registry/**
 poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/jenkins/**
 poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/gitlab/**
