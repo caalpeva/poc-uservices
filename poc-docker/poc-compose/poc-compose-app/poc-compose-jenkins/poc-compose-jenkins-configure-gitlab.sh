@@ -34,9 +34,10 @@ function main {
   checkArguments $@
   initialize
 
-  print_info "To execute this script successfully, it is necessary to manually execute the steps indicated in the readme.md file."
-  print_debug "Create the corresponding job entries in jenkins."
-  print_debug "Create repository and user in gitlab."
+  print_box "JENKINS" \
+    "Before running this script you must manually perform the steps indicated in the README.md file." \
+    " - Create the corresponding job entries in Jenkins." \
+    " - Create repository and user in Gitlab."
   checkInteractiveMode
 
   print_info "Check /etc/hosts file"
@@ -46,8 +47,9 @@ function main {
     sudo echo "127.0.0.1  $GITLAB_DOMAIN" >> /etc/hosts
     xtrace off
   fi
+  checkInteractiveMode
 
-  print_info "Add application code to gitlab"
+  print_info "Add application code to Gitlab"
   xtrace on
   cd app
   git init
@@ -59,18 +61,18 @@ function main {
   xtrace off
   checkInteractiveMode
 
-  print_info "Create gitlab hook to jenkins job"
+  print_info "Create gitlab hook to Jenkins job"
   print_debug "Find repository directory"
   GIT_REPOSITORY_ROOT_DIR="/var/opt/gitlab/git-data/repositories/@hashed"
   DIRECTORY=$(docker::execContainerAsRootDos $CONTAINER_GITLAB find $GIT_REPOSITORY_ROOT_DIR -type d -name "*.git" | grep -v wiki.git)
-  echo "Directory---> $DIRECTORY"
+  echo "$DIRECTORY"
   checkInteractiveMode
 
   print_debug "Create custom_hooks directory"
   docker::execContainerAsRootDos $CONTAINER_GITLAB mkdir -p $DIRECTORY/custom_hooks
   checkInteractiveMode
 
-  print_debug "Copy postreceive script to custom_hooks directory"
+  print_debug "Copy post-receive script to custom_hooks directory"
   docker::copyFiles hooks/post-receive $CONTAINER_GITLAB:$DIRECTORY/custom_hooks/post-receive
 
   print_debug "Grant execution permissions to the script"
@@ -81,11 +83,10 @@ function main {
   docker::execContainerAsRootDos $CONTAINER_GITLAB "chown git:git $DIRECTORY/custom_hooks/ -R"
   checkInteractiveMode
 
-  print_info "Check that the gitlab hook works satisfactorily."
-  print_debug "Make any changes to the app and push to gitlab."
-  print_debug "Check that the execution of the job is triggered from gitlab."
+  print_info "Check that the Gitlab hook works satisfactorily."
+  print_debug "Make any changes to the app and push to Gitlab."
+  print_debug "Check that the execution of the job is triggered automatically."
   checkInteractiveMode
-
 
   checkCleanupMode
   print_done "Poc completed successfully "
