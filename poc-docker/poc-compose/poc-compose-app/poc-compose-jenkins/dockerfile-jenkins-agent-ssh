@@ -4,3 +4,7 @@ LABEL version="1.0" maintainer="<kalpeva@gmail.com>"
 
 # Fix: add PATH to /etc/environment
 RUN echo PATH=$PATH >> /etc/environment
+
+# Install maven
+RUN apt-get update && \
+    apt-get install --assume-yes maven
