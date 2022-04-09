@@ -10,10 +10,13 @@
   ### Execute "Build now" on parent job.
   ### Add gitlab credentials named "gitlab_credentials".
 
-## Configurar Gitlab server
+## Configure Gitlab server
   ### First create root user with credentials.
   ### Create group named "poc"
   ### Create repository named "poc-app-maven-simple"
   ### Create user for repository with same credentials as "gitlab_credentials".
   ### Manage repository access for user with maintainer permissions.
   ### Execute script to push application code and create hook with jenkins.
+
+## Configure SSH agent
+  ### Create a Jenkins SSH credentials

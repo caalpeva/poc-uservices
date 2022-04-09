@@ -11,7 +11,7 @@ RUN useradd ${NEWUSER} && \
     mkdir /home/${NEWUSER}/.ssh && \
     chmod 700 /home/${NEWUSER}/.ssh
 
-COPY ssh-keys/key.pub /home/${NEWUSER}/.ssh/authorized_keys
+COPY tmp/key.pub /home/${NEWUSER}/.ssh/authorized_keys
 
 RUN chown ${NEWUSER}:${NEWUSER} -R /home/${NEWUSER}/.ssh && \
     chmod 600 /home/${NEWUSER}/.ssh/authorized_keys

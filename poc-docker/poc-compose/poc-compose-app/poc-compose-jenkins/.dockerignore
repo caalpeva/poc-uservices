@@ -1,4 +1,5 @@
 app
 gitlab
 docker-registry
+hooks
 jobs

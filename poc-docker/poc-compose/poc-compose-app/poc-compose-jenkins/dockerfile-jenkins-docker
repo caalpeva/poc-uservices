@@ -2,6 +2,10 @@ FROM jenkins/jenkins
 
 USER root
 
+# Install maven
+RUN apt-get update && \
+    apt-get install --assume-yes maven
+
 # Install docker
 RUN apt-get update && \
   apt-get -y install apt-transport-https \

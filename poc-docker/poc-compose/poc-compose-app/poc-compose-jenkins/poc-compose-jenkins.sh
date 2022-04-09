@@ -11,16 +11,18 @@ source "${DIR}/../../../utils/docker-compose.src"
 
 PROJECT_NAME="poc_jenkins"
 NETWORK_NAME="${PROJECT_NAME}_network"
-IMAGE="centos-server-ssh-with-keys"
+IMAGE="poc-centos:ssh"
 
-CONTAINER_JENKINS="poc_jenkins"
-CONTAINER_SSH="poc_machine_server_ssh"
+CONTAINER_JENKINS="poc_server_jenkins"
+CONTAINER_SSH="poc_server_ssh"
+
 JENKINS_DIRECTORY="${DIR}/jenkins"
 GITLAB_DIRECTORY="${DIR}/gitlab"
 DOCKER_REGISTRY_DIRECTORY="${DIR}/docker-registry"
+JOBS_DIRECTORY="${DIR}/jobs"
 TMP_DIRECTORY="${DIR}/tmp"
 
-SSH_SERVER_USER="perico"
+SSH_SERVER_USER="jenkins"
 SSH_SERVER_PASSWORD="1234"
 
 function initialize() {
@@ -67,8 +69,30 @@ function cleanup {
   docker_compose::downWithProjectName $PROJECT_NAME
   docker::removeImages $IMAGE
   xtrace on
-  rm -rf ${TMP_DIRECTORY}
+  #rm -rf ${TMP_DIRECTORY}
   xtrace off
+}
+
+function generateSshKeys {
+  print_info "Generate ssh keys"
+  xtrace on
+  ssh-keygen -f ${TMP_DIRECTORY}/key -m PEM -N ''
+  xtrace off
+  checkInteractiveMode
+
+  print_info "Create common.env with public key content"
+  xtrace on
+  echo "JENKINS_AGENT_SSH_PUBKEY=$(cat ${TMP_DIRECTORY}/key.pub)" > ${TMP_DIRECTORY}/common.env
+  xtrace off
+  checkInteractiveMode
+}
+
+function createDslScriptForParentJob {
+  print_info "Create DSL script for parent job"
+  xtrace on
+  cat ${JOBS_DIRECTORY}/* > ${JOBS_DIRECTORY}/job-parent.dsl
+  xtrace off
+  checkInteractiveMode
 }
 
 function main {
@@ -81,19 +105,18 @@ function main {
     " - ."
   checkInteractiveMode
 
-  print_info "Generate ssh keys"
-  xtrace on
-  ssh-keygen -f ${TMP_DIRECTORY}/key -m PEM -N ''
-  xtrace off
-  checkInteractiveMode
+  createDslScriptForParentJob
+
+  #generateSshKeys
 
   docker::createImageFromDockerfile $IMAGE \
     "--build-arg NEWUSER=$SSH_SERVER_USER" \
     "--build-arg NEWUSER_PASSWORD=$SSH_SERVER_PASSWORD" \
-    "--file dockerfile-server-ssh-with-keys" $DIR
+    "--file dockerfile-centos-ssh-keys" $DIR
+  checkInteractiveMode
 
   print_info "Execute docker-compose"
-  docker_compose::upWithProjectName $PROJECT_NAME
+  docker_compose::upWithProjectName $PROJECT_NAME --build
 
   print_info "Check containers status..."
   docker_compose::psWithProjectName $PROJECT_NAME

@@ -9,7 +9,7 @@
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>Simple project with maven</name>
+	<name>poc-app-maven-basic</name>
 
   <dependencies>
     <dependency>

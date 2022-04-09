@@ -10,7 +10,7 @@ source "${DIR}/../../../utils/docker.src"
 source "${DIR}/../../../utils/docker-compose.src"
 
 GITLAB_DOMAIN="gitlab.example.com"
-CONTAINER_GITLAB="poc_machine_server_git"
+CONTAINER_GITLAB="poc_server_gitlab"
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -34,7 +34,7 @@ function main {
   checkArguments $@
   initialize
 
-  print_box "JENKINS" \
+  print_box "CONFIGURE JENKINS AND GITLAB" \
     "Before running this script you must manually perform the steps indicated in the README.md file." \
     " - Create the corresponding job entries in Jenkins." \
     " - Create repository and user in Gitlab."

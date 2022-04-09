@@ -1,0 +1,131 @@
+def notifyStatusChangeViaEmail(buildStatus) {
+    def subject
+
+    switch (buildStatus) {
+        case 'SUCCESS':
+            subject="Jenkins build is back to normal"
+            break
+
+        case 'UNSTABLE':
+            subject="Jenkins build is unstable"
+            break
+
+        case 'FAILURE':
+            subject="Build failed in Jenkins"
+            break
+    }
+
+    mail to: 'hyeepaa@gmail.com',
+    subject: "${subject}: ${currentBuild.fullDisplayName}",
+    body: "See ${env.BUILD_URL} for more details"
+}
+
+pipeline {
+    agent any
+    /*
+    agent {
+      label 'agent1'
+    }
+    */
+
+    triggers {
+      pollSCM('* * * * *')
+    }
+
+    environment {
+      DOCKER_REGISTRY_URL="localhost:5000"
+      DOCKER_IMAGE="poc-app-maven-simple"
+    }
+
+    stages {
+        /*
+        stage("Env Variables") {
+          steps {
+            sh "printenv"
+          }
+        }
+        */
+
+        stage ("Checkout") {
+          steps {
+            sh 'echo "NODE: $NODE_NAME"'
+            git branch: 'master',
+                credentialsId: 'gitlab_credentials',
+                url: 'http://gitlab.example.com/poc/poc-app-maven-simple.git'
+          }
+        }
+
+        stage ("Compile") {
+            steps {
+                sh 'echo "NODE: $NODE_NAME"'
+                sh "mvn compile"
+            }
+        }
+
+        stage('Unit test') {
+          steps {
+            sh 'mvn test'
+          }
+          post {
+            always {
+              junit 'target/surefire-reports/*.xml'
+            }
+          }
+        }
+
+        stage('Package') {
+          steps {
+            sh 'mvn -B -DskipTests clean package'
+          }
+          post {
+            success {
+              archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+          }
+        }
+
+        stage("Docker build") {
+          steps {
+            // sh "docker build -f Dockerfile-app -t ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE}:${BUILD_NUMBER} ."
+            sh "docker-compose build"
+          }
+        }
+
+        /*
+        stage("Docker login") {
+          steps {
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'docker-hub-credentials',
+              usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
+                sh "docker login --username $USERNAME --password $PASSWORD"
+              }
+          }
+        }
+        */
+
+        stage("Docker push") {
+          steps {
+            // sh "docker push ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
+            sh "docker tag ${DOCKER_IMAGE} ${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
+            sh "sed  -i 's+${DOCKER_IMAGE}+${DOCKER_REGISTRY_URL}/${DOCKER_IMAGE}:${BUILD_NUMBER}+g' docker-compose.yml"
+            sh "cat docker-compose.yml"
+            sh "docker-compose push"
+          }
+        }
+
+        stage("Deploy to staging") {
+          steps {
+            sh "docker-compose -f docker-compose.yml up -d"
+          }
+        }
+    }
+
+    post {
+      always {
+        sh "docker-compose -f docker-compose.yml down"
+      }
+
+      changed {
+        notifyStatusChangeViaEmail(currentBuild.currentResult)
+      }
+    }
+}

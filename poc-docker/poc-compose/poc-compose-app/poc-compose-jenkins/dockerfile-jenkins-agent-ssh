@@ -1,0 +1,6 @@
+FROM jenkins/ssh-agent:jdk11
+
+LABEL version="1.0" maintainer="<kalpeva@gmail.com>"
+
+# Fix: add PATH to /etc/environment
+RUN echo PATH=$PATH >> /etc/environment
