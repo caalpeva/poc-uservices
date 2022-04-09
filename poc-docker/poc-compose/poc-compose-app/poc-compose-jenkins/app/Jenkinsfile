@@ -46,6 +46,7 @@ pipeline {
         }
         */
 
+        /*
         stage ("Checkout") {
           steps {
             sh 'echo "NODE: $NODE_NAME"'
@@ -54,6 +55,7 @@ pipeline {
                 url: 'http://gitlab.example.com/poc/poc-app-maven-simple.git'
           }
         }
+        */
 
         stage ("Compile") {
             steps {
