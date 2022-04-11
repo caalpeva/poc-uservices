@@ -85,7 +85,7 @@ function main {
 
   print_info "Check that the Gitlab hook works satisfactorily."
   print_debug "Make any changes to the app and push to Gitlab."
-  print_debug "Check that the execution of the job is triggered automatically."
+  print_debug "Check that the execution of the jobs are triggered automatically."
   checkInteractiveMode
 
   checkCleanupMode

@@ -49,12 +49,6 @@ function initialize() {
     xtrace off
   fi
   xtrace off
-  print_debug "Creating tmp directory..."
-  if [ ! -d ${TMP_DIRECTORY} ]; then
-    xtrace on
-    mkdir ${TMP_DIRECTORY}
-    xtrace off
-  fi
 }
 
 function handleTermSignal() {
@@ -68,23 +62,6 @@ function cleanup {
   print_debug "Cleaning environment..."
   docker_compose::downWithProjectName $PROJECT_NAME
   docker::removeImages $IMAGE
-  xtrace on
-  #rm -rf ${TMP_DIRECTORY}
-  xtrace off
-}
-
-function generateSshKeys {
-  print_info "Generate ssh keys"
-  xtrace on
-  ssh-keygen -f ${TMP_DIRECTORY}/key -m PEM -N ''
-  xtrace off
-  checkInteractiveMode
-
-  print_info "Create common.env with public key content"
-  xtrace on
-  echo "JENKINS_AGENT_SSH_PUBKEY=$(cat ${TMP_DIRECTORY}/key.pub)" > ${TMP_DIRECTORY}/common.env
-  xtrace off
-  checkInteractiveMode
 }
 
 function createDslScriptForParentJob {
@@ -106,8 +83,6 @@ function main {
   checkInteractiveMode
 
   createDslScriptForParentJob
-
-  #generateSshKeys
 
   docker::createImageFromDockerfile $IMAGE \
     "--build-arg NEWUSER=$SSH_SERVER_USER" \

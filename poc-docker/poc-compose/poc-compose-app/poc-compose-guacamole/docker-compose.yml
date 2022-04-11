@@ -22,7 +22,7 @@ services:
     env_file: common.env
     networks:
       - network
-    restart: always
+    #restart: always
     depends_on:
       - daemon
   proxy:
@@ -34,7 +34,7 @@ services:
       - $PWD/conf/nginx.conf:/etc/nginx/nginx.conf
     networks:
       - network
-    restart: always
+    #restart: always
     depends_on:
       - web
 volumes:
