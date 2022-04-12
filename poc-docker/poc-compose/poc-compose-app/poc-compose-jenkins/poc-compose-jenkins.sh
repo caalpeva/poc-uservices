@@ -30,25 +30,21 @@ function initialize() {
   setTerminalSignals
   cleanup
   print_debug "Creating data directory..."
-  xtrace on
   if [ ! -d ${JENKINS_DIRECTORY} ]; then
     xtrace on
     mkdir -p ${JENKINS_DIRECTORY}
     xtrace off
   fi
-  xtrace on
   if [ ! -d ${GITLAB_DIRECTORY} ]; then
     xtrace on
     mkdir -p ${GITLAB_DIRECTORY}
     xtrace off
   fi
-  xtrace on
   if [ ! -d ${DOCKER_REGISTRY_DIRECTORY} ]; then
     xtrace on
     mkdir -p ${DOCKER_REGISTRY_DIRECTORY}
     xtrace off
   fi
-  xtrace off
 }
 
 function handleTermSignal() {
