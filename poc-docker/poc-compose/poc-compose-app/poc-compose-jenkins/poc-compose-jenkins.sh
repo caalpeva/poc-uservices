@@ -78,10 +78,11 @@ function main {
   initialize
 
   print_box "JENKINS" \
+    "" \
     " Jenkins is an automation tool for tasks that belong to the software development workflow." \
     " - First run the poc-compose-jenkins-generate-ssh-keys.sh script to generate the ssh keys." \
-    " - After deploying the microservices, run the poc-compose-jenkins-configure-gitlab-hook.sh " \
-    "   to add data to a repository and configure the hook."
+    " - After deploying the microservices, run the poc-compose-jenkins-configure-gitlab-hooks.sh " \
+    "   to add data to a repository and configure the hooks."
   checkInteractiveMode
 
   createDslScriptForParentJob

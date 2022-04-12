@@ -35,6 +35,7 @@ function main {
   initialize
 
   print_box "CONFIGURE JENKINS AND GITLAB" \
+    "" \
     "Before running this script you must manually perform the steps indicated in the README.md file." \
     " - Create the corresponding job entries in Jenkins." \
     " - Create repository and user in Gitlab."
