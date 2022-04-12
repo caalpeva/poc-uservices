@@ -11,7 +11,7 @@ source "${DIR}/../../../utils/docker-compose.src"
 
 PROJECT_NAME="poc_guacamole"
 NETWORK_NAME="${PROJECT_NAME}_network"
-IMAGE="centos-server-ssh"
+IMAGE="poc-centos-server-ssh:no-keys"
 
 CONTAINER_PREFIX="poc_guacamole"
 CONTAINER_MYSQL="${CONTAINER_PREFIX}_mysql"

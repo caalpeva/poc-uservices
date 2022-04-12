@@ -11,14 +11,14 @@ source "${DIR}/../../../utils/docker-compose.src"
 
 PROJECT_NAME="poc_jenkins"
 NETWORK_NAME="${PROJECT_NAME}_network"
-IMAGE="poc-centos:ssh"
+IMAGE="poc-centos-server-ssh:keys"
 
 CONTAINER_JENKINS="poc_server_jenkins"
 CONTAINER_SSH="poc_server_ssh"
 
-JENKINS_DIRECTORY="${DIR}/jenkins"
-GITLAB_DIRECTORY="${DIR}/gitlab"
-DOCKER_REGISTRY_DIRECTORY="${DIR}/docker-registry"
+JENKINS_DIRECTORY="${DIR}/mount/jenkins"
+GITLAB_DIRECTORY="${DIR}/mount/gitlab"
+DOCKER_REGISTRY_DIRECTORY="${DIR}/mount/docker-registry"
 JOBS_DIRECTORY="${DIR}/jobs"
 TMP_DIRECTORY="${DIR}/tmp"
 
@@ -33,19 +33,19 @@ function initialize() {
   xtrace on
   if [ ! -d ${JENKINS_DIRECTORY} ]; then
     xtrace on
-    mkdir ${JENKINS_DIRECTORY}
+    mkdir -p ${JENKINS_DIRECTORY}
     xtrace off
   fi
   xtrace on
   if [ ! -d ${GITLAB_DIRECTORY} ]; then
     xtrace on
-    mkdir ${GITLAB_DIRECTORY}
+    mkdir -p ${GITLAB_DIRECTORY}
     xtrace off
   fi
   xtrace on
   if [ ! -d ${DOCKER_REGISTRY_DIRECTORY} ]; then
     xtrace on
-    mkdir ${DOCKER_REGISTRY_DIRECTORY}
+    mkdir -p ${DOCKER_REGISTRY_DIRECTORY}
     xtrace off
   fi
   xtrace off
@@ -78,8 +78,10 @@ function main {
   initialize
 
   print_box "JENKINS" \
-    "" \
-    " - ."
+    " Jenkins is an automation tool for tasks that belong to the software development workflow." \
+    " - First run the poc-compose-jenkins-generate-ssh-keys.sh script to generate the ssh keys." \
+    " - After deploying the microservices, run the poc-compose-jenkins-configure-gitlab-hook.sh " \
+    "   to add data to a repository and configure the hook."
   checkInteractiveMode
 
   createDslScriptForParentJob
