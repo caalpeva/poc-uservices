@@ -52,7 +52,7 @@ services:
 
   machine_ssh:
     container_name: poc_server_ssh
-    image: poc-centos:ssh
+    image: poc-centos-server-ssh:keys
     networks:
       - network
 
