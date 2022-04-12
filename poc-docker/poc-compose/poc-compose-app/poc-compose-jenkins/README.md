@@ -46,20 +46,9 @@ Install the plugins suggested in the initial process and also install the follow
 | SSH    | This plugin executes shell commands remotely using SSH protocol. |
 | SSH Agent   | This plugin allows you to provide SSH credentials to builds via a ssh-agent in Jenkins |
 
-#### 2.2 Configure system
+#### 2.2 Configure global security
 
-  * Configure system E-mail notification
-
-    - SMTP server: smtp.gmail.com
-    - SMTP port: 587
-    - Use SMTP authentication with <account> and <password> from gmail
-    - Use TLS
-
-  * Add SSH sites that projects will want to connect
-
-    - Indicate hostname, port and credentials
-
-#### 2.3 Configure global security
+Secure Jenkins; define who is allowed to access/use the system and configure credentials.
 
   * Select Role-Based strategy as the authorization method
 
@@ -69,7 +58,7 @@ Install the plugins suggested in the initial process and also install the follow
 
     - Assign roles to users.
 
-  * Manage credential entries
+  * Manage credentials
 
     - Add credentials called _**"gitlab_credentials"**_ of the type "Username with password" with the same username and password created to access the gitlab repository.
 
@@ -78,30 +67,72 @@ Install the plugins suggested in the initial process and also install the follow
   * CSRF Protection
 
     - Select Stric crumb isuuer
+
     - Uncheck the session ID
+
     - Enable script security for Job DSL scripts
 
+#### 2.3 Configure system
+
+Configure global settings and paths.
+
+  * Configure system E-mail notification
+
+    - SMTP server: _**smtp.gmail.com**_
+
+    - SMTP port: _**587**_
+
+    - Use SMTP authentication with username and password from gmail
+
+    - Use TLS
+
+  * Add SSH sites that projects will want to connect
+
+    - Indicate hostname _**"poc_server_ssh"**_, port _**"22"**__ and credentials _**"jenkins_credentials"**_
+
+    - Check the connection is successful.
+
+
 #### 2.4 Configure global tools:
+
+Configure tools, their locations and automatic installers.
 
   * Maven
 
     - Add Maven installations
 
-#### 2.5 Configure Jenkins SSH agent:
+#### 2.5 Manage Nodes:
 
+Add, remove, control and monitor the various nodes that Jenkins runs jobs on.
 
+  * Add new node with the following data:
+    - Name: _**agent1**_
+
+    - Remote root directory: _**/home/jenkins_home**_
+
+    - Usage: Select _**"Only build jobs with label expressions matching this node"**_
+
+    - Launch method: Select _**"Launch agents via SSH"**_
+
+    - Host: _**poc_server_jenkins_agent_ssh**__
+
+    - Credentials: Select _**"jenkins_credentials"**_
+
+    - Host key verification strategy: Select _**"Manually trusted key verification strategy"**_
+
+    - Check the connection is successful.
 
 #### 2.6 Create first Job as _"Seed Job"_
 
-Create a freestyle job called _**"poc-seed-job"**_ to load a DSL script and allow you to generate predefined jobs programmatically.
+Create a freestyle job to load a DSL script and programmatically generate predefined jobs.
 
   * Select _**"Process job DSLs"**_ step.
 
   * Check _**"Use the provided DSL script"**_ option.
 
-  * Copy the contents of the job-parent.dsl file from jobs directory.
+  * Copy the contents of the _**"job-parent.dsl"**_ file from jobs directory.
 
-  * Execute "Build now" on parent job.
+  * Execute _**"Build now"**_ on parent job.
 
   * Check that 3 more jobs are created automatically.
 
