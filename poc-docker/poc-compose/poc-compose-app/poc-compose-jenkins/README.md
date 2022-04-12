@@ -1,4 +1,4 @@
-## Proof of concept about Jenkins and related servers
+# Proof of concept about Jenkins and related servers
 
 Before deploying microservices, you need to have ssh keys to securely access remote machines via command line. So, run the following script to generate the public and private shh keys.
 
@@ -13,11 +13,11 @@ To deploy the complete environment of microservices, run the following script:
 ```
 Next, it is necessary to make some configurations interactively in the machines.
 
-### 1. Configure Gitlab server
+## 1. Configure Gitlab
 
 Access to http://localhost:80 and create root user with credentials.
 
-#### 1.1 Create repository
+### 1.1 Create repository
 
   * Create group called _**"poc"**_
 
@@ -25,13 +25,13 @@ Access to http://localhost:80 and create root user with credentials.
 
   * Create username with password for this repository.
 
-  * Manage repository access for the above username with maintainer permissions.
+  * Manage repository access for the above user by granting maintainer permissions.
 
-### 2. Configure Jenkins server
+## 2. Configure Jenkins
 
 Access to http://localhost:8080 and create main user with credentials (admin/admin).
 
-#### 2.1 Plugin installations
+### 2.1 Plugin installations
 
 Install the plugins suggested in the initial process and also install the following plugins:
 
@@ -46,7 +46,7 @@ Install the plugins suggested in the initial process and also install the follow
 | SSH    | This plugin executes shell commands remotely using SSH protocol. |
 | SSH Agent   | This plugin allows you to provide SSH credentials to builds via a ssh-agent in Jenkins |
 
-#### 2.2 Configure global security
+### 2.2 Configure global security
 
 Secure Jenkins; define who is allowed to access/use the system and configure credentials.
 
@@ -72,7 +72,7 @@ Secure Jenkins; define who is allowed to access/use the system and configure cre
 
     - Enable script security for Job DSL scripts
 
-#### 2.3 Configure system
+### 2.3 Configure system
 
 Configure global settings and paths.
 
@@ -93,7 +93,7 @@ Configure global settings and paths.
     - Check the connection is successful.
 
 
-#### 2.4 Configure global tools:
+### 2.4 Configure global tools
 
 Configure tools, their locations and automatic installers.
 
@@ -101,7 +101,7 @@ Configure tools, their locations and automatic installers.
 
     - Add Maven installations
 
-#### 2.5 Manage Nodes:
+### 2.5 Manage nodes
 
 Add, remove, control and monitor the various nodes that Jenkins runs jobs on.
 
@@ -122,7 +122,7 @@ Add, remove, control and monitor the various nodes that Jenkins runs jobs on.
 
     - Check the connection is successful.
 
-#### 2.6 Create first Job as _"Seed Job"_
+### 2.6 Create first Job as _"Seed Job"_
 
 Create a freestyle job to load a DSL script and programmatically generate predefined jobs.
 
