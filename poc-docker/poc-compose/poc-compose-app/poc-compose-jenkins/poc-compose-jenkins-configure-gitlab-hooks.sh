@@ -62,7 +62,7 @@ function main {
   xtrace off
   checkInteractiveMode
 
-  print_info "Create gitlab hook to Jenkins job"
+  print_info "Create gitlab hook to Jenkins jobs"
   print_debug "Find repository directory"
   GIT_REPOSITORY_ROOT_DIR="/var/opt/gitlab/git-data/repositories/@hashed"
   DIRECTORY=$(docker::execContainerAsRootDos $CONTAINER_GITLAB find $GIT_REPOSITORY_ROOT_DIR -type d -name "*.git" | grep -v wiki.git)

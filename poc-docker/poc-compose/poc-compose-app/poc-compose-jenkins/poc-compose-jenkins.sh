@@ -85,12 +85,17 @@ function main {
     "   to add data to a repository and configure the hooks."
   checkInteractiveMode
 
+  if [ ! -d ${TMP_DIRECTORY} ]; then
+    print_error "SSH keys not found."
+    exit 1
+  fi
+
   createDslScriptForParentJob
 
   docker::createImageFromDockerfile $IMAGE \
     "--build-arg NEWUSER=$SSH_SERVER_USER" \
     "--build-arg NEWUSER_PASSWORD=$SSH_SERVER_PASSWORD" \
-    "--file dockerfile-centos-ssh-keys" $DIR
+    "--file dockerfile-server-ssh-keys" $DIR
   checkInteractiveMode
 
   print_info "Execute docker-compose"

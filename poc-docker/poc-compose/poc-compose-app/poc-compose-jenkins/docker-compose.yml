@@ -4,7 +4,7 @@ services:
     container_name: poc_server_jenkins
     image: poc-jenkins:docker
     build:
-      context: dockerfiles
+      context: .
       dockerfile: dockerfile-jenkins-docker
     ports:
       - "8080:8080"
@@ -18,12 +18,11 @@ services:
     container_name: poc_server_jenkins_agent_ssh
     image: poc-jenkins:ssh-agent
     build:
-      context: dockerfiles
+      context: .
       dockerfile: dockerfile-jenkins-agent-ssh
     env_file: $PWD/tmp/common.env
     networks:
       - network
-
 
   machine_gitlab:
     container_name: poc_server_gitlab
