@@ -35,6 +35,7 @@ function main {
   initialize
 
   print_box "CONFIGURE JENKINS AND GITLAB" \
+    "" \
     "Before running this script you must manually perform the steps indicated in the README.md file." \
     " - Create the corresponding job entries in Jenkins." \
     " - Create repository and user in Gitlab."
@@ -61,7 +62,7 @@ function main {
   xtrace off
   checkInteractiveMode
 
-  print_info "Create gitlab hook to Jenkins job"
+  print_info "Create gitlab hook to Jenkins jobs"
   print_debug "Find repository directory"
   GIT_REPOSITORY_ROOT_DIR="/var/opt/gitlab/git-data/repositories/@hashed"
   DIRECTORY=$(docker::execContainerAsRootDos $CONTAINER_GITLAB find $GIT_REPOSITORY_ROOT_DIR -type d -name "*.git" | grep -v wiki.git)
@@ -85,7 +86,7 @@ function main {
 
   print_info "Check that the Gitlab hook works satisfactorily."
   print_debug "Make any changes to the app and push to Gitlab."
-  print_debug "Check that the execution of the job is triggered automatically."
+  print_debug "Check that the execution of the jobs are triggered automatically."
   checkInteractiveMode
 
   checkCleanupMode

@@ -11,14 +11,14 @@ source "${DIR}/../../../utils/docker-compose.src"
 
 PROJECT_NAME="poc_jenkins"
 NETWORK_NAME="${PROJECT_NAME}_network"
-IMAGE="poc-centos:ssh"
+IMAGE="poc-centos-server-ssh:keys"
 
 CONTAINER_JENKINS="poc_server_jenkins"
 CONTAINER_SSH="poc_server_ssh"
 
-JENKINS_DIRECTORY="${DIR}/jenkins"
-GITLAB_DIRECTORY="${DIR}/gitlab"
-DOCKER_REGISTRY_DIRECTORY="${DIR}/docker-registry"
+JENKINS_DIRECTORY="${DIR}/mount/jenkins"
+GITLAB_DIRECTORY="${DIR}/mount/gitlab"
+DOCKER_REGISTRY_DIRECTORY="${DIR}/mount/docker-registry"
 JOBS_DIRECTORY="${DIR}/jobs"
 TMP_DIRECTORY="${DIR}/tmp"
 
@@ -30,29 +30,19 @@ function initialize() {
   setTerminalSignals
   cleanup
   print_debug "Creating data directory..."
-  xtrace on
   if [ ! -d ${JENKINS_DIRECTORY} ]; then
     xtrace on
-    mkdir ${JENKINS_DIRECTORY}
+    mkdir -p ${JENKINS_DIRECTORY}
     xtrace off
   fi
-  xtrace on
   if [ ! -d ${GITLAB_DIRECTORY} ]; then
     xtrace on
-    mkdir ${GITLAB_DIRECTORY}
+    mkdir -p ${GITLAB_DIRECTORY}
     xtrace off
   fi
-  xtrace on
   if [ ! -d ${DOCKER_REGISTRY_DIRECTORY} ]; then
     xtrace on
-    mkdir ${DOCKER_REGISTRY_DIRECTORY}
-    xtrace off
-  fi
-  xtrace off
-  print_debug "Creating tmp directory..."
-  if [ ! -d ${TMP_DIRECTORY} ]; then
-    xtrace on
-    mkdir ${TMP_DIRECTORY}
+    mkdir -p ${DOCKER_REGISTRY_DIRECTORY}
     xtrace off
   fi
 }
@@ -68,23 +58,6 @@ function cleanup {
   print_debug "Cleaning environment..."
   docker_compose::downWithProjectName $PROJECT_NAME
   docker::removeImages $IMAGE
-  xtrace on
-  #rm -rf ${TMP_DIRECTORY}
-  xtrace off
-}
-
-function generateSshKeys {
-  print_info "Generate ssh keys"
-  xtrace on
-  ssh-keygen -f ${TMP_DIRECTORY}/key -m PEM -N ''
-  xtrace off
-  checkInteractiveMode
-
-  print_info "Create common.env with public key content"
-  xtrace on
-  echo "JENKINS_AGENT_SSH_PUBKEY=$(cat ${TMP_DIRECTORY}/key.pub)" > ${TMP_DIRECTORY}/common.env
-  xtrace off
-  checkInteractiveMode
 }
 
 function createDslScriptForParentJob {
@@ -102,17 +75,23 @@ function main {
 
   print_box "JENKINS" \
     "" \
-    " - ."
+    " Jenkins is an automation tool for tasks that belong to the software development workflow." \
+    " - First run the poc-compose-jenkins-generate-ssh-keys.sh script to generate the ssh keys." \
+    " - After deploying the microservices, run the poc-compose-jenkins-configure-gitlab-hooks.sh " \
+    "   to add data to a repository and configure the hooks."
   checkInteractiveMode
 
-  createDslScriptForParentJob
+  if [ ! -d ${TMP_DIRECTORY} ]; then
+    print_error "SSH keys not found."
+    exit 1
+  fi
 
-  #generateSshKeys
+  createDslScriptForParentJob
 
   docker::createImageFromDockerfile $IMAGE \
     "--build-arg NEWUSER=$SSH_SERVER_USER" \
     "--build-arg NEWUSER_PASSWORD=$SSH_SERVER_PASSWORD" \
-    "--file dockerfile-centos-ssh-keys" $DIR
+    "--file dockerfile-server-ssh-keys" $DIR
   checkInteractiveMode
 
   print_info "Execute docker-compose"

@@ -1,6 +1,4 @@
 app
-gitlab
-jenkins
-docker-registry
+mount
 hooks
 jobs

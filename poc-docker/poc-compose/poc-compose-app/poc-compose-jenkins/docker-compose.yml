@@ -2,7 +2,6 @@ version: '3'
 services:
   machine_jenkins:
     container_name: poc_server_jenkins
-    #image: jenkins/jenkins
     image: poc-jenkins:docker
     build:
       context: .
@@ -10,8 +9,18 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - $PWD/jenkins:/var/jenkins_home
+      - $PWD/mount/jenkins:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - network
+
+  machine_jenkins_agent:
+    container_name: poc_server_jenkins_agent_ssh
+    image: poc-jenkins:ssh-agent
+    build:
+      context: .
+      dockerfile: dockerfile-jenkins-agent-ssh
+    env_file: $PWD/tmp/common.env
     networks:
       - network
 
@@ -23,9 +32,9 @@ services:
       - "443:443"
       - "80:80"
     volumes:
-      - "$PWD/gitlab/config:/etc/gitlab"
-      - "$PWD/gitlab/logs:/var/log/gitlab"
-      - "$PWD/gitlab/data:/var/opt/gitlab"
+      - "$PWD/mount/gitlab/config:/etc/gitlab"
+      - "$PWD/mount/gitlab/logs:/var/log/gitlab"
+      - "$PWD/mount/gitlab/data:/var/opt/gitlab"
     networks:
       - network
 
@@ -36,23 +45,13 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - $PWD/docker-registry/:/var/lib/registry
+      - $PWD/mount/docker-registry/:/var/lib/registry
     networks:
       - network
 
   machine_ssh:
     container_name: poc_server_ssh
-    image: poc-centos:ssh
-    networks:
-      - network
-
-  machine_ssh_agent:
-    container_name: poc_server_ssh_agent
-    image: poc-jenkins:ssh-agent
-    build:
-      context: .
-      dockerfile: dockerfile-jenkins-agent-ssh
-    env_file: $PWD/tmp/common.env
+    image: poc-centos-server-ssh:keys
     networks:
       - network
 

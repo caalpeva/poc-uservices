@@ -8,3 +8,6 @@ RUN echo PATH=$PATH >> /etc/environment
 # Install maven
 RUN apt-get update && \
     apt-get install --assume-yes maven
+
+# Install git
+RUN apt-get install --assume-yes git
