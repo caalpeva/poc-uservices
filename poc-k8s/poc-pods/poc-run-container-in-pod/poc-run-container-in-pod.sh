@@ -51,10 +51,10 @@ function main {
   fi
 
   kubectl::apply $CONFIGURATION_FILE_POD
-  kubectl::showPodsByDefaultNamespace
+  kubectl::showPods
 
   print_info "Show logs..."
-  kubectl::showLogsByDefaultNamespace $POD_NAME
+  kubectl::showLogs $POD_NAME
 
   #print_info "Run command in the same running container with tty..."
   #print_debug "Use the shell for example to execute:\n\tprintenv"

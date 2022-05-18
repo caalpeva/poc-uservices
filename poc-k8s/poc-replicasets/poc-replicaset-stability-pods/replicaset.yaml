@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: poc-rs-stability-pods
+  labels:
+    name: poc-rs-stability-pods
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: poc-rs-stability-pods
+  template:
+    metadata:
+      name: poc-pod-environment-with-replicas
+      labels:
+        name: poc-rs-stability-pods
+        language: golang
+    spec:
+      containers:
+        - name: poc-app-message-loop
+          image: kalpeva/poc-golang-message-loop:1.0
+          env:
+            - name: CHARACTER
+              value: "un arquero."
+            - name: SLEEP_TIME
+              value: "3s"
