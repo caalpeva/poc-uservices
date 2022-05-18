@@ -8,7 +8,7 @@ source "${DIR}/../../../utils/microservices-utils.src"
 source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
-FLAG_CREATE_AND_PUSH_IMAGE=true
+FLAG_CREATE_AND_PUSH_IMAGE=false
 
 CONFIGURATION_FILE_POD=${DIR}/pod.yaml
 POD_NAME="poc-pod-environment"
@@ -33,6 +33,10 @@ function handleTermSignal() {
 function cleanup {
   print_debug "Cleaning environment..."
   kubectl::unapply $CONFIGURATION_FILE_POD
+  images=($(docker::getImagesWithTags $IMAGE))
+  if [ ${#images[@]} -gt 0 ]; then
+    docker::removeImages ${images[*]}
+  fi
 }
 
 function main {
@@ -43,14 +47,13 @@ function main {
   if [ $FLAG_CREATE_AND_PUSH_IMAGE = true ]; then
     print_info "Filter images by name"
     docker::showImagesByPrefix $IMAGE
-
     docker::createImageAndPushToDockerHub $IMAGE $SNAPSHOT $TAG $DIR
   fi
 
-  kubectl::showPodsByDefaultNamespace
   kubectl::apply $CONFIGURATION_FILE_POD
   kubectl::showPodsByDefaultNamespace
 
+  print_info "Show logs..."
   kubectl::showLogsByDefaultNamespace $POD_NAME
 
   #print_info "Run command in the same running container with tty..."

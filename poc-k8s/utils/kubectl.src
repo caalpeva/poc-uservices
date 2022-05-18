@@ -23,7 +23,6 @@ function kubectl::unapply() {
   xtrace on
   kubectl delete -f $1
   xtrace off
-  checkInteractiveMode
 }
 
 function kubectl::showPodsByDefaultNamespace() {
@@ -49,6 +48,7 @@ function kubectl::showLogsByDefaultNamespace() {
   kubectl wait --for=condition=ready pod $pod
   kubectl logs $pod
   xtrace off
+  checkInteractiveMode
 }
 
 function kubectl::execUniqueContainer() {

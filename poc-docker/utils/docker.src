@@ -91,6 +91,12 @@ function docker::getImages() {
   checkInteractiveMode
 }
 
+function docker::getImagesWithTags() {
+  xtrace on
+  docker images | grep $1 | awk '{ print $1":"$2}'
+  xtrace off
+}
+
 function docker::getImagesByPrefix() {
   xtrace on
   docker images | grep $1
