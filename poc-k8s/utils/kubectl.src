@@ -1,0 +1,112 @@
+#!/bin/echo "source me !"
+# Requires: /../../dependencies/downloads/poc-bash-master/includes/print-utils.src
+# 	    /../../dependencies/downloads/poc-bash-master/includes/trace-utils.src
+#       /../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src
+#           /../../utils/microservices-utils.src
+
+##########################
+#    BASIC K8S METHODS   #
+##########################
+
+function kubectl::apply() {
+  file=$1
+  print_info "Apply configuration from $1"
+  xtrace on
+  kubectl apply -f $1
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::unapply() {
+  file=$1
+  print_info "Unapply configuration from $1"
+  xtrace on
+  kubectl delete -f $1
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showPodsByDefaultNamespace() {
+  print_info "Show pods by default namespace"
+  xtrace on
+  kubectl get pods --output wide
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showPodsByNamespace() {
+  namespace=$1
+  print_info "Show pods by namespace $namespace"
+  xtrace on
+  kubectl -n $namespace get po -o wide
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showLogsByDefaultNamespace() {
+  pod=$1
+  xtrace on
+  kubectl wait --for=condition=ready pod $pod
+  kubectl logs $pod
+  xtrace off
+}
+
+function kubectl::execUniqueContainer() {
+  pod=$1
+  shift
+  xtrace on
+  kubectl exec $pod -- $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::execUniqueContainerWithTty() {
+  pod=$1
+  shift
+  xtrace on
+  kubectl exec -it $pod -- $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::execContainerPing() {
+  from=$1
+  to=$2
+  command="docker exec $from ping $to -c 3"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
+function kubectl::execContainerPingAsRoot() {
+  from=$1
+  to=$2
+  command="docker exec -u root $from ping $to -c 3"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
+function kubectl::checkUrl  {
+  command="curl $1"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
+function kubectl::checkHttpServerAvailability  {
+  declare -i result=0
+  print_info "Check that the Http server from $1 is available..."
+  print_debug "Extract host port from container data..."
+  port=$(docker::getFirstHostPortFromContainerData $1 $2)
+
+  docker::checkUrl "http://localhost:${port}"
+  if [ $? -ne 0 ]
+  then
+    print_error "Http server from $1 is not available"
+    result=1
+  fi
+
+  checkInteractiveMode
+  return $result
+}
