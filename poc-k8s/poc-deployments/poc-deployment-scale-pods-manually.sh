@@ -8,9 +8,9 @@ source "${DIR}/../../utils/microservices-utils.src"
 source "${DIR}/../../poc-docker/utils/docker.src"
 source "${DIR}/../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/replicaset.yaml
-REPLICASET_NAME="poc-replicaset"
-LABEL_NAME="poc-replicaset"
+CONFIGURATION_FILE=${DIR}/deployment.yaml
+DEPLOYMENT_NAME="poc-deployment"
+LABEL_NAME="poc-deployment"
 
 REPLICAS_EXPECTED=5
 
@@ -39,17 +39,22 @@ function main {
 
   kubectl::showNodes
   kubectl::apply $CONFIGURATION_FILE
-  kubectl::waitForPodsByLabel "name=$LABEL_NAME"
+
+  kubectl::waitForDeployment $DEPLOYMENT_NAME
+  kubectl::showDeployments
   kubectl::showReplicaSets
   kubectl::showPods
 
-  kubectl::scaleReplicaSet $REPLICASET_NAME $REPLICAS_EXPECTED
+  kubectl::scaleDeployment $DEPLOYMENT_NAME $REPLICAS_EXPECTED
+  sleep 20
+  kubectl::waitForPodsByLabel "name=$LABEL_NAME"
+  kubectl::showDeployments
   kubectl::showReplicaSets
   kubectl::showPods
 
   print_info "Check the scaled of pods"
   POD_NUMBER=($(kubectl::getPodNames))
-  POD_REPLICAS=$(kubectl::getReplicasFromReplicaSet $REPLICASET_NAME)
+  POD_REPLICAS=$(kubectl::getReplicasFromDeployment $DEPLOYMENT_NAME)
   if [ ${#POD_NUMBER[@]} -ne $REPLICAS_EXPECTED -o $POD_REPLICAS -ne $REPLICAS_EXPECTED ]; then
     print_error "Poc completed with failure. Pod replicas is not $REPLICAS_EXPECTED."
     exit 1

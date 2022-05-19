@@ -17,27 +17,44 @@ function kubectl::showNodes() {
 }
 
 function kubectl::apply() {
-  file=$1
-  print_info "Apply configuration from $1"
+  print_info "Apply configuration"
   xtrace on
   kubectl apply -f $1
   xtrace off
+  sleep 1
   checkInteractiveMode
 }
 
 function kubectl::unapply() {
-  file=$1
-  print_info "Unapply configuration from $1"
+  print_info "Unapply configuration"
   xtrace on
   kubectl delete -f $1
   xtrace off
   sleep 3
 }
 
+function kubectl::getAll() {
+  print_info "Show all objects by default namespace"
+  xtrace on
+  kubectl get all -l $1
+  xtrace off
+  checkInteractiveMode
+}
+
+### PODS
+
 function kubectl::showPods() {
   print_info "Show pods by default namespace"
   xtrace on
   kubectl get pods --output wide
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showPodsByLabel() {
+  print_info "Show pods by default namespace"
+  xtrace on
+  kubectl get pods -l $1 --output wide
   xtrace off
   checkInteractiveMode
 }
@@ -51,15 +68,34 @@ function kubectl::showPodsByNamespace() {
   checkInteractiveMode
 }
 
+function kubectl::getRunningPods() {
+  xtrace on
+  #-o=custom-columns=NAME:.metadata.name,S:.status.phase \
+  kubectl get po --no-headers | grep Running | awk '{print $1}'
+  xtrace off
+}
+
 function kubectl::getPodNames() {
   xtrace on
   kubectl get pods --no-headers -o custom-columns=":metadata.name"
   xtrace off
 }
 
+function kubectl::getPodStatus() {
+  xtrace on
+  kubectl get pods --no-headers -o custom-columns=":status.phase"
+  xtrace off
+}
+
 function kubectl::getFirstPodName() {
   xtrace on
   kubectl get pods -o jsonpath="{.items[0].metadata.name}"
+  xtrace off
+}
+
+function kubectl::getFirstPodNameByLabel() {
+  xtrace on
+  kubectl get pods -l $1 -o jsonpath="{.items[0].metadata.name}"
   xtrace off
 }
 
@@ -76,6 +112,45 @@ function kubectl::deletePod() {
   xtrace off
   checkInteractiveMode
 }
+
+function kubectl::showLogs() {
+  pod=$1
+  xtrace on
+  kubectl wait --for=condition=ready pod $pod
+  kubectl logs $pod
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showLogsByContainer() {
+  pod=$1
+  container=$2
+  xtrace on
+  kubectl wait --for=condition=ready pod $pod
+  kubectl logs $pod -c $container
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::execUniqueContainer() {
+  pod=$1
+  shift
+  xtrace on
+  kubectl exec $pod -- $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::execUniqueContainerWithTty() {
+  pod=$1
+  shift
+  xtrace on
+  kubectl exec -it $pod -- $@
+  xtrace off
+  checkInteractiveMode
+}
+
+### REPLICASETS
 
 function kubectl::showReplicaSets() {
   print_info "Show replicasets by default namespace"
@@ -100,10 +175,13 @@ function kubectl::scaleReplicaSet() {
   checkInteractiveMode
 }
 
+### DEPLOYMENTS
+
 function kubectl::showDeployments() {
   print_info "Show deployments by default namespace"
   xtrace on
-  kubectl get deploy -o wide
+  #kubectl get deploy -o wide
+  kubectl get deploy
   xtrace off
   checkInteractiveMode
 }
@@ -128,29 +206,18 @@ function kubectl::waitForDeployment() {
   xtrace off
 }
 
-function kubectl::showLogs() {
-  pod=$1
+function kubectl::showRolloutStatusFromDeployment() {
+  print_info "Show rollout status from deployment"
   xtrace on
-  kubectl wait --for=condition=ready pod $pod
-  kubectl logs $pod
+  kubectl rollout status deployment $1
   xtrace off
   checkInteractiveMode
 }
 
-function kubectl::execUniqueContainer() {
-  pod=$1
-  shift
+function kubectl::rollbackDeployment() {
+  print_info "Rollout undo deployment"
   xtrace on
-  kubectl exec $pod -- $@
-  xtrace off
-  checkInteractiveMode
-}
-
-function kubectl::execUniqueContainerWithTty() {
-  pod=$1
-  shift
-  xtrace on
-  kubectl exec -it $pod -- $@
+  kubectl rollout undo deployment $1
   xtrace off
   checkInteractiveMode
 }

@@ -37,14 +37,13 @@ function main {
 
   kubectl::showNodes
   kubectl::apply $CONFIGURATION_FILE
-  kubectl::waitForPodsByLabel "name=$REPLICASET_NAME"
+  kubectl::waitForPodsByLabel "name=$LABEL_NAME"
   kubectl::showReplicaSets
   kubectl::showPods
 
   print_info "Delete a pod"
   POD_NAME=$(kubectl::getFirstPodName)
   kubectl::deletePod $POD_NAME
-
   kubectl::showPods
 
   print_info "Check the stability of pods"

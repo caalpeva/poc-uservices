@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-deployment
+  labels:
+    name: poc-deployment
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      name: poc-deployment
+  strategy:
+    type: RollingUpdate
+    #type: Recreate
+    rollingUpdate:
+      maxUnavailable: 10%
+      maxSurge: 10%
+  template:
+    metadata:
+      labels:
+        name: poc-deployment
+        language: golang
+    spec:
+      containers:
+        - name: poc-app-message-loop
+          image: kalpeva/poc-golang-message-loop:1.0
+          env:
+            - name: CHARACTER
+              value: "un tractor amarillo."
+            - name: SLEEP_TIME
+              value: "2s"
