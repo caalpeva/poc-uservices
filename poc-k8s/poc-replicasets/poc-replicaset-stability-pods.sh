@@ -10,6 +10,7 @@ source "${DIR}/../utils/kubectl.src"
 
 CONFIGURATION_FILE=${DIR}/replicaset.yaml
 REPLICASET_NAME="poc-replicaset"
+LABEL_NAME="poc-replicaset"
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -36,6 +37,7 @@ function main {
 
   kubectl::showNodes
   kubectl::apply $CONFIGURATION_FILE
+  kubectl::waitForPodsByLabel "name=$REPLICASET_NAME"
   kubectl::showReplicaSets
   kubectl::showPods
 

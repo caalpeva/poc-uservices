@@ -63,6 +63,13 @@ function kubectl::getFirstPodName() {
   xtrace off
 }
 
+function kubectl::waitForPodsByLabel() {
+  xtrace on
+  kubectl wait pods -l $1 --for=condition=Ready
+  #kubectl wait pods -l $1 --for=condition=Ready --timeout=30s
+  xtrace off
+}
+
 function kubectl::deletePod() {
   xtrace on
   kubectl delete pod $1
@@ -91,6 +98,34 @@ function kubectl::scaleReplicaSet() {
   kubectl scale replicaset $1 --replicas=$2
   xtrace off
   checkInteractiveMode
+}
+
+function kubectl::showDeployments() {
+  print_info "Show deployments by default namespace"
+  xtrace on
+  kubectl get deploy -o wide
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::getReplicasFromDeployment() {
+  xtrace on
+  kubectl get deploy $1 -o jsonpath="{.spec.replicas}"
+  xtrace off
+}
+
+function kubectl::scaleDeployment() {
+  print_info "Scale replicas to $2"
+  xtrace on
+  kubectl scale deployment $1 --replicas=$2
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::waitForDeployment() {
+  xtrace on
+  kubectl wait --for=condition=available deployment $1
+  xtrace off
 }
 
 function kubectl::showLogs() {
