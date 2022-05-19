@@ -2,14 +2,14 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../../utils/microservices-utils.src"
-source "${DIR}/../../../poc-docker/utils/docker.src"
-source "${DIR}/../../utils/kubectl.src"
+source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../utils/microservices-utils.src"
+source "${DIR}/../../poc-docker/utils/docker.src"
+source "${DIR}/../utils/kubectl.src"
 
 CONFIGURATION_FILE=${DIR}/replicaset.yaml
-REPLICASET_NAME="poc-rs-stability-pods"
+REPLICASET_NAME="poc-replicaset"
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -34,6 +34,7 @@ function main {
   checkArguments $@
   initialize
 
+  kubectl::showNodes
   kubectl::apply $CONFIGURATION_FILE
   kubectl::showReplicaSets
   kubectl::showPods
@@ -51,7 +52,7 @@ function main {
     print_error "Poc completed with failure. Pod replicas is not $POD_REPLICAS."
     exit 1
   fi
-    
+
   print_debug "Check the number of pods is always equal to the number of replicas ($POD_REPLICAS)"
   print_debug "Pod $POD_NAME was deleted but a new one was created in its place"
   checkInteractiveMode

@@ -8,6 +8,14 @@
 #    BASIC K8S METHODS   #
 ##########################
 
+function kubectl::showNodes() {
+  print_info "Show information about nodes"
+  xtrace on
+  kubectl get nodes
+  xtrace off
+  checkInteractiveMode
+}
+
 function kubectl::apply() {
   file=$1
   print_info "Apply configuration from $1"
@@ -23,6 +31,7 @@ function kubectl::unapply() {
   xtrace on
   kubectl delete -f $1
   xtrace off
+  sleep 3
 }
 
 function kubectl::showPods() {
@@ -74,6 +83,14 @@ function kubectl::getReplicasFromReplicaSet() {
   xtrace on
   kubectl get rs $1 -o jsonpath="{.spec.replicas}"
   xtrace off
+}
+
+function kubectl::scaleReplicaSet() {
+  print_info "Scale replicas to $2"
+  xtrace on
+  kubectl scale replicaset $1 --replicas=$2
+  xtrace off
+  checkInteractiveMode
 }
 
 function kubectl::showLogs() {

@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-  name: poc-rs-stability-pods
+  name: poc-replicaset
   labels:
-    name: poc-rs-stability-pods
+    name: poc-replicaset
 spec:
   replicas: 3
   selector:
     matchLabels:
-      name: poc-rs-stability-pods
+      name: poc-replicaset
   template:
     metadata:
       name: poc-pod-environment-with-replicas
       labels:
-        name: poc-rs-stability-pods
+        name: poc-replicaset
         language: golang
     spec:
       containers:

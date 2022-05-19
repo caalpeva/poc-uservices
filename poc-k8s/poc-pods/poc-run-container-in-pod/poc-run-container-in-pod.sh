@@ -44,6 +44,8 @@ function main {
   checkArguments $@
   initialize
 
+  kubectl::showNodes
+
   if [ $FLAG_CREATE_AND_PUSH_IMAGE = true ]; then
     print_info "Filter images by name"
     docker::showImagesByPrefix $IMAGE
