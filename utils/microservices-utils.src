@@ -66,8 +66,13 @@ function setTerminalSignals() {
 }
 
 function evalCommand  {
-  command=$1
+  command=$*
   echo "+ $command"
   eval "$command"
+  return $?
+}
+
+function executeCurl  {
+  evalCommand curl $*
   return $?
 }

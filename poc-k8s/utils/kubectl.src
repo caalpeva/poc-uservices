@@ -16,6 +16,13 @@ function kubectl::showNodes() {
   checkInteractiveMode
 }
 
+function kubectl::getNodeAddress() {
+  xtrace on
+  kubectl get nodes --no-headers \
+    -o custom-columns=":status.addresses[?(@.type == 'InternalIP')].address"
+  xtrace off
+}
+
 function kubectl::apply() {
   print_info "Apply configuration"
   xtrace on
@@ -240,44 +247,9 @@ function kubectl::showEndpointsByService() {
   checkInteractiveMode
 }
 
-function kubectl::execContainerPing() {
-  from=$1
-  to=$2
-  command="docker exec $from ping $to -c 3"
-  echo "+ $command"
-  eval "$command"
-  return $?
-}
-
-function kubectl::execContainerPingAsRoot() {
-  from=$1
-  to=$2
-  command="docker exec -u root $from ping $to -c 3"
-  echo "+ $command"
-  eval "$command"
-  return $?
-}
-
-function kubectl::checkUrl  {
-  command="curl $1"
-  echo "+ $command"
-  eval "$command"
-  return $?
-}
-
-function kubectl::checkHttpServerAvailability  {
-  declare -i result=0
-  print_info "Check that the Http server from $1 is available..."
-  print_debug "Extract host port from container data..."
-  port=$(docker::getFirstHostPortFromContainerData $1 $2)
-
-  docker::checkUrl "http://localhost:${port}"
-  if [ $? -ne 0 ]
-  then
-    print_error "Http server from $1 is not available"
-    result=1
-  fi
-
-  checkInteractiveMode
-  return $result
+function kubectl::getPortByService() {
+  xtrace on
+  kubectl get svc $1 --no-headers \
+    -o custom-columns=":spec.ports[?(@.targetPort == '$2')].port"
+  xtrace off
 }

@@ -15,6 +15,7 @@ DEPLOYMENT_CLIENT_NAME="poc-client"
 DEPLOYMENT_SERVER_NAME="poc-server"
 SERVICE_NAME="poc-service"
 LABEL_NAME="poc-service"
+LOCAL_PORT=9999
 
 IMAGE="poc-golang-server-client"
 SNAPSHOT="1.0-snapshot"
@@ -47,14 +48,13 @@ function main {
   checkArguments $@
   initialize
 
+  print_box "KUBERNETES PORT-FORWARD" \
+    "" \
+    "The kubectl port-forward command allows you to forward traffic from a local machine port" \
+    "to the port of a pod or service exposed by the application."
+  checkInteractiveMode
+
   kubectl::showNodes
-
-  if [ $FLAG_CREATE_AND_PUSH_IMAGE = true ]; then
-    print_info "Filter images by name"
-    docker::showImagesByPrefix $IMAGE
-    docker::createImageAndPushToDockerHub $IMAGE $SNAPSHOT $TAG $DIR
-  fi
-
   kubectl::apply $CONFIGURATION_FILE
   kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME
   kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 10
@@ -64,9 +64,39 @@ function main {
   kubectl::showServices "poc=$LABEL_NAME"
   kubectl::showEndpointsByService $SERVICE_NAME
 
-  print_info "Show logs from client pod..."
-  POD_NAME=$(kubectl::getFirstPodNameByLabel "app=$DEPLOYMENT_CLIENT_NAME")
-  kubectl::showLogs $POD_NAME
+  print_info "Extract port from service"
+  SERVICE_PORT=$(kubectl::getPortByService ${SERVICE_NAME} http-server)
+  checkInteractiveMode
+
+  print_info "Forward local port to service port"
+  evalCommand kubectl port-forward service/${SERVICE_NAME} --address 0.0.0.0 ${LOCAL_PORT}:${SERVICE_PORT} "&"
+  PID=$!
+  checkInteractiveMode
+
+  sleep 3
+  SERVER_AVAILABLE=true
+  print_info "Make requests from local port..."
+  for i in {1..3}
+  do
+    executeCurl http://localhost:$LOCAL_PORT/echo
+    if [ $? -ne 0 ]
+    then
+      print_error "Http server from $1 is not available"
+      SERVER_AVAILABLE=false
+    fi
+    checkInteractiveMode
+  done
+
+  print_info "Kill the execution of the port-forward command"
+  xtrace on
+  kill -9 $PID
+  xtrace off
+  checkCleanupMode
+
+  if [ $SERVER_AVAILABLE = false ]; then
+    print_error "Poc completed with failure"
+    exit 1
+  fi
 
   checkCleanupMode
   print_done "Poc completed successfully"
