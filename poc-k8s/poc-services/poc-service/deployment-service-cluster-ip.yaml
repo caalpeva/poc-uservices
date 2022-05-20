@@ -2,9 +2,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: poc-service
+  name: poc-server-service
   labels:
-    app: poc-service
     poc: poc-service
 spec:
   type: ClusterIP
@@ -69,7 +68,7 @@ spec:
             - client
           env:
             - name: SERVER_URL
-              value: "http://poc-server:9000"
+              value: "http://poc-server-service:9000"
             - name: ENDPOINT
               value: "/echo"
             - name: SLEEP_TIME
