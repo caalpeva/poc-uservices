@@ -6,17 +6,18 @@ RUN adduser -D -g '' elf
 
 # Create workspace
 WORKDIR /opt/app/
-COPY app/go.mod .
+COPY src/go.mod src/go.sum ./
 
 # fetch dependancies
 RUN go mod download
 RUN go mod verify
 
 # copy the source code as the last step
-COPY app/ .
+COPY src/ .
 
 # build the binary
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -a -installsuffix cgo -o /go/bin/app .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -a -installsuffix cgo -o /go/bin/server ./cmd/server
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -a -installsuffix cgo -o /go/bin/client ./cmd/client
 
 # build a small image
 FROM alpine:3.13.2
@@ -26,10 +27,11 @@ LABEL language="golang"
 COPY --from=builder /etc/passwd /etc/passwd
 
 # copy the static executable
-COPY --from=builder /go/bin/app /usr/local/bin/app
+COPY --from=builder /go/bin/server /usr/local/bin/server
+COPY --from=builder /go/bin/client /usr/local/bin/client
 
 # use an unprivileged user.
 USER elf
 
-# run app
-ENTRYPOINT ["app"]
+# run server by default
+ENTRYPOINT ["server"]

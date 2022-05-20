@@ -33,10 +33,10 @@ function kubectl::unapply() {
   sleep 3
 }
 
-function kubectl::getAll() {
+function kubectl::showAll() {
   print_info "Show all objects by default namespace"
   xtrace on
-  kubectl get all -l $1
+  kubectl get all -l $1 -o wide
   xtrace off
   checkInteractiveMode
 }
@@ -218,6 +218,24 @@ function kubectl::rollbackDeployment() {
   print_info "Rollout undo deployment"
   xtrace on
   kubectl rollout undo deployment $1
+  xtrace off
+  checkInteractiveMode
+}
+
+### SERVICES
+
+function kubectl::showServices() {
+  print_info "Show services by default namespace"
+  xtrace on
+  kubectl get svc -l $1
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showEndpointsByService() {
+  print_info "Show endpoints filtered by service"
+  xtrace on
+  kubectl get endpoints $1
   xtrace off
   checkInteractiveMode
 }
