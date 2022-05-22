@@ -10,12 +10,11 @@ source "${DIR}/../../utils/kubectl.src"
 
 FLAG_CREATE_AND_PUSH_IMAGE=false
 
-CONFIGURATION_FILE=${DIR}/deployment-service-cluster-ip.yaml
+CONFIGURATION_FILE=${DIR}/deployment-service-node-port.yaml
 DEPLOYMENT_CLIENT_NAME="poc-client"
 DEPLOYMENT_SERVER_NAME="poc-server"
 SERVICE_NAME="poc-service"
-POC_LABEL_VALUE="poc-service-cluster-ip"
-LOCAL_PORT=9999
+POC_LABEL_VALUE="poc-service-node-port"
 
 IMAGE="poc-golang-server-client"
 SNAPSHOT="1.0-snapshot"
@@ -48,13 +47,14 @@ function main {
   checkArguments $@
   initialize
 
-  print_box "KUBERNETES PORT-FORWARD" \
-    "" \
-    "The kubectl port-forward command allows you to forward traffic from a local machine port" \
-    "to the port of a pod or service exposed by the application."
-  checkInteractiveMode
-
   kubectl::showNodes
+
+  if [ $FLAG_CREATE_AND_PUSH_IMAGE = true ]; then
+    print_info "Filter images by name"
+    docker::showImagesByPrefix $IMAGE
+    docker::createImageAndPushToDockerHub $IMAGE $SNAPSHOT $TAG $DIR
+  fi
+
   kubectl::apply $CONFIGURATION_FILE
   kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME
   kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 10
@@ -64,39 +64,22 @@ function main {
   kubectl::showServices "poc=$POC_LABEL_VALUE"
   kubectl::showEndpointsByService $SERVICE_NAME
 
-  print_info "Extract port from service"
-  SERVICE_PORT=$(kubectl::getPortByService ${SERVICE_NAME} http-server)
+  print_info "Extract node port from service"
+  NODE_PORT=$(kubectl::getNodePortByService ${SERVICE_NAME} http-server)
   checkInteractiveMode
 
-  print_info "Forward local port to service port"
-  evalCommand kubectl port-forward service/${SERVICE_NAME} --address 0.0.0.0 ${LOCAL_PORT}:${SERVICE_PORT} "&"
-  PID=$!
-  checkInteractiveMode
-
-  sleep 3
-  SERVER_AVAILABLE=true
-  print_info "Make requests from local port..."
-  for i in {1..3}
+  print_info "Check that the port has been enabled on all nodes"
+  NODE_ADDRESSES=$(kubectl::getNodeAddresses)
+  for NODE_ADDRESS in ${NODE_ADDRESSES[@]}
   do
-    executeCurl http://localhost:$LOCAL_PORT/echo
+    executeCurl http://$NODE_ADDRESS:$NODE_PORT/echo
     if [ $? -ne 0 ]
     then
-      print_error "Http server is not available"
+      print_error "Http server from $NODE_ADDRESS:$NODE_PORT is not available"
       SERVER_AVAILABLE=false
     fi
     checkInteractiveMode
   done
-
-  print_info "Kill the execution of the port-forward command"
-  xtrace on
-  kill -9 $PID
-  xtrace off
-  checkCleanupMode
-
-  if [ $SERVER_AVAILABLE = false ]; then
-    print_error "Poc completed with failure"
-    exit 1
-  fi
 
   checkCleanupMode
   print_done "Poc completed successfully"

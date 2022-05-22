@@ -14,7 +14,7 @@ CONFIGURATION_FILE=${DIR}/deployment-service-cluster-ip.yaml
 DEPLOYMENT_CLIENT_NAME="poc-client"
 DEPLOYMENT_SERVER_NAME="poc-server"
 SERVICE_NAME="poc-service"
-LABEL_NAME="poc-service"
+POC_LABEL_VALUE="poc-service-cluster-ip"
 
 IMAGE="poc-golang-server-client"
 SNAPSHOT="1.0-snapshot"
@@ -60,13 +60,26 @@ function main {
   kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 10
   kubectl::showDeployments
   kubectl::showReplicaSets
-  kubectl::showPodsByLabel "poc=$LABEL_NAME"
-  kubectl::showServices "poc=$LABEL_NAME"
+  kubectl::showPodsByLabel "poc=$POC_LABEL_VALUE"
+  kubectl::showServices "poc=$POC_LABEL_VALUE"
   kubectl::showEndpointsByService $SERVICE_NAME
 
   print_info "Show logs from client pod..."
   POD_NAME=$(kubectl::getFirstPodNameByLabel "app=$DEPLOYMENT_CLIENT_NAME")
   kubectl::showLogs $POD_NAME
+
+  print_info "Check that the port has been enabled on all nodes"
+  NODE_ADDRESSES=$(kubectl::getNodeAddresses)
+  for NODE_ADDRESS in ${NODE_ADDRESSES[@]}
+  do
+    executeCurl http://$NODE_ADDRESS:$NODE_PORT/echo
+    if [ $? -ne 0 ]
+    then
+      print_error "Http server from $NODE_ADDRESS:$NODE_PORT is not available"
+      SERVER_AVAILABLE=false
+    fi
+    checkInteractiveMode
+  done
 
   checkCleanupMode
   print_done "Poc completed successfully"

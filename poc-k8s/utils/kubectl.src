@@ -16,7 +16,7 @@ function kubectl::showNodes() {
   checkInteractiveMode
 }
 
-function kubectl::getNodeAddress() {
+function kubectl::getNodeAddresses() {
   xtrace on
   kubectl get nodes --no-headers \
     -o custom-columns=":status.addresses[?(@.type == 'InternalIP')].address"
@@ -251,5 +251,12 @@ function kubectl::getPortByService() {
   xtrace on
   kubectl get svc $1 --no-headers \
     -o custom-columns=":spec.ports[?(@.targetPort == '$2')].port"
+  xtrace off
+}
+
+function kubectl::getNodePortByService() {
+  xtrace on
+  kubectl get svc $1 --no-headers \
+    -o custom-columns=":spec.ports[?(@.targetPort == '$2')].nodePort"
   xtrace off
 }
