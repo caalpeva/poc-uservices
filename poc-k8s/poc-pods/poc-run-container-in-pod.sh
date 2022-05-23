@@ -10,13 +10,10 @@ source "${DIR}/../../utils/kubectl.src"
 
 FLAG_CREATE_AND_PUSH_IMAGE=false
 
-CONFIGURATION_FILE=${DIR}/deployment-service-node-port.yaml
-DEPLOYMENT_CLIENT_NAME="poc-client"
-DEPLOYMENT_SERVER_NAME="poc-server"
-SERVICE_NAME="poc-service"
-POC_LABEL_VALUE="poc-service-node-port"
+CONFIGURATION_FILE_POD=${DIR}/pod.yaml
+POD_NAME="poc-pod-environment"
 
-IMAGE="poc-golang-server-client"
+IMAGE="poc-golang-message-loop"
 SNAPSHOT="1.0-snapshot"
 TAG="1.0"
 
@@ -35,7 +32,7 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  kubectl::unapply $CONFIGURATION_FILE
+  kubectl::unapply $CONFIGURATION_FILE_POD
   images=($(docker::getImagesWithTags $IMAGE))
   if [ ${#images[@]} -gt 0 ]; then
     docker::removeImages ${images[*]}
@@ -55,31 +52,18 @@ function main {
     docker::createImageAndPushToDockerHub $IMAGE $SNAPSHOT $TAG $DIR
   fi
 
-  kubectl::apply $CONFIGURATION_FILE
-  kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME
-  kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 10
-  kubectl::showDeployments -l "poc=$POC_LABEL_VALUE"
-  kubectl::showReplicaSets -l "poc=$POC_LABEL_VALUE"
-  kubectl::showPods -l "poc=$POC_LABEL_VALUE"
-  kubectl::showServices -l "poc=$POC_LABEL_VALUE"
-  kubectl::showEndpointsByService $SERVICE_NAME
+  kubectl::apply $CONFIGURATION_FILE_POD
+  kubectl::showPods
 
-  print_info "Extract node port from service"
-  NODE_PORT=$(kubectl::getNodePortByService ${SERVICE_NAME} http-server)
-  checkInteractiveMode
+  print_info "Show logs..."
+  kubectl::showLogs $POD_NAME
 
-  print_info "Check that the port has been enabled on all nodes"
-  NODE_ADDRESSES=$(kubectl::getNodeAddresses)
-  for NODE_ADDRESS in ${NODE_ADDRESSES[@]}
-  do
-    executeCurl http://$NODE_ADDRESS:$NODE_PORT/echo
-    if [ $? -ne 0 ]
-    then
-      print_error "Http server from $NODE_ADDRESS:$NODE_PORT is not available"
-      SERVER_AVAILABLE=false
-    fi
-  done
-  checkInteractiveMode
+  #print_info "Run command in the same running container with tty..."
+  #print_debug "Use the shell for example to execute:\n\tprintenv"
+  #print_info "-Type exit to exit"
+  #kubectl::execUniqueContainerWithTty $POD_NAME "/bin/sh"
+  print_info "Check environment variables"
+  kubectl::execUniqueContainer $POD_NAME "printenv"
 
   checkCleanupMode
   print_done "Poc completed successfully"

@@ -10,7 +10,7 @@ source "${DIR}/../../utils/kubectl.src"
 
 FLAG_CREATE_AND_PUSH_IMAGE=false
 
-CONFIGURATION_FILE=${DIR}/deployment-service-cluster-ip.yaml
+CONFIGURATION_FILE=${DIR}/config/deployment-service-cluster-ip.yaml
 DEPLOYMENT_CLIENT_NAME="poc-client"
 DEPLOYMENT_SERVER_NAME="poc-server"
 SERVICE_NAME="poc-service"

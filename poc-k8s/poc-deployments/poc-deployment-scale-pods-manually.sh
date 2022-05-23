@@ -8,7 +8,7 @@ source "${DIR}/../../utils/microservices-utils.src"
 source "${DIR}/../../poc-docker/utils/docker.src"
 source "${DIR}/../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/deployment.yaml
+CONFIGURATION_FILE=${DIR}/config/deployment.yaml
 DEPLOYMENT_NAME="poc-deployment"
 LABEL_NAME="poc-deployment"
 
