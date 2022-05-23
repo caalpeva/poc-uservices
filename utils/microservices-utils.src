@@ -27,6 +27,7 @@ function checkArguments() {
   print_debug "Checking arguments ($#)..."
 
   # Parse the options
+  OPTIND=1
   while getopts "his" option; do
     case $option in
       h) usage 0

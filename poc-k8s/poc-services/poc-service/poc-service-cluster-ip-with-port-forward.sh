@@ -58,10 +58,10 @@ function main {
   kubectl::apply $CONFIGURATION_FILE
   kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME
   kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 10
-  kubectl::showDeployments
-  kubectl::showReplicaSets
-  kubectl::showPodsByLabel "poc=$POC_LABEL_VALUE"
-  kubectl::showServices "poc=$POC_LABEL_VALUE"
+  kubectl::showDeployments -l "poc=$POC_LABEL_VALUE"
+  kubectl::showReplicaSets -l "poc=$POC_LABEL_VALUE"
+  kubectl::showPods -l "poc=$POC_LABEL_VALUE"
+  kubectl::showServices -l "poc=$POC_LABEL_VALUE"
   kubectl::showEndpointsByService $SERVICE_NAME
 
   print_info "Extract port from service"
@@ -84,8 +84,8 @@ function main {
       print_error "Http server is not available"
       SERVER_AVAILABLE=false
     fi
-    checkInteractiveMode
   done
+  checkInteractiveMode
 
   print_info "Kill the execution of the port-forward command"
   xtrace on

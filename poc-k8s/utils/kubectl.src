@@ -5,6 +5,12 @@
 #           /../../utils/microservices-utils.src
 
 ##########################
+#  K8S GLOBAL VARIABLES  #
+##########################
+NAMESPACE=""
+LABELS=""
+
+##########################
 #    BASIC K8S METHODS   #
 ##########################
 
@@ -48,83 +54,103 @@ function kubectl::showAll() {
   checkInteractiveMode
 }
 
+function kubectl::resetGlobalVariables() {
+  NAMESPACE=""
+  LABELS=""
+}
+
+function kubectl::manageArguments() {
+  kubectl::resetGlobalVariables
+  OPTIND=1
+  while getopts "n:l:" option; do
+    case ${option} in
+      n) NAMESPACE=$OPTARG
+         ;;
+      l) LABELS=$OPTARG
+         ;;
+      ?) echo "Invalid option: $OPTARG" 1>&2
+         ;;
+      :) echo "Invalid option: $OPTARG requires an argument" 1>&2
+    esac
+  done
+  shift $((OPTIND-1))
+}
+
 ### PODS
 
 function kubectl::showPods() {
-  print_info "Show pods by default namespace"
+  print_info "Show pods"
+  kubectl::manageArguments $@
   xtrace on
-  kubectl get pods --output wide
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get pods ${LABELS:+-l $LABELS} \
+    --output wide
   xtrace off
   checkInteractiveMode
 }
 
-function kubectl::showPodsByLabel() {
-  print_info "Show pods by default namespace"
+function kubectl::showPodsInAllNamespaces() {
+  print_info "Show pods"
+  kubectl::manageArguments $@
   xtrace on
-  kubectl get pods -l $1 --output wide
-  xtrace off
-  checkInteractiveMode
-}
-
-function kubectl::showPodsByNamespace() {
-  namespace=$1
-  print_info "Show pods by namespace $namespace"
-  xtrace on
-  kubectl -n $namespace get po -o wide
+  kubectl get pods --all-namespaces ${LABELS:+-l $LABELS} --output wide
   xtrace off
   checkInteractiveMode
 }
 
 function kubectl::getRunningPods() {
+  kubectl::manageArguments $@
   xtrace on
-  #-o=custom-columns=NAME:.metadata.name,S:.status.phase \
-  kubectl get po --no-headers | grep Running | awk '{print $1}'
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po --no-headers | grep Running | awk '{print $1}'
   xtrace off
 }
 
 function kubectl::getPodNames() {
+  kubectl::manageArguments $@
   xtrace on
-  kubectl get pods --no-headers -o custom-columns=":metadata.name"
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get pods --no-headers -o custom-columns=":metadata.name"
   xtrace off
 }
 
 function kubectl::getPodStatus() {
+  kubectl::manageArguments $@
   xtrace on
-  kubectl get pods --no-headers -o custom-columns=":status.phase"
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get pods --no-headers -o custom-columns=":status.phase"
   xtrace off
 }
 
 function kubectl::getFirstPodName() {
+  kubectl::manageArguments $@
   xtrace on
-  kubectl get pods -o jsonpath="{.items[0].metadata.name}"
-  xtrace off
-}
-
-function kubectl::getFirstPodNameByLabel() {
-  xtrace on
-  kubectl get pods -l $1 -o jsonpath="{.items[0].metadata.name}"
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get pods -o jsonpath="{.items[0].metadata.name}"
   xtrace off
 }
 
 function kubectl::waitForPodsByLabel() {
+  kubectl::manageArguments $@
   xtrace on
-  kubectl wait pods -l $1 --for=condition=Ready
-  #kubectl wait pods -l $1 --for=condition=Ready --timeout=30s
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait pods -l $1 --for=condition=Ready
+  #kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait pods -l $1 --for=condition=Ready --timeout=30s
   xtrace off
 }
 
 function kubectl::deletePod() {
+  pod=$1
+  shift
+  kubectl::manageArguments $@
   xtrace on
-  kubectl delete pod $1
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} delete pod $pod
   xtrace off
   checkInteractiveMode
 }
 
 function kubectl::showLogs() {
   pod=$1
+  shift
+  kubectl::manageArguments $@
   xtrace on
-  kubectl wait --for=condition=ready pod $pod
-  kubectl logs $pod
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} logs $pod
   xtrace off
   checkInteractiveMode
 }
@@ -132,9 +158,11 @@ function kubectl::showLogs() {
 function kubectl::showLogsByContainer() {
   pod=$1
   container=$2
+  shift
+  kubectl::manageArguments $@
   xtrace on
-  kubectl wait --for=condition=ready pod $pod
-  kubectl logs $pod -c $container
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} logs $pod -c $container
   xtrace off
   checkInteractiveMode
 }
@@ -160,24 +188,42 @@ function kubectl::execUniqueContainerWithTty() {
 ### REPLICASETS
 
 function kubectl::showReplicaSets() {
-  print_info "Show replicasets by default namespace"
+  print_info "Show replicasets"
+  kubectl::manageArguments $@
   xtrace on
-  #kubectl get rs -o wide
-  kubectl get rs
+  #kubectl ${NAMESPACE:+--namespace $NAMESPACE} get rs ${LABELS:+-l $LABELS} -o wide
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get rs ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showReplicaSetsInAllNamespaces() {
+  print_info "Show replicasets"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl get rs --all-namespaces ${LABELS:+-l $LABELS}
   xtrace off
   checkInteractiveMode
 }
 
 function kubectl::getReplicasFromReplicaSet() {
+  replicaSet=$1
+  shift
+  kubectl::manageArguments $@
   xtrace on
-  kubectl get rs $1 -o jsonpath="{.spec.replicas}"
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get rs $replicaSet -o jsonpath="{.spec.replicas}"
   xtrace off
 }
 
 function kubectl::scaleReplicaSet() {
-  print_info "Scale replicas to $2"
+  replicaSet=$1
+  replicas=$2
+  shift
+  print_info "Scale replicas to $replicas"
+  kubectl::manageArguments $@
   xtrace on
-  kubectl scale replicaset $1 --replicas=$2
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    scale replicaset $replicaSet --replicas=$replicas
   xtrace off
   checkInteractiveMode
 }
@@ -185,46 +231,77 @@ function kubectl::scaleReplicaSet() {
 ### DEPLOYMENTS
 
 function kubectl::showDeployments() {
-  print_info "Show deployments by default namespace"
+  print_info "Show deployments"
+  kubectl::manageArguments $@
   xtrace on
-  #kubectl get deploy -o wide
-  kubectl get deploy
+  #kubectl ${NAMESPACE:+--namespace $NAMESPACE} get deploy ${LABELS:+-l $LABELS} -o wide
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get deploy ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showDeploymentsInAllNamespaces() {
+  print_info "Show deployments"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl get deploy --all-namespaces ${LABELS:+-l $LABELS}
   xtrace off
   checkInteractiveMode
 }
 
 function kubectl::getReplicasFromDeployment() {
+  deploy=$1
+  kubectl::manageArguments $@
+  shift
   xtrace on
-  kubectl get deploy $1 -o jsonpath="{.spec.replicas}"
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get deploy $deploy -o jsonpath="{.spec.replicas}"
   xtrace off
 }
 
 function kubectl::scaleDeployment() {
-  print_info "Scale replicas to $2"
+  deploy=$1
+  replicas=$2
+  shift
+  print_info "Scale replicas to $replicas"
+  kubectl::manageArguments $@
   xtrace on
-  kubectl scale deployment $1 --replicas=$2
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    scale deployment $deploy --replicas=$replicas
   xtrace off
   checkInteractiveMode
 }
 
 function kubectl::waitForDeployment() {
+  deploy=$1
+  shift
+  kubectl::manageArguments $@
   xtrace on
-  kubectl wait --for=condition=available deployment $1
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    wait --for=condition=available deployment $deploy
   xtrace off
 }
 
 function kubectl::showRolloutStatusFromDeployment() {
   print_info "Show rollout status from deployment"
+  deploy=$1
+  shift
+  kubectl::manageArguments $@
   xtrace on
-  kubectl rollout status deployment $1
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    rollout status deployment $deploy
   xtrace off
   checkInteractiveMode
 }
 
 function kubectl::rollbackDeployment() {
   print_info "Rollout undo deployment"
+  deploy=$1
+  shift
+  kubectl::manageArguments $@
   xtrace on
-  kubectl rollout undo deployment $1
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    rollout undo deployment $deploy
   xtrace off
   checkInteractiveMode
 }
@@ -232,31 +309,56 @@ function kubectl::rollbackDeployment() {
 ### SERVICES
 
 function kubectl::showServices() {
-  print_info "Show services by default namespace"
+  print_info "Show services"
+  kubectl::manageArguments $@
   xtrace on
-  kubectl get svc -l $1
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get svc ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showServicesInAllNamespaces() {
+  print_info "Show services"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl get svc --all-namespaces ${LABELS:+-l $LABELS}
   xtrace off
   checkInteractiveMode
 }
 
 function kubectl::showEndpointsByService() {
   print_info "Show endpoints filtered by service"
+  service=$1
+  shift
+  kubectl::manageArguments $@
   xtrace on
-  kubectl get endpoints $1
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get endpoints $service
   xtrace off
   checkInteractiveMode
 }
 
 function kubectl::getPortByService() {
+  service=$1
+  targetPort=$2
+  shift
+  kubectl::manageArguments $@
   xtrace on
-  kubectl get svc $1 --no-headers \
-    -o custom-columns=":spec.ports[?(@.targetPort == '$2')].port"
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get svc $service --no-headers \
+    -o custom-columns=":spec.ports[?(@.targetPort == '$targetPort')].port"
   xtrace off
 }
 
 function kubectl::getNodePortByService() {
+  service=$1
+  targetPort=$2
+  shift
+  kubectl::manageArguments $@
   xtrace on
-  kubectl get svc $1 --no-headers \
-    -o custom-columns=":spec.ports[?(@.targetPort == '$2')].nodePort"
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get svc $service --no-headers \
+    -o custom-columns=":spec.ports[?(@.targetPort == '$targetPort')].nodePort"
   xtrace off
 }
