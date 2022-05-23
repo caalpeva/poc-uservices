@@ -69,7 +69,7 @@ function setTerminalSignals() {
 function evalCommand  {
   command=$*
   echo "+ $command"
-  eval "$command"
+  eval "$command" && echo -e ""
   return $?
 }
 

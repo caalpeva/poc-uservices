@@ -78,8 +78,8 @@ function main {
       print_error "Http server from $NODE_ADDRESS:$NODE_PORT is not available"
       SERVER_AVAILABLE=false
     fi
-    checkInteractiveMode
   done
+  checkInteractiveMode
 
   checkCleanupMode
   print_done "Poc completed successfully"
