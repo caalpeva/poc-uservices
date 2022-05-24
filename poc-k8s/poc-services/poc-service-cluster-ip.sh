@@ -8,8 +8,6 @@ source "${DIR}/../../../utils/microservices-utils.src"
 source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
-FLAG_CREATE_AND_PUSH_IMAGE=false
-
 CONFIGURATION_FILE=${DIR}/config/deployment-service-cluster-ip.yaml
 DEPLOYMENT_CLIENT_NAME="poc-client"
 DEPLOYMENT_SERVER_NAME="poc-server"
@@ -36,10 +34,6 @@ function handleTermSignal() {
 function cleanup {
   print_debug "Cleaning environment..."
   kubectl::unapply $CONFIGURATION_FILE
-  images=($(docker::getImagesWithTags $IMAGE))
-  if [ ${#images[@]} -gt 0 ]; then
-    docker::removeImages ${images[*]}
-  fi
 }
 
 function main {
@@ -48,13 +42,6 @@ function main {
   initialize
 
   kubectl::showNodes
-
-  if [ $FLAG_CREATE_AND_PUSH_IMAGE = true ]; then
-    print_info "Filter images by name"
-    docker::showImagesByPrefix $IMAGE
-    docker::createImageAndPushToDockerHub $IMAGE $SNAPSHOT $TAG $DIR
-  fi
-
   kubectl::apply $CONFIGURATION_FILE
   kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME
   kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 10

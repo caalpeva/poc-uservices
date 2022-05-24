@@ -18,8 +18,6 @@ TAG="1.0"
 CONTAINER_PREFIX="poc_ubuntu_utils"
 CONTAINER1_NAME="${CONTAINER_PREFIX}_1"
 
-DOCKER_USERNAME="NONE"
-
 #############
 # FUNCTIONS #
 #############
@@ -44,14 +42,6 @@ function cleanup() {
   docker::removeImages "$IMAGE:$TAG" "$IMAGE:$SNAPSHOT"
 }
 
-function dockerLogin() {
-  read -p "Username: " DOCKER_USERNAME
-  xtrace on
-  docker login --username $DOCKER_USERNAME
-  xtrace off
-  checkInteractiveMode
-}
-
 function main() {
   print_debug "$(basename $0) [PID = $$]"
   checkArguments $@
@@ -65,7 +55,8 @@ function main() {
   docker::showImagesByPrefix $IMAGE
 
   print_info "Login with your Docker ID to push images to Docker Hub"
-  dockerLogin
+  DOCKER_USERNAME=$(docker::loginPrompt)
+  docker::login ${DOCKER_USERNAME:="none"}
 
   print_info "Retag image for Docker Hub with username"
   docker::tagImage "$IMAGE:$SNAPSHOT" "$DOCKER_USERNAME/$IMAGE:$TAG"

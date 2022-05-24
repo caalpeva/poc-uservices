@@ -8,7 +8,7 @@ source "${DIR}/../../../utils/microservices-utils.src"
 source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/deployment-service-cluster-ip-namespaces.yaml
+CONFIGURATION_FILE=${DIR}/config/deployment-service-cluster-ip-namespaces.yaml
 DEPLOYMENT_CLIENT_NAME="poc-client"
 DEPLOYMENT_SERVER_NAME="poc-server"
 SERVICE_NAME="poc-service"
@@ -44,7 +44,6 @@ function main {
   initialize
 
   kubectl::showNodes
-
   kubectl::apply $CONFIGURATION_FILE
   kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME
   kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 10

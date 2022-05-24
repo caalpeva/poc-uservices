@@ -93,7 +93,7 @@ function docker::getImages() {
 
 function docker::getImagesWithTags() {
   xtrace on
-  docker images | grep $1 | awk '{ print $1":"$2}'
+  docker images | grep $@ | awk '{ print $1":"$2}'
   xtrace off
 }
 
@@ -492,22 +492,32 @@ function docker::createImageAndPushToDockerHub {
   image=$1
   snapshot=$2
   tag=$3
-  dir=$4
+  username=$4
+  dir=$5
   docker::createImageFromDockerfile "$image:$snapshot" $dir
 
-  print_info "Login with your Docker ID to push images to Docker Hub"
-  read -p "Username: " docker_username
-  xtrace on
-  docker login --username $docker_username
-  xtrace off
-  checkInteractiveMode
-
   print_info "Retag image for Docker Hub with username"
-  docker::tagImage "$image:$snapshot" "$docker_username/$image:$tag"
+  docker::tagImage "$image:$snapshot" "$username/$image:$tag"
 
   print_info "Filter images by name"
   docker::showImagesByPrefix $image
 
   print_info "Push image to Docker Hub"
-  docker::pushImage "$docker_username/$image:$tag"
+  docker::pushImage "$username/$image:$tag"
+}
+
+##########################
+#  DOCKER LOGIN METHODS  #
+##########################
+
+function docker::loginPrompt {
+  read -p "Username: " username
+  echo $username
+}
+
+function docker::login {
+  xtrace on
+  docker login --username $1
+  xtrace off
+  checkInteractiveMode
 }
