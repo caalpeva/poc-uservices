@@ -42,7 +42,7 @@ function main {
   kubectl::waitForDeployment $DEPLOYMENT_NAME
   kubectl::showDeployments
   kubectl::showReplicaSets
-  kubectl::showPodsByLabel "name=$LABEL_NAME"
+  kubectl::showPods -l "name=$LABEL_NAME"
 
   print_info "Show logs..."
   POD_NAME=$(kubectl::getFirstPodNameByLabel "name=$LABEL_NAME")
@@ -52,7 +52,7 @@ function main {
   kubectl::apply $CONFIGURATION_UPDATE_FILE
   kubectl::showDeployments
   kubectl::showReplicaSets
-  kubectl::showPods
+  kubectl::showPods -l "name=$LABEL_NAME"
 
   kubectl::showRolloutStatusFromDeployment $DEPLOYMENT_NAME && sleep 2
   kubectl::showPods
@@ -71,7 +71,7 @@ function main {
   kubectl::rollbackDeployment $DEPLOYMENT_NAME && sleep 2
   kubectl::showDeployments
   kubectl::showReplicaSets
-  kubectl::showPods
+  kubectl::showPods -l "name=$LABEL_NAME"
 
   kubectl::showRolloutStatusFromDeployment $DEPLOYMENT_NAME && sleep 2
   kubectl::showPods

@@ -42,10 +42,10 @@ function main {
   kubectl::waitForDeployment $DEPLOYMENT_NAME
   kubectl::showDeployments
   kubectl::showReplicaSets
-  kubectl::showPodsByLabel "name=$LABEL_NAME"
+  kubectl::showPods -l "name=$LABEL_NAME"
 
   print_info "Show logs..."
-  POD_NAME=$(kubectl::getFirstPodNameByLabel "name=$LABEL_NAME")
+  POD_NAME=$(kubectl::getFirstPodName -l "name=$LABEL_NAME"")
   kubectl::showLogs $POD_NAME
 
   print_info "Update the deployment..."

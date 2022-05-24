@@ -8,15 +8,10 @@ source "${DIR}/../../utils/microservices-utils.src"
 source "${DIR}/../../poc-docker/utils/docker.src"
 source "${DIR}/../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/config/deployment-service-cluster-ip.yaml
-DEPLOYMENT_CLIENT_NAME="poc-client"
-DEPLOYMENT_SERVER_NAME="poc-server"
-SERVICE_NAME="poc-service"
-POC_LABEL_VALUE="poc-service-cluster-ip"
-
-IMAGE="poc-golang-server-client"
-SNAPSHOT="1.0-snapshot"
-TAG="1.0"
+CONFIGURATION_FILE=${DIR}/config/deployment-configmap-environment-key.yaml
+CONFIGMAP_NAME="poc-configmap-environment-key"
+DEPLOYMENT_NAME="poc-configmap-environment-key"
+LABEL_NAME="poc-configmap-environment-key"
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -43,16 +38,16 @@ function main {
 
   kubectl::showNodes
   kubectl::apply $CONFIGURATION_FILE
-  kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME
-  kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 10
-  kubectl::showDeployments -l "poc=$POC_LABEL_VALUE"
-  kubectl::showReplicaSets -l "poc=$POC_LABEL_VALUE"
-  kubectl::showPods -l "poc=$POC_LABEL_VALUE"
-  kubectl::showServices -l "poc=$POC_LABEL_VALUE"
-  kubectl::showEndpointsByService $SERVICE_NAME
 
-  print_info "Show logs from client pod..."
-  POD_NAME=$(kubectl::getFirstPodName -l "app=$DEPLOYMENT_CLIENT_NAME")
+  kubectl::waitForDeployment $DEPLOYMENT_NAME
+  kubectl::showDeployments -l "poc=$LABEL_NAME"
+  kubectl::showReplicaSets -l "poc=$LABEL_NAME"
+  kubectl::showPods -l "poc=$LABEL_NAME"
+  kubectl::showConfigMaps -l "poc=$LABEL_NAME"
+  kubectl::showConfigMapDescription $CONFIGMAP_NAME
+
+  print_info "Show logs..."
+  POD_NAME=$(kubectl::getFirstPodName -l "poc=$LABEL_NAME")
   kubectl::showLogs $POD_NAME
 
   checkCleanupMode

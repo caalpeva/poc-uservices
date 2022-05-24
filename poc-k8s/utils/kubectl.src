@@ -76,7 +76,9 @@ function kubectl::manageArguments() {
   shift $((OPTIND-1))
 }
 
-### PODS
+##########################
+#       POD METHODS      #
+##########################
 
 function kubectl::showPods() {
   print_info "Show pods"
@@ -185,7 +187,9 @@ function kubectl::execUniqueContainerWithTty() {
   checkInteractiveMode
 }
 
-### REPLICASETS
+##########################
+#   REPLICASET METHODS   #
+##########################
 
 function kubectl::showReplicaSets() {
   print_info "Show replicasets"
@@ -228,7 +232,9 @@ function kubectl::scaleReplicaSet() {
   checkInteractiveMode
 }
 
-### DEPLOYMENTS
+##########################
+#   DEPLOYMENT METHODS   #
+##########################
 
 function kubectl::showDeployments() {
   print_info "Show deployments"
@@ -306,7 +312,9 @@ function kubectl::rollbackDeployment() {
   checkInteractiveMode
 }
 
-### SERVICES
+##########################
+#     SERVICE METHODS    #
+##########################
 
 function kubectl::showServices() {
   print_info "Show services"
@@ -361,4 +369,30 @@ function kubectl::getNodePortByService() {
     get svc $service --no-headers \
     -o custom-columns=":spec.ports[?(@.targetPort == '$targetPort')].nodePort"
   xtrace off
+}
+
+##########################
+#   CONFIGMAP METHODS    #
+##########################
+
+function kubectl::showConfigMaps() {
+  print_info "Show configmaps"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get cm ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showConfigMapDescription() {
+  configmap=$1
+  shift
+  print_info "Show configmap description"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    describe cm $configmap ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
 }
