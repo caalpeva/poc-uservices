@@ -50,6 +50,9 @@ function main {
   POD_NAME=$(kubectl::getFirstPodName -l "poc=$LABEL_NAME")
   kubectl::showLogs $POD_NAME
 
+  print_info "Check environment variables"
+  kubectl::execUniqueContainer $POD_NAME "env"
+
   checkCleanupMode
   print_done "Poc completed successfully"
   exit 0

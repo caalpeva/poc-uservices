@@ -35,7 +35,6 @@ function kubectl::apply() {
   kubectl apply -f $1
   xtrace off
   sleep 1
-  checkInteractiveMode
 }
 
 function kubectl::unapply() {
@@ -134,6 +133,7 @@ function kubectl::waitForPodsByLabel() {
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait pods -l $1 --for=condition=Ready
   #kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait pods -l $1 --for=condition=Ready --timeout=30s
   xtrace off
+  checkInteractiveMode
 }
 
 function kubectl::deletePod() {
@@ -173,8 +173,18 @@ function kubectl::execUniqueContainer() {
   pod=$1
   shift
   xtrace on
-  kubectl exec $pod -- $@
+  kubectl exec $pod -- $*
   xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::execUniqueContainerWithReturnCarriage() {
+  pod=$1
+  shift
+  xtrace on
+  kubectl exec $pod -- $*
+  xtrace off
+  echo
   checkInteractiveMode
 }
 
@@ -182,7 +192,7 @@ function kubectl::execUniqueContainerWithTty() {
   pod=$1
   shift
   xtrace on
-  kubectl exec -it $pod -- $@
+  kubectl exec -it $pod -- $*
   xtrace off
   checkInteractiveMode
 }
@@ -286,6 +296,7 @@ function kubectl::waitForDeployment() {
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
     wait --for=condition=available deployment $deploy
   xtrace off
+  checkInteractiveMode
 }
 
 function kubectl::showRolloutStatusFromDeployment() {

@@ -8,10 +8,10 @@ source "${DIR}/../../utils/microservices-utils.src"
 source "${DIR}/../../poc-docker/utils/docker.src"
 source "${DIR}/../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/config/deployment-configmap-environment-file.yaml
-CONFIGMAP_NAME="poc-configmap-environment-file"
-DEPLOYMENT_NAME="poc-configmap-environment-file"
-LABEL_NAME="poc-configmap-environment-file"
+CONFIGURATION_FILE=${DIR}/config/deployment-configmap-as-volume.yaml
+CONFIGMAP_NAME="poc-configmap-as-volume"
+DEPLOYMENT_NAME="poc-configmap-as-volume"
+LABEL_NAME="poc-configmap-as-volume"
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -50,8 +50,11 @@ function main {
   POD_NAME=$(kubectl::getFirstPodName -l "poc=$LABEL_NAME")
   kubectl::showLogs $POD_NAME
 
-  print_info "Check environment variables"
-  kubectl::execUniqueContainer $POD_NAME "env"
+  print_info "Check files created"
+  kubectl::execUniqueContainer $POD_NAME "ls -l /tmp/files"
+
+  print_info "Check file content"
+  kubectl::execUniqueContainerWithReturnCarriage $POD_NAME "cat /tmp/files/text.txt"  
 
   checkCleanupMode
   print_done "Poc completed successfully"

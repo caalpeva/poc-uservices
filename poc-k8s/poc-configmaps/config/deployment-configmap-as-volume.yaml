@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: poc-configmap-as-volume
+  labels:
+    poc: poc-configmap-as-volume
+data:
+  text.txt: |-
+    erase una vez un nariz pegada a un cuerpo.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-configmap-as-volume
+  labels:
+    poc: poc-configmap-as-volume
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      poc: poc-configmap-as-volume
+  template:
+    metadata:
+      labels:
+        poc: poc-configmap-as-volume
+    spec:
+      containers:
+        - name: poc-app-message-loop
+          image: kalpeva/poc-golang-message-loop:1.0
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: poc-volume-as-configmap
+              mountPath: /tmp/files
+      volumes:
+        - name: poc-volume-as-configmap
+          configMap:
+            name: poc-configmap-as-volume
