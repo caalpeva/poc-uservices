@@ -182,7 +182,7 @@ function kubectl::execUniqueContainerWithReturnCarriage() {
   pod=$1
   shift
   xtrace on
-  kubectl exec $pod -- $*
+  kubectl exec $pod -- "$@"
   xtrace off
   echo
   checkInteractiveMode
@@ -192,7 +192,7 @@ function kubectl::execUniqueContainerWithTty() {
   pod=$1
   shift
   xtrace on
-  kubectl exec -it $pod -- $*
+  kubectl exec -it $pod -- $@
   xtrace off
   checkInteractiveMode
 }
@@ -404,6 +404,68 @@ function kubectl::showConfigMapDescription() {
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
     describe cm $configmap ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+##########################
+#    SECRETS METHODS     #
+##########################
+
+function kubectl::createGenericSecret() {
+  secret=$1
+  pocLabel=$2
+  shift
+  shift
+  print_info "Create generic secret and edit labels"
+  xtrace on
+  kubectl create secret generic $secret $@ \
+    --dry-run=client -o yaml | \
+    sed -e 's|creationTimestamp: null|labels:|' | \
+    sed -e "s/labels:/& \n    $pocLabel/" | \
+    tee | kubectl apply -f -
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showSecrets() {
+  print_info "Show secrets"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get secrets ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showSecretDescription() {
+  secret=$1
+  shift
+  print_info "Show secret description"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    describe secrets $secret ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::decodeSecretByKey() {
+  secret=$1
+  secretKey=$2
+  shift
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get secret $secret \
+    -o custom-columns=":data['${secretKey}']" | base64 --decode
+  xtrace off
+}
+
+function kubectl::deleteSecret() {
+  xtrace on
+  kubectl delete secret $1
   xtrace off
   checkInteractiveMode
 }
