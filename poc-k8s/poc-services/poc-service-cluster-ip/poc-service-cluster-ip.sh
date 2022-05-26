@@ -2,17 +2,17 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../../poc-docker/utils/docker.src"
-source "${DIR}/../utils/kubectl.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../../utils/microservices-utils.src"
+source "${DIR}/../../../poc-docker/utils/docker.src"
+source "${DIR}/../../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/config/deployment-service-node-port.yaml
+CONFIGURATION_FILE=${DIR}/config/deployment-service-cluster-ip.yaml
 DEPLOYMENT_CLIENT_NAME="poc-client"
 DEPLOYMENT_SERVER_NAME="poc-server"
 SERVICE_NAME="poc-service"
-POC_LABEL_VALUE="poc-service-node-port"
+POC_LABEL_VALUE="poc-service-cluster-ip"
 
 IMAGE="poc-golang-server-client"
 SNAPSHOT="1.0-snapshot"
@@ -51,22 +51,9 @@ function main {
   kubectl::showServices -l "poc=$POC_LABEL_VALUE"
   kubectl::showEndpointsByService $SERVICE_NAME
 
-  print_info "Extract node port from service"
-  NODE_PORT=$(kubectl::getNodePortByService ${SERVICE_NAME} http-server)
-  checkInteractiveMode
-
-  print_info "Check that the port has been enabled on all nodes"
-  NODE_ADDRESSES=$(kubectl::getNodeAddresses)
-  for NODE_ADDRESS in ${NODE_ADDRESSES[@]}
-  do
-    executeCurl http://$NODE_ADDRESS:$NODE_PORT/echo
-    if [ $? -ne 0 ]
-    then
-      print_error "Http server from $NODE_ADDRESS:$NODE_PORT is not available"
-      SERVER_AVAILABLE=false
-    fi
-  done
-  checkInteractiveMode
+  print_info "Show logs from client pod..."
+  POD_NAME=$(kubectl::getFirstPodName -l "app=$DEPLOYMENT_CLIENT_NAME")
+  kubectl::showLogs $POD_NAME
 
   checkCleanupMode
   print_done "Poc completed successfully"

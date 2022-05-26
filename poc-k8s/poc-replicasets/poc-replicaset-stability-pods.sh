@@ -8,7 +8,7 @@ source "${DIR}/../../utils/microservices-utils.src"
 source "${DIR}/../../poc-docker/utils/docker.src"
 source "${DIR}/../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/config/replicaset.yaml
+CONFIGURATION_FILE=${DIR}/replicaset.yaml
 REPLICASET_NAME="poc-replicaset"
 LABEL_NAME="poc-replicaset"
 
