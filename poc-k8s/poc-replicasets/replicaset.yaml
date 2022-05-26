@@ -3,16 +3,16 @@ kind: ReplicaSet
 metadata:
   name: poc-replicaset
   labels:
-    name: poc-replicaset
+    poc: poc-replicaset
 spec:
   replicas: 3
   selector:
     matchLabels:
-      name: poc-replicaset
+      poc: poc-replicaset
   template:
     metadata:
       labels:
-        name: poc-replicaset
+        poc: poc-replicaset
         language: golang
     spec:
       containers:

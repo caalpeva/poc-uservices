@@ -134,8 +134,10 @@ function kubectl::getFirstPodName() {
 function kubectl::waitForPodsByLabel() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait pods ${LABELS:+-l $LABELS} --for=condition=Ready
-  #kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait pods ${LABELS:+-l $LABELS} --for=condition=Ready --timeout=30s
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    wait pods ${LABELS:+-l $LABELS} \
+    --for=condition=Ready
+    #--timeout=30s
   xtrace off
   checkInteractiveMode
 }
@@ -146,6 +148,16 @@ function kubectl::deletePod() {
   kubectl::manageArguments $@
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} delete pod $pod
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::forceDeletePod() {
+  pod=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} delete pod $pod --force --grace-period=0
   xtrace off
   checkInteractiveMode
 }

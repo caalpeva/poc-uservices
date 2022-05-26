@@ -10,7 +10,7 @@ source "${DIR}/../utils/kubectl.src"
 
 CONFIGURATION_FILE=${DIR}/replicaset.yaml
 REPLICASET_NAME="poc-replicaset"
-LABEL_NAME="poc-replicaset"
+POC_LABEL_VALUE=$REPLICASET_NAME
 
 REPLICAS_EXPECTED=5
 
@@ -39,7 +39,7 @@ function main {
 
   kubectl::showNodes
   kubectl::apply $CONFIGURATION_FILE
-  kubectl::waitForPodsByLabel "name=$LABEL_NAME"
+  kubectl::waitForPodsByLabel -l "poc=$POC_LABEL_VALUE"
   kubectl::showReplicaSets
   kubectl::showPods
 
