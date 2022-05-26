@@ -116,22 +116,26 @@ function kubectl::getPodNames() {
 function kubectl::getPodStatus() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get pods --no-headers -o custom-columns=":status.phase"
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get pods ${LABELS:+-l $LABELS} \
+    --no-headers -o custom-columns=":status.phase"
   xtrace off
 }
 
 function kubectl::getFirstPodName() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get pods -o jsonpath="{.items[0].metadata.name}"
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get pods ${LABELS:+-l $LABELS} \
+    -o jsonpath="{.items[0].metadata.name}"
   xtrace off
 }
 
 function kubectl::waitForPodsByLabel() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait pods -l $1 --for=condition=Ready
-  #kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait pods -l $1 --for=condition=Ready --timeout=30s
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait pods ${LABELS:+-l $LABELS} --for=condition=Ready
+  #kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait pods ${LABELS:+-l $LABELS} --for=condition=Ready --timeout=30s
   xtrace off
   checkInteractiveMode
 }

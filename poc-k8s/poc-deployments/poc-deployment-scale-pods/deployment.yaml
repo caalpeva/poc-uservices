@@ -1,24 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: poc-deployment
+  name: poc-deployment-scale-manual
   labels:
-    name: poc-deployment
+    poc: poc-deployment-scale-manual
 spec:
-  replicas: 10
+  replicas: 8
   selector:
     matchLabels:
-      name: poc-deployment
+      poc: poc-deployment-scale-manual
   strategy:
-    type: RollingUpdate
-    #type: Recreate
-    rollingUpdate:
-      maxUnavailable: 10%
-      maxSurge: 10%
+    type: Recreate
   template:
     metadata:
       labels:
-        name: poc-deployment
+        poc: poc-deployment-scale-manual
         language: golang
     spec:
       containers:

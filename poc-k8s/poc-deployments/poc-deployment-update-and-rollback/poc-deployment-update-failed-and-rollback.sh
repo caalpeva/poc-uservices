@@ -2,16 +2,16 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../../poc-docker/utils/docker.src"
-source "${DIR}/../utils/kubectl.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../../utils/microservices-utils.src"
+source "${DIR}/../../../poc-docker/utils/docker.src"
+source "${DIR}/../../utils/kubectl.src"
 
 CONFIGURATION_FILE=${DIR}/config/deployment.yaml
 CONFIGURATION_UPDATE_FILE=${DIR}/config/deployment-update-bad.yaml
-DEPLOYMENT_NAME="poc-deployment"
-LABEL_NAME="poc-deployment"
+DEPLOYMENT_NAME="poc-deployment-update"
+POC_LABEL_VALUE=$DEPLOYMENT_NAME
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -42,10 +42,10 @@ function main {
   kubectl::waitForDeployment $DEPLOYMENT_NAME
   kubectl::showDeployments
   kubectl::showReplicaSets
-  kubectl::showPods -l "name=$LABEL_NAME"
+  kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Show logs..."
-  POD_NAME=$(kubectl::getFirstPodName -l "name=$LABEL_NAME"")
+  POD_NAME=$(kubectl::getFirstPodName -l "poc=$POC_LABEL_VALUE")
   kubectl::showLogs $POD_NAME
 
   print_info "Update the deployment..."

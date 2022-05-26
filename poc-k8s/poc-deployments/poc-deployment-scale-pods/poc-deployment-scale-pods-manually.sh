@@ -2,17 +2,17 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../../poc-docker/utils/docker.src"
-source "${DIR}/../utils/kubectl.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../../utils/microservices-utils.src"
+source "${DIR}/../../../poc-docker/utils/docker.src"
+source "${DIR}/../../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/config/deployment.yaml
-DEPLOYMENT_NAME="poc-deployment"
-LABEL_NAME="poc-deployment"
+CONFIGURATION_FILE=${DIR}/deployment.yaml
+DEPLOYMENT_NAME="poc-deployment-scale-manual"
+POC_LABEL_VALUE=$DEPLOYMENT_NAME
 
-REPLICAS_EXPECTED=5
+REPLICAS_EXPECTED=4
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -46,8 +46,8 @@ function main {
   kubectl::showPods
 
   kubectl::scaleDeployment $DEPLOYMENT_NAME $REPLICAS_EXPECTED
-  sleep 20
-  kubectl::waitForPodsByLabel "name=$LABEL_NAME"
+  sleep 15
+  kubectl::waitForPodsByLabel -l "poc=$POC_LABEL_VALUE"
   kubectl::showDeployments
   kubectl::showReplicaSets
   kubectl::showPods

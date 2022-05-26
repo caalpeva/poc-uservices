@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-deployment-update
+  labels:
+    poc: poc-deployment-update
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      poc: poc-deployment-update
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
+      maxSurge: 10%
+  template:
+    metadata:
+      labels:
+        poc: poc-deployment-update
+        language: golang
+    spec:
+      containers:
+        - name: poc-app-message-loop
+          image: kalpeva/poc-golang-message-loop:1.0
+          env:
+            - name: CHARACTER
+              value: "un circo."
+            - name: SLEEP_TIME
+              value: "1s"
