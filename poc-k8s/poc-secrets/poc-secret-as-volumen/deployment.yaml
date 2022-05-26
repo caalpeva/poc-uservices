@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-secret-as-volume
+  labels:
+    poc: poc-secret-as-volume
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      poc: poc-secret-as-volume
+  template:
+    metadata:
+      labels:
+        poc: poc-secret-as-volume
+    spec:
+      containers:
+        - name: poc-app-message-loop
+          image: kalpeva/poc-golang-message-loop:1.0
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: poc-secret-as-volume
+              mountPath: /tmp/files
+      volumes:
+        - name: poc-secret-as-volume
+          secret:
+            secretName: poc-secret-as-volume

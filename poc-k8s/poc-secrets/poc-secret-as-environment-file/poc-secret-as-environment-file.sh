@@ -2,16 +2,21 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../../poc-docker/utils/docker.src"
-source "${DIR}/../utils/kubectl.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../../utils/microservices-utils.src"
+source "${DIR}/../../../poc-docker/utils/docker.src"
+source "${DIR}/../../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/config/deployment-with-env-key-from-secret.yaml
-SECRET_NAME="poc-secret-as-environment-key"
-DEPLOYMENT_NAME="poc-secret-as-environment-key"
-POC_LABEL_VALUE="poc-secret-as-environment-key"
+TMP_DIRECTORY="${DIR}/tmp"
+
+CONFIGURATION_FILE=${DIR}/deployment.yaml
+SECRET_NAME="poc-secret-as-environment-file"
+DEPLOYMENT_NAME=$SECRET_NAME
+POC_LABEL_VALUE=$SECRET_NAME
+
+CHARACTER="una-corona."
+SLEEP_TIME="3s"
 
 HIDDEN_PLACE="un_pueblo_muy_lejano."
 
@@ -19,6 +24,12 @@ function initialize() {
   print_info "Preparing poc environment..."
   setTerminalSignals
   cleanup
+  print_debug "Creating temporal files..."
+  if [ ! -d ${TMP_DIRECTORY} ]; then
+    xtrace on
+    mkdir ${TMP_DIRECTORY}
+    xtrace off
+  fi
 }
 
 function handleTermSignal() {
@@ -31,7 +42,11 @@ function handleTermSignal() {
 function cleanup {
   print_debug "Cleaning environment..."
   kubectl::unapply $CONFIGURATION_FILE
-  kubectl::deleteSecret $SECRET_NAME
+  kubectl::unapply ${TMP_DIRECTORY}/*
+  #kubectl::deleteSecret $SECRET_NAME
+  xtrace on
+  rm -rf ${TMP_DIRECTORY}
+  xtrace off
 }
 
 function main {
@@ -41,15 +56,18 @@ function main {
 
   kubectl::showNodes
 
-  kubectl::createGenericSecret $SECRET_NAME "poc: $POC_LABEL_VALUE" \
-    --from-literal=hidden-place=${HIDDEN_PLACE}
+  kubectl::createGenericSecret ${TMP_DIRECTORY}/secret.yaml \
+    ${SECRET_NAME} "poc: $POC_LABEL_VALUE" \
+    --from-literal=CHARACTER=${CHARACTER} \
+    --from-literal=SLEEP_TIME=${SLEEP_TIME}
   kubectl::showSecrets -l "poc=$POC_LABEL_VALUE"
-  kubectl::showSecretDescription $SECRET_NAME
+  kubectl::showSecretDescription ${SECRET_NAME}
 
   print_info "Decode secret value"
-  DECODED_VALUE=$(kubectl::decodeSecretByKey $SECRET_NAME "hidden-place")
+  print_debug "Check that the generated file has the values encoded in base64"
+  DECODED_VALUE=$(kubectl::decodeSecretByKey ${SECRET_NAME} "CHARACTER")
   echo $DECODED_VALUE
-  if [ $HIDDEN_PLACE != $DECODED_VALUE ]; then
+  if [ $CHARACTER != $DECODED_VALUE ]; then
     print_error "Poc failure. Unexpected decoded value."
     exit 1
   fi

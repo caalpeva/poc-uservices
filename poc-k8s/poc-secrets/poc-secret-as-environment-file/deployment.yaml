@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-secret-as-environment-file
+  labels:
+    poc: poc-secret-as-environment-file
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      poc: poc-secret-as-environment-file
+  template:
+    metadata:
+      labels:
+        poc: poc-secret-as-environment-file
+    spec:
+      containers:
+        - name: poc-app-message-loop
+          image: kalpeva/poc-golang-message-loop:1.0
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: poc-secret-as-environment-file

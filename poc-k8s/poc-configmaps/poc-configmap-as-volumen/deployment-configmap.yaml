@@ -29,9 +29,9 @@ spec:
           image: kalpeva/poc-golang-message-loop:1.0
           imagePullPolicy: IfNotPresent
           volumeMounts:
-            - name: poc-volume
+            - name: poc-configmap-as-volume
               mountPath: /tmp/files
       volumes:
-        - name: poc-volume
+        - name: poc-configmap-as-volume
           configMap:
             name: poc-configmap-as-volume
