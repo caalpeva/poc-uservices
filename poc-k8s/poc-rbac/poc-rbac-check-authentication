@@ -10,19 +10,12 @@ source "${DIR}/../utils/kubectl.src"
 
 TMP_DIRECTORY="${DIR}/tmp"
 USERNAME=user
-GROUP=developer
 KUBECONFIG_FILE=${TMP_DIRECTORY}/${USERNAME}-config
 
 function initialize() {
   print_info "Preparing poc environment..."
   setTerminalSignals
   cleanup
-  print_debug "Creating temporal files..."
-  if [ ! -d ${TMP_DIRECTORY} ]; then
-    xtrace on
-    mkdir ${TMP_DIRECTORY}
-    xtrace off
-  fi
 }
 
 function handleTermSignal() {
@@ -58,7 +51,7 @@ function main {
   kubectl::showServices
 
   if [ ! -f ${KUBECONFIG_FILE} ]; then
-    print_error "Kubeconfig not found."
+    print_error "New kubeconfig not found."
     exit 1
   fi
 
