@@ -27,6 +27,7 @@ function generateSshKeys {
 
 function main {
   print_info "$(basename $0) [PID = $$]"
+  checkArguments $@
 
   rm -rf ${TMP_DIRECTORY}
   print_debug "Creating tmp directory..."

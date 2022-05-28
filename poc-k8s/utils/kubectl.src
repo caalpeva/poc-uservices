@@ -14,6 +14,22 @@ LABELS=""
 #    BASIC K8S METHODS   #
 ##########################
 
+function kubectl::showKubeconfig() {
+  print_info "Check the active kubeconfig"
+  xtrace on
+  echo "KUBECONFIG=$KUBECONFIG"
+  kubectl config view
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showKubeconfigFile() {
+  xtrace on
+  kubectl --kubeconfig=$1 config view
+  xtrace off
+  checkInteractiveMode
+}
+
 function kubectl::showNodes() {
   print_info "Show information about nodes"
   xtrace on
@@ -40,7 +56,7 @@ function kubectl::apply() {
 function kubectl::unapply() {
   print_info "Unapply configuration"
   xtrace on
-  kubectl delete -f $@
+  kubectl delete -f $@ --ignore-not-found=true
   xtrace off
   sleep 3
 }

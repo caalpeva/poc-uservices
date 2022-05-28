@@ -41,7 +41,7 @@ function cleanup {
   #kubectl::deleteSecret $SECRET_NAME
   xtrace on
   rm -rf ${TMP_DIRECTORY}
-  xtrace offpoc-secret-as-volume
+  xtrace off
 }
 
 function main {
