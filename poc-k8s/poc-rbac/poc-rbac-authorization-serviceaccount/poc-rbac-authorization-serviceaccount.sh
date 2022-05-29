@@ -63,9 +63,7 @@ function main {
   kubectl::showNodes
 
   kubectl::apply $CONFIGFILE_NAMESPACE \
-    $CONFIGFILE_SERVICEACCOUNT \
-     $CONFIGFILE_ROLE \
-     $CONFIGFILE_ROLEBINDING \
+     $CONFIGFILE_SERVICEACCOUNT \
      $CONFIGFILE_DEPLOYMENT
 
   kubectl::showPods -n $NAMESPACE

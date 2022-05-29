@@ -21,3 +21,8 @@ spec:
       containers:
         - name: poc-app-access-k8s
           image: kalpeva/poc-golang-access-k8s:1.0
+          env:
+            - name: NAMESPACE
+              value: "poc-rbac-service-account-ns"
+            - name: SLEEP_TIME
+              value: "3s"

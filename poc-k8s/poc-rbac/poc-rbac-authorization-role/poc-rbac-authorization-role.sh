@@ -34,8 +34,7 @@ function handleTermSignal() {
 function cleanup {
   print_debug "Cleaning environment..."
   kubectl::unsetKubeconfig
-  kubectl::unapply $CONFIGURATION2_FILE
-  kubectl::unapply $CONFIGURATION1_FILE
+  kubectl::unapply $CONFIGURATION2_FILE $CONFIGURATION1_FILE
 }
 
 function main {
@@ -52,12 +51,11 @@ function main {
   print_info "Before applying the role configuration, we make sure that we are using the administrator user, eliminating the KUBECONFIG variable."
   kubectl::unsetKubeconfig
   checkInteractiveMode
-  
+
   kubectl::showKubeconfig
   kubectl::showNodes
 
-  kubectl::apply $CONFIGURATION1_FILE
-  kubectl::apply $CONFIGURATION2_FILE
+  kubectl::apply $CONFIGURATION1_FILE $CONFIGURATION2_FILE
 
   kubectl::showRoles -l "poc=$POC_LABEL_VALUE"
   kubectl::showRoleDescription $ROLE_NAME

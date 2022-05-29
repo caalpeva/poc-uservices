@@ -4,7 +4,7 @@ metadata:
   name: poc-rbac-service-account
   labels:
     poc: poc-rbac-service-account
-  namespace: default
+  namespace: poc-rbac-service-account-ns
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

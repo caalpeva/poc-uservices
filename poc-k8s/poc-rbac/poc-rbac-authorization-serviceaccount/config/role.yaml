@@ -4,11 +4,13 @@ metadata:
   name: poc-rbac-service-account
   labels:
     poc: poc-rbac-service-account
-  namespace: default
+  namespace: poc-rbac-service-account-ns
 rules:
 - apiGroups:
   - ""
   resources:
   - pods
   verbs:
+  - get
   - list
+  - watch
