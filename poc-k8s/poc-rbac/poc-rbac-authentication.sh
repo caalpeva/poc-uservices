@@ -2,11 +2,11 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../../poc-docker/utils/docker.src"
-source "${DIR}/../utils/kubectl.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../../utils/microservices-utils.src"
+source "${DIR}/../../../poc-docker/utils/docker.src"
+source "${DIR}/../../utils/kubectl.src"
 
 TMP_DIRECTORY="${DIR}/tmp"
 USERNAME=user
