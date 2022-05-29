@@ -3,29 +3,21 @@ kind: Deployment
 metadata:
   name: poc-rbac-service-account
   labels:
-    poc: poc-rbac-service-account
+    app: rbac
   namespace: poc-rbac-service-account-ns
 spec:
   replicas: 1
   selector:
     matchLabels:
-      poc: poc-rbac-service-account
+      app: rbac
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        poc: poc-rbac-service-account
-        language: golang
+        app: rbac
     spec:
-      serviceAccountName: poc-rbac-service-account
+      serviceAccountName: developer
       containers:
         - name: poc-app-access-k8s
           image: kalpeva/poc-golang-access-k8s:1.0
-          imagePullPolicy: Always
-          env:
-            - name: NAMESPACE
-              value: "poc-rbac-service-account"
-            - name: SLEEP_TIME
-              value: "2s"
-          resources: {}

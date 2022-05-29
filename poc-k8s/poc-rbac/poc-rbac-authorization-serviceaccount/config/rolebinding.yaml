@@ -1,15 +1,15 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: poc-rbac-service-account
+  name: developer
   labels:
-    poc: poc-rbac-service-account
-  namespace: poc-rbac-service-account-ns
+    app: rbac
+  namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: poc-rbac-service-account
+  name: developer
 subjects:
 - kind: ServiceAccount
-  name: poc-rbac-service-account
+  name: developer
   namespace: poc-rbac-service-account-ns
