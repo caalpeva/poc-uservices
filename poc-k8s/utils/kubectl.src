@@ -44,7 +44,6 @@ function kubectl::unsetKubeconfig() {
   xtrace on
   unset KUBECONFIG
   xtrace off
-  checkInteractiveMode
 }
 
 function kubectl::showNodes() {
@@ -64,17 +63,23 @@ function kubectl::getNodeAddresses() {
 
 function kubectl::apply() {
   print_info "Apply configuration"
-  xtrace on
-  kubectl apply -f $@
-  xtrace off
+  for file in $@
+  do
+    xtrace on
+    kubectl apply -f $file
+    xtrace off
+  done
   sleep 1
 }
 
 function kubectl::unapply() {
   print_info "Unapply configuration"
-  xtrace on
-  kubectl delete -f $@ --ignore-not-found=true
-  xtrace off
+  for file in $@
+  do
+    xtrace on
+    kubectl delete -f $file --ignore-not-found=true
+    xtrace off
+  done
   sleep 3
 }
 
@@ -136,6 +141,13 @@ function kubectl::getRunningPods() {
   kubectl::manageArguments $@
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po --no-headers | grep Running | awk '{print $1}'
+  xtrace off
+}
+
+function kubectl::getAllPods() {
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po --no-headers | awk '{print $1}'
   xtrace off
 }
 
@@ -201,6 +213,17 @@ function kubectl::showLogs() {
   kubectl::manageArguments $@
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} logs $pod
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showLogsNoTimeout() {
+  pod=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod --timeout=1s
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} logs $pod
   xtrace off
   checkInteractiveMode

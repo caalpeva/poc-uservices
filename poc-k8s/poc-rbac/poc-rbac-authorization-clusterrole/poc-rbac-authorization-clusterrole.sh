@@ -51,6 +51,8 @@ function main {
 
   print_info "Before applying the cluster role configuration, we make sure that we are using the administrator user, eliminating the KUBECONFIG variable."
   kubectl::unsetKubeconfig
+  checkInteractiveMode
+  
   kubectl::showKubeconfig
   kubectl::showNodes
 
