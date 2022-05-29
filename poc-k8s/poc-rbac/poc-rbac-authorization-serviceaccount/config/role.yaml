@@ -1,9 +1,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: developer
+  name: poc-rbac-service-account
   labels:
-    app: rbac
+    poc: poc-rbac-service-account
   namespace: default
 rules:
 - apiGroups:

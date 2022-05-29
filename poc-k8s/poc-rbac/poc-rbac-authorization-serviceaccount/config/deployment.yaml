@@ -3,21 +3,21 @@ kind: Deployment
 metadata:
   name: poc-rbac-service-account
   labels:
-    app: rbac
+    poc: poc-rbac-service-account
   namespace: poc-rbac-service-account-ns
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rbac
+      poc: poc-rbac-service-account
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: rbac
+        poc: poc-rbac-service-account
     spec:
-      serviceAccountName: developer
+      serviceAccountName: poc-rbac-service-account
       containers:
         - name: poc-app-access-k8s
           image: kalpeva/poc-golang-access-k8s:1.0
