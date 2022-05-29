@@ -43,6 +43,8 @@ function main {
     "   but the user still does not have permissions to access the cluster resources."
   checkInteractiveMode
 
+  print_info "Before applying the role configuration, we make sure that we are using the administrator user, eliminating the KUBECONFIG variable."
+  kubectl::unsetKubeconfig
   kubectl::showKubeconfig
   kubectl::showNodes
 
@@ -55,7 +57,7 @@ function main {
     exit 1
   fi
 
-  print_info "Set the new kubeconfig to active"
+  print_info "Set the kubeconfig to refer to the file that contains the user credentials"
   xtrace on
   export KUBECONFIG=${KUBECONFIG_FILE}
   xtrace off
@@ -63,8 +65,9 @@ function main {
 
   kubectl::showKubeconfig
 
-  print_info "Check that you doesn't have permissions to access the cluster resources pods"
+  print_info "Check that you doesn't have permissions to access the cluster resources"
   kubectl::showPods
+  kubectl::showPods -n kube-system
   kubectl::showServices
 
   checkCleanupMode

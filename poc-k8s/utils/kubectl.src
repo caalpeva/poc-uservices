@@ -15,7 +15,7 @@ LABELS=""
 ##########################
 
 function kubectl::showKubeconfig() {
-  print_info "Check the active kubeconfig"
+  print_info "Check the active KUBECONFIG"
   xtrace on
   echo "KUBECONFIG=$KUBECONFIG"
   kubectl config view
@@ -26,6 +26,23 @@ function kubectl::showKubeconfig() {
 function kubectl::showKubeconfigFile() {
   xtrace on
   kubectl --kubeconfig=$1 config view
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::setKubeconfig() {
+  print_debug "Set KUBECONFIG to new kubeconfig file"
+  kubeconfigFile=$1
+  xtrace on
+  export KUBECONFIG=$kubeconfigFile
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::unsetKubeconfig() {
+  print_debug "Unset KUBECONFIG"
+  xtrace on
+  unset KUBECONFIG
   xtrace off
   checkInteractiveMode
 }
@@ -500,6 +517,98 @@ function kubectl::decodeSecretByKey() {
 function kubectl::deleteSecret() {
   xtrace on
   kubectl delete secret $1
+  xtrace off
+  checkInteractiveMode
+}
+
+##########################
+#      RBAC METHODS      #
+##########################
+
+function kubectl::showRoles() {
+  print_info "Show roles"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get roles ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showRoleDescription() {
+  role=$1
+  shift
+  print_info "Show role description"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    describe role $role ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showRoleBindings() {
+  print_info "Show rolebindings"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get rolebindings ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showRoleBindingDescription() {
+  role=$1
+  shift
+  print_info "Show rolebinding description"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    describe rolebinding $role ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showClusterRoles() {
+  print_info "Show cluster roles"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get clusterroles ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showClusterRoleDescription() {
+  role=$1
+  shift
+  print_info "Show clusterrole description"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    describe clusterrole $role ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showClusterRoleBindings() {
+  print_info "Show rolebindings"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get clusterrolebindings ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showClusterRoleBindingDescription() {
+  role=$1
+  shift
+  print_info "Show rolebinding description"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    describe clusterrolebinding $role ${LABELS:+-l $LABELS}
   xtrace off
   checkInteractiveMode
 }
