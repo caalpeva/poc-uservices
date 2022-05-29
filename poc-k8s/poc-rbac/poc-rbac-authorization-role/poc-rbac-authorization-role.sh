@@ -64,6 +64,7 @@ function main {
 
   if [ ! -f ${KUBECONFIG_FILE} ]; then
     print_error "New kubeconfig not found."
+    checkCleanupMode
     exit 1
   fi
 
