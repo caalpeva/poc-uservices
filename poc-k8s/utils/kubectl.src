@@ -10,6 +10,9 @@
 NAMESPACE=""
 LABELS=""
 
+METRICS_TIMEOUT_SECS=120 # Set timeout in seconds
+METRICS_INTERVAL_SECS=5   # Set interval (duration) in seconds
+
 ##########################
 #    BASIC K8S METHODS   #
 ##########################
@@ -165,6 +168,58 @@ function kubectl::getPodStatus() {
     get pods ${LABELS:+-l $LABELS} \
     --no-headers -o custom-columns=":status.phase"
   xtrace off
+}
+
+function kubectl::showPodMemoryLimitFromDeployment() {
+  deployment=$1
+  shift
+  #kubectl get pods -o json
+  #kubectl get pods -o=jsonpath='{@}'
+  #kubectl get pods -o=jsonpath='{.items[0]}'
+  #kubectl get pods -o=jsonpath='{.items[0].metadata.name}'
+  #kubectl get pods -o=jsonpath="{.items[*]['metadata.name', 'status.capacity']}"
+  #kubectl get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.startTime}{"\n"}{end}'
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get deploy $deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{..resources.limits.memory}{"\n"}'
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::checkRestartCountByPod() {
+  isTraceEnabled=${1:-false}
+  if [ $isTraceEnabled = true ]; then
+      xtrace on
+  fi
+  shift
+
+  pod=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get pod --no-headers \
+    -o custom-columns="':status.containerStatuses[0].restartCount"
+  result=$?
+  xtrace off
+  return $result
+}
+
+function kubectl::waitForPodRestarted() {
+  podPrefix=$1
+  print_debug "Waiting for pod restarted..."
+  pod=$(kubectl::getRunningPods | grep ^$podPrefix)
+  kubectl::checkRestartCountByPod $pod true
+  declare -i isRestarted=0
+  local endTime=$(( $(date +%s) + $METRICS_TIMEOUT_SECS )) # Calculate end time.
+  while [ $isRestarted -le 0 -a $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
+    sleep $METRICS_INTERVAL_SECS
+    kubectl::checkRestartCountByPod false $pod
+    isRestarted=$?
+  done
+
+  return $isRestarted
 }
 
 function kubectl::getFirstPodName() {
@@ -634,4 +689,65 @@ function kubectl::showClusterRoleBindingDescription() {
     describe clusterrolebinding $role ${LABELS:+-l $LABELS}
   xtrace off
   checkInteractiveMode
+}
+
+##########################
+#      RESOURCES      #
+##########################
+
+function kubectl::checkNodeMetrics() {
+  isTraceEnabled=${1:-false}
+  if [ $isTraceEnabled = true ]; then
+      xtrace on
+  fi
+
+  kubectl top nodes 2> /dev/null
+
+  result=$?
+  xtrace off
+  return $result
+}
+
+function kubectl::waitForNodeMetrics() {
+  print_debug "Waiting for available node metrics..."
+  kubectl::checkNodeMetrics true
+  local areMetricsAvailable=$?
+  local endTime=$(( $(date +%s) + $METRICS_TIMEOUT_SECS )) # Calculate end time.
+  while [ $areMetricsAvailable != 0 -a $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
+    sleep $METRICS_INTERVAL_SECS
+    kubectl::checkNodeMetrics
+    areMetricsAvailable=$?
+  done
+
+  return $areMetricsAvailable
+}
+
+function kubectl::checkPodMetrics() {
+  isTraceEnabled=$1
+  shift
+  if [ $isTraceEnabled = true ]; then
+      xtrace on
+  fi
+
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    top pods ${LABELS:+-l $LABELS} --containers 2> /dev/null
+
+  result=$?
+  xtrace off
+  return $result
+}
+
+function kubectl::waitForPodMetrics() {
+  print_debug "Waiting for available pod metrics..."
+  kubectl::manageArguments $@
+  kubectl::checkPodMetrics true $@
+  local areMetricsAvailable=$?
+  local endTime=$(( $(date +%s) + $METRICS_TIMEOUT_SECS )) # Calculate end time.
+  while [ $areMetricsAvailable != 0 -a $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
+    sleep $METRICS_INTERVAL_SECS
+    kubectl::checkPodMetrics false $@
+    areMetricsAvailable=$?
+  done
+
+  return $areMetricsAvailable
 }

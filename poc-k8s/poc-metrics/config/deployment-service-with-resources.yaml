@@ -1,0 +1,97 @@
+# server application service
+apiVersion: v1
+kind: Service
+metadata:
+  name: poc-service
+  namespace: default
+  labels:
+    poc: poc-metrics-hpa
+spec:
+  type: ClusterIP
+  selector:
+    app: poc-server
+  ports:
+    - port: 9000
+      protocol: TCP
+      targetPort: http-server
+
+---
+# server application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-server
+  labels:
+    app: poc-server
+    poc: poc-metrics-hpa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poc-server
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: poc-server
+        poc: poc-metrics-hpa
+    spec:
+      containers:
+        - name: server
+          image: kalpeva/poc-golang-server-client:1.0
+          command:
+            - server
+          ports:
+            - name: http-server
+              containerPort: 8000
+          resources:
+            requests:
+              cpu: 20m
+              memory: 100Mi
+            limits:
+              cpu: 25m
+              memory: 200Mi
+
+---
+# client application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-client
+  namespace: default
+  labels:
+    app: poc-client
+    poc: poc-metrics-hpa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poc-client
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: poc-client
+        poc: poc-metrics-hpa
+    spec:
+      containers:
+        - name: client
+          image: kalpeva/poc-golang-server-client:1.0
+          command:
+            - client
+          env:
+            - name: SERVER_URL
+              value: "http://poc-service:9000"
+            - name: ENDPOINT
+              value: "/echo"
+            - name: SLEEP_TIME
+              value: "50ms"
+          resources:
+            requests:
+              cpu: 20m
+              memory: 25Mi
+            limits:
+              cpu: 25m
+              memory: 30Mi
