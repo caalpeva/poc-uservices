@@ -43,7 +43,7 @@ function main {
   kubectl::showNodes
   kubectl::apply $CONFIGFILE_DEPLOYMENT
   kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME
-  kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 10
+  kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME
   kubectl::showDeployments
   kubectl::showReplicaSets
   kubectl::showPods -l "poc=$POC_LABEL_VALUE"
@@ -59,45 +59,34 @@ function main {
     exit 1
   fi
 
-  print_info "Update the deployment with the resources limited"
+  print_info "Update the deployment to limit CPU and RAM resources"
   kubectl::apply $CONFIGFILE_DEPLOYMENT_UPDATE && sleep 5
-  kubectl::showDeployments
-  kubectl::showReplicaSets
-  kubectl::showPods -l "poc=$POC_LABEL_VALUE" && sleep 5
+  kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME && sleep 2
+  kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 2
+  kubectl::showDeployments && sleep 2
+  kubectl::showReplicaSets && sleep 2
+  kubectl::showPods -l "poc=$POC_LABEL_VALUE" && sleep 2
 
-  print_info "Note the memory limit configured on the client pod container"
-  print_debug "This value is insufficient for the correct operation of the pod"
-  kubectl::showPodMemoryLimitFromDeployment $DEPLOYMENT_CLIENT_NAME
+  print_info "Show configured CPU limit for client pod"
+  kubectl::getCpuLimitFromDeployment $DEPLOYMENT_CLIENT_NAME && sleep 2
+  checkInteractiveMode
 
-  print_info "Show the resource consumption of the pods again"
-  kubectl::waitForPodMetrics &
+  print_info "Show configured RAM limit for client pod"
+  kubectl::getRamLimitFromDeployment $DEPLOYMENT_CLIENT_NAME && sleep 2
+  checkInteractiveMode
+
+  print_info "Show memory consumption progress until it reaches the configured RAM limit"
+  POD_NAME=$(kubectl::getRunningPods | grep ^$DEPLOYMENT_CLIENT_NAME)
+  kubectl::watchPodMetrics $POD_NAME &
   PID=$!
   showProgressBar $PID
   wait $PID
-  if [ $? -ne 0 ]; then
-    print_error "Timeout. Metrics server unavailable"
-    cleanup
-    exit 1
-  fi
 
-  print_info "Wait for the pod to restart"
-  kubectl::waitForPodRestarted $DEPLOYMENT_CLIENT_NAME
   kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
-  print_info "Show the resource consumption of the pods again"
-  kubectl::waitForPodMetrics &
-  PID=$!
-  showProgressBar $PID
-  wait $PID
-  if [ $? -ne 0 ]; then
-    print_error "Timeout. Metrics server unavailable"
-    cleanup
-    exit 1
-  fi
-
-  print_info "Check the limits of the configured resources"
-  print_debug "Check that cpu consumption does not exceed the configured limit."
-  print_debug "Check that after a while the container exceeds the configured memory limit and therefore the pod that contains it is restarted."
+  print_info "Check resource limits"
+  print_debug "Note that CPU consumption never exceed the configured CPU limit"
+  print_debug "Verify that when memory consumption exceeds the configured RAM limit the pod restarts"
   checkInteractiveMode
 
   checkCleanupMode

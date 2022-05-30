@@ -10,8 +10,11 @@
 NAMESPACE=""
 LABELS=""
 
-METRICS_TIMEOUT_SECS=120 # Set timeout in seconds
-METRICS_INTERVAL_SECS=5   # Set interval (duration) in seconds
+RESTART_TIMEOUT_SECS=300
+RESTART_INTERVAL_SECS=30   # Set interval (duration) in seconds
+
+METRICS_TIMEOUT_SECS=150  # Set timeout in seconds
+METRICS_INTERVAL_SECS=10   # Set interval (duration) in seconds
 
 ##########################
 #    BASIC K8S METHODS   #
@@ -80,7 +83,7 @@ function kubectl::unapply() {
   for file in $@
   do
     xtrace on
-    kubectl delete -f $file --ignore-not-found=true
+    kubectl delete -f $file --wait=true --ignore-not-found=true
     xtrace off
   done
   sleep 3
@@ -170,7 +173,7 @@ function kubectl::getPodStatus() {
   xtrace off
 }
 
-function kubectl::showPodMemoryLimitFromDeployment() {
+function kubectl::getRamLimitFromDeployment() {
   deployment=$1
   shift
   #kubectl get pods -o json
@@ -184,39 +187,44 @@ function kubectl::showPodMemoryLimitFromDeployment() {
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
     get deploy $deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{..resources.limits.memory}{"\n"}'
   xtrace off
-  checkInteractiveMode
 }
 
-function kubectl::checkRestartCountByPod() {
-  isTraceEnabled=${1:-false}
-  if [ $isTraceEnabled = true ]; then
-      xtrace on
-  fi
-  shift
-
-  pod=$1
+function kubectl::getCpuLimitFromDeployment() {
+  deployment=$1
   shift
   kubectl::manageArguments $@
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get pod --no-headers \
-    -o custom-columns="':status.containerStatuses[0].restartCount"
-  result=$?
+    get deploy $deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{..resources.limits.cpu}{"\n"}'
   xtrace off
-  return $result
 }
 
-function kubectl::waitForPodRestarted() {
-  podPrefix=$1
-  print_debug "Waiting for pod restarted..."
-  pod=$(kubectl::getRunningPods | grep ^$podPrefix)
-  kubectl::checkRestartCountByPod $pod true
+function kubectl::getRestartCountByPod() {
+  pod=$1
+  shift
+  kubectl::manageArguments $@
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get pod $pod --no-headers \
+    -o custom-columns=":status.containerStatuses[0].restartCount"
+  xtrace off
+}
+
+function kubectl::watchPodMetrics() {
   declare -i isRestarted=0
-  local endTime=$(( $(date +%s) + $METRICS_TIMEOUT_SECS )) # Calculate end time.
-  while [ $isRestarted -le 0 -a $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
-    sleep $METRICS_INTERVAL_SECS
-    kubectl::checkRestartCountByPod false $pod
-    isRestarted=$?
+  previousRestartCount=$(kubectl::getRestartCountByPod $1)
+  previousRestartCount=${previousRestartCount:-0}
+  local endTime=$(( $(date +%s) + $RESTART_TIMEOUT_SECS )) # Calculate end time.
+  while [ $isRestarted -eq 0 -a $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
+    kubectl::waitForPodMetrics
+    sleep $RESTART_INTERVAL_SECS
+    echo $1
+    #kubectl get pod $1 > /dev/null 2>1&
+    #isRestarted=$?
+    currentRestartCount=$(kubectl::getRestartCountByPod $1)
+    currentRestartCount=${currentRestartCount:-0}
+    if [ $currentRestartCount -gt $previousRestartCount ];then
+      isRestarted=1
+    fi
   done
 
   return $isRestarted

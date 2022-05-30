@@ -9,8 +9,6 @@ source "${DIR}/../../utils/microservices-utils.src"
 source "${DIR}/../../poc-docker/utils/docker.src"
 source "${DIR}/../utils/kubectl.src"
 
-UNINSTALL_METRICS_SERVER=false
-
 CONFIGFILE_METRICS_SERVER=${DIR}/config/metrics-server.yaml
 
 function initialize() {
@@ -28,9 +26,7 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  if [ $UNINSTALL_METRICS_SERVER = true ]; then
-    kubectl::unapply $CONFIGFILE_METRICS_SERVER
-  fi
+  kubectl::unapply $CONFIGFILE_METRICS_SERVER
 }
 
 function main {
