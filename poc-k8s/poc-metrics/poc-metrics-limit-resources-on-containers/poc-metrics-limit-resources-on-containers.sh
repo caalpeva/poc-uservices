@@ -2,12 +2,12 @@
 
 DIR=$(dirname $(readlink -f $0))
 
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src"
-source "${DIR}/../../utils/microservices-utils.src"
-source "${DIR}/../../poc-docker/utils/docker.src"
-source "${DIR}/../utils/kubectl.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
+source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src"
+source "${DIR}/../../../utils/microservices-utils.src"
+source "${DIR}/../../../poc-docker/utils/docker.src"
+source "${DIR}/../../utils/kubectl.src"
 
 CONFIG_DIR=${DIR}/config
 CONFIGFILE_DEPLOYMENT=${CONFIG_DIR}/deployment-service.yaml
@@ -15,7 +15,7 @@ CONFIGFILE_DEPLOYMENT_UPDATE=${CONFIG_DIR}/deployment-service-with-resources.yam
 
 DEPLOYMENT_CLIENT_NAME="poc-client"
 DEPLOYMENT_SERVER_NAME="poc-server"
-POC_LABEL_VALUE="poc-metrics-hpa"
+POC_LABEL_VALUE="poc-metrics"
 
 function initialize() {
   print_info "Preparing poc environment..."

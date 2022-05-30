@@ -9,7 +9,7 @@ source "${DIR}/../../utils/microservices-utils.src"
 source "${DIR}/../../poc-docker/utils/docker.src"
 source "${DIR}/../utils/kubectl.src"
 
-CONFIGFILE_METRICS_SERVER=${DIR}/config/metrics-server.yaml
+CONFIGFILE_METRICS_SERVER=${DIR}/components/metrics-server.yaml
 
 function initialize() {
   print_info "Preparing poc environment..."

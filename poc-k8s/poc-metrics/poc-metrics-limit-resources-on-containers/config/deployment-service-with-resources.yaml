@@ -45,6 +45,13 @@ spec:
           ports:
             - name: http-server
               containerPort: 8000
+          #resources:
+          #  requests:
+          #    cpu: 20m
+          #    memory: 100Mi
+          #  limits:
+          #    cpu: 25m
+          #    memory: 200Mi
 
 ---
 # client application
@@ -55,7 +62,7 @@ metadata:
   namespace: default
   labels:
     app: poc-client
-    poc: poc-metrics-hpa
+    poc: poc-metrics
 spec:
   replicas: 1
   selector:
@@ -67,7 +74,7 @@ spec:
     metadata:
       labels:
         app: poc-client
-        poc: poc-metrics-hpa
+        poc: poc-metrics
     spec:
       containers:
         - name: client
@@ -81,3 +88,10 @@ spec:
               value: "/echo"
             - name: SLEEP_TIME
               value: "50ms"
+          resources:
+            requests:
+              cpu: 20m
+              memory: 20Mi
+            limits:
+              cpu: 25m
+              memory: 30Mi
