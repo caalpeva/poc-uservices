@@ -32,7 +32,8 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  kubectl::unapply $CONFIGFILE_DEPLOYMENT_UPDATE $CONFIGFILE_DEPLOYMENT
+  kubectl::unapply $CONFIGFILE_DEPLOYMENT
+  kubectl::resetMetricsServer
 }
 
 function main {
@@ -49,39 +50,28 @@ function main {
   kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Show the resource consumption of the pods"
-  kubectl::waitForPodMetrics &
-  PID=$!
-  showProgressBar $PID
-  wait $PID
-  if [ $? -ne 0 ]; then
-    print_error "Timeout. Metrics server unavailable"
-    cleanup
-    exit 1
-  fi
+  kubectl::showPodMetrics
+  kubectl::resetMetricsServer
 
   print_info "Update the deployment to limit CPU and RAM resources"
-  kubectl::apply $CONFIGFILE_DEPLOYMENT_UPDATE && sleep 5
+  kubectl::apply $CONFIGFILE_DEPLOYMENT_UPDATE && sleep 2
   kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME && sleep 2
   kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 2
-  kubectl::showDeployments && sleep 2
-  kubectl::showReplicaSets && sleep 2
-  kubectl::showPods -l "poc=$POC_LABEL_VALUE" && sleep 2
+  kubectl::showDeployments
+  kubectl::showReplicaSets
+  kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Show configured CPU limit for client pod"
-  kubectl::getCpuLimitFromDeployment $DEPLOYMENT_CLIENT_NAME && sleep 2
+  kubectl::getCpuLimitFromDeployment $DEPLOYMENT_CLIENT_NAME
   checkInteractiveMode
 
   print_info "Show configured RAM limit for client pod"
-  kubectl::getRamLimitFromDeployment $DEPLOYMENT_CLIENT_NAME && sleep 2
+  kubectl::getRamLimitFromDeployment $DEPLOYMENT_CLIENT_NAME
   checkInteractiveMode
 
   print_info "Show memory consumption progress until it reaches the configured RAM limit"
   POD_NAME=$(kubectl::getRunningPods | grep ^$DEPLOYMENT_CLIENT_NAME)
-  kubectl::watchPodMetrics $POD_NAME &
-  PID=$!
-  showProgressBar $PID
-  wait $PID
-
+  kubectl::watchPodMetricsUntilPodRestarted $POD_NAME
   kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Check resource limits"

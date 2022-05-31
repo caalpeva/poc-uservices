@@ -1,8 +1,9 @@
 #!/bin/echo "source me !"
-# Requires: /../../dependencies/downloads/poc-bash-master/includes/print-utils.src
-# 	    /../../dependencies/downloads/poc-bash-master/includes/trace-utils.src
-#       /../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src
-#           /../../utils/microservices-utils.src
+# Requires:
+# /../../dependencies/downloads/poc-bash-master/includes/print-utils.src
+# /../../dependencies/downloads/poc-bash-master/includes/trace-utils.src
+# /../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src
+# /../../utils/microservices-utils.src
 
 ##########################
 #  K8S GLOBAL VARIABLES  #
@@ -209,27 +210,6 @@ function kubectl::getRestartCountByPod() {
   xtrace off
 }
 
-function kubectl::watchPodMetrics() {
-  declare -i isRestarted=0
-  previousRestartCount=$(kubectl::getRestartCountByPod $1)
-  previousRestartCount=${previousRestartCount:-0}
-  local endTime=$(( $(date +%s) + $RESTART_TIMEOUT_SECS )) # Calculate end time.
-  while [ $isRestarted -eq 0 -a $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
-    kubectl::waitForPodMetrics
-    sleep $RESTART_INTERVAL_SECS
-    echo $1
-    #kubectl get pod $1 > /dev/null 2>1&
-    #isRestarted=$?
-    currentRestartCount=$(kubectl::getRestartCountByPod $1)
-    currentRestartCount=${currentRestartCount:-0}
-    if [ $currentRestartCount -gt $previousRestartCount ];then
-      isRestarted=1
-    fi
-  done
-
-  return $isRestarted
-}
-
 function kubectl::getFirstPodName() {
   kubectl::manageArguments $@
   xtrace on
@@ -267,7 +247,6 @@ function kubectl::forceDeletePod() {
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} delete pod $pod --force --grace-period=0
   xtrace off
-  checkInteractiveMode
 }
 
 function kubectl::showLogs() {
@@ -700,8 +679,17 @@ function kubectl::showClusterRoleBindingDescription() {
 }
 
 ##########################
-#      RESOURCES      #
+#     METRICS SERVER     #
 ##########################
+
+function kubectl::resetMetricsServer() {
+  print_debug "Reset metrics server to clean obsolete pod data"
+  PODS=($(kubectl::getRunningPods -n kube-system | grep ^metrics-server))
+  for pod in $PODS; do
+    kubectl::forceDeletePod $pod -n kube-system
+  done
+  checkInteractiveMode
+}
 
 function kubectl::checkNodeMetrics() {
   isTraceEnabled=${1:-false}
@@ -758,4 +746,37 @@ function kubectl::waitForPodMetrics() {
   done
 
   return $areMetricsAvailable
+}
+
+
+function kubectl::showPodMetrics() {
+  kubectl::waitForPodMetrics &
+  PID=$!
+  showProgressBar $PID
+  wait $PID
+}
+
+function kubectl::waitForPodMetricsUntilPodRestarted() {
+  declare -i isRestarted=0
+  previousRestartCount=$(kubectl::getRestartCountByPod $1)
+  previousRestartCount=${previousRestartCount:-0}
+  local endTime=$(( $(date +%s) + $RESTART_TIMEOUT_SECS )) # Calculate end time.
+  while [ $isRestarted -eq 0 -a $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
+    kubectl::waitForPodMetrics
+    sleep $RESTART_INTERVAL_SECS
+    currentRestartCount=$(kubectl::getRestartCountByPod $1)
+    currentRestartCount=${currentRestartCount:-0}
+    if [ $currentRestartCount -gt $previousRestartCount ];then
+      isRestarted=1
+    fi
+  done
+
+  return $isRestarted
+}
+
+function kubectl::watchPodMetricsUntilPodRestarted() {
+  kubectl::waitForPodMetricsUntilPodRestarted $1 &
+  PID=$!
+  showProgressBar $PID
+  wait $PID
 }

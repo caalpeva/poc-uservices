@@ -36,6 +36,7 @@ function cleanup {
   print_debug "Cleaning environment..."
   kubectl::unapply $CONFIGFILE_DEPLOYMENT \
     $CONFIGFILE_HORIZONTAL_POD_AUTOSCALER
+  kubectl::resetMetricsServer
 }
 
 function main {
@@ -52,53 +53,31 @@ function main {
   kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Show the resource consumption of the pods"
-  kubectl::waitForPodMetrics &
-  PID=$!
-  showProgressBar $PID
-  wait $PID
-  if [ $? -ne 0 ]; then
-    print_error "Timeout. Metrics server unavailable"
-    cleanup
-    exit 1
-  fi
+  kubectl::showPodMetrics
+  kubectl::resetMetricsServer
 
   print_info "Simular demanda de peticiones"
-  kubectl::scaleDeployment $DEPLOYMENT_CLIENT_NAME $REPLICAS_EXPECTED && sleep 3
-  kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME && sleep 3
-  kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 3
-  kubectl::showDeployments && sleep 3
-  kubectl::showReplicaSets && sleep 3
-  kubectl::showPods -l "poc=$POC_LABEL_VALUE" && sleep 3
+  kubectl::scaleDeployment $DEPLOYMENT_CLIENT_NAME $REPLICAS_EXPECTED && sleep 2
+  kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME && sleep 2
+  kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 2
+  kubectl::showDeployments
+  kubectl::showReplicaSets
+  kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Show the resource consumption of the pods"
-  kubectl::waitForPodMetrics &
-  PID=$!
-  showProgressBar $PID
-  wait $PID
-  if [ $? -ne 0 ]; then
-    print_error "Timeout. Metrics server unavailable"
-    cleanup
-    exit 1
-  fi
+  kubectl::showPodMetrics
+  kubectl::resetMetricsServer
 
   print_info "Configure horizontal pod autoscaler for server deployment"
-  kubectl::apply $CONFIGFILE_HORIZONTAL_POD_AUTOSCALER && sleep 5
-  kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME && sleep 3
-  kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 3
-  kubectl::showDeployments && sleep 3
-  kubectl::showReplicaSets && sleep 3
-  kubectl::showPods -l "poc=$POC_LABEL_VALUE" && sleep 3
+  kubectl::apply $CONFIGFILE_HORIZONTAL_POD_AUTOSCALER && sleep 2
+  kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME && sleep 2
+  kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 2
+  kubectl::showDeployments
+  kubectl::showReplicaSets
+  kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Show the resource consumption of the pods"
-  kubectl::waitForPodMetrics &
-  PID=$!
-  showProgressBar $PID
-  wait $PID
-  if [ $? -ne 0 ]; then
-    print_error "Timeout. Metrics server unavailable"
-    cleanup
-    exit 1
-  fi
+  kubectl::showPodMetrics
 
   print_info "Check resource limits"
   print_debug "Note that CPU consumption never exceed the configured CPU limit"

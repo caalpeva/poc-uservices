@@ -44,6 +44,8 @@ function main {
   print_info "Delete a pod"
   POD_NAME=$(kubectl::getFirstPodName)
   kubectl::forceDeletePod $POD_NAME
+  checkInteractiveMode
+
   kubectl::showPods
 
   print_info "Check the stability of pods"
