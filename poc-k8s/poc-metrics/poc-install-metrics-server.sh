@@ -34,19 +34,16 @@ function main {
   checkArguments $@
   initialize
 
+  print_box "METRICS SERVER INSTALLATION" \
+    "" \
+    " - Installs the kubernetes metrics service that allows you to collect information about CPU and RAM."
+  checkInteractiveMode
+
   kubectl::showNodes
   kubectl::apply $CONFIGFILE_METRICS_SERVER
 
   print_info "Show the resource consumption of the nodes"
-  kubectl::waitForNodeMetrics &
-  PID=$!
-  showProgressBar $PID
-  wait $PID
-  if [ $? -ne 0 ]; then
-    print_error "Timeout. Metrics server unavailable"
-    cleanup
-    exit 1
-  fi
+  kubectl::showNodeMetrics
 
   checkCleanupMode
   print_done "Poc completed successfully"

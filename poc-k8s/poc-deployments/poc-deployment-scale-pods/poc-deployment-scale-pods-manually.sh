@@ -59,9 +59,7 @@ function main {
     print_error "Poc completed with failure. Pod replicas is not $REPLICAS_EXPECTED."
     exit 1
   fi
-
   print_debug "Check that the number of pod replicas has changed ($POD_REPLICAS)"
-  checkInteractiveMode
 
   checkCleanupMode
   print_done "Poc completed successfully"

@@ -678,6 +678,17 @@ function kubectl::showClusterRoleBindingDescription() {
   checkInteractiveMode
 }
 
+###################################
+#    HORIZONTAL POD AUTOSCALER    #
+###################################
+
+function kubectl::getHorizontalPodAutoscaler() {
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get hpa ${LABELS:+-l $LABELS}
+  xtrace off
+}
+
 ##########################
 #     METRICS SERVER     #
 ##########################
@@ -715,7 +726,18 @@ function kubectl::waitForNodeMetrics() {
     areMetricsAvailable=$?
   done
 
+  if [ $areMetricsAvailable -ne 0 ]; then
+    print_warn "Timeout. Metrics server unavailable"
+  fi
+
   return $areMetricsAvailable
+}
+
+function kubectl::showNodeMetrics() {
+  kubectl::waitForNodeMetrics &
+  PID=$!
+  showProgressBar $PID
+  wait $PID
 }
 
 function kubectl::checkPodMetrics() {
@@ -744,6 +766,10 @@ function kubectl::waitForPodMetrics() {
     kubectl::checkPodMetrics false $@
     areMetricsAvailable=$?
   done
+
+  if [ $areMetricsAvailable -ne 0 ]; then
+    print_warn "Timeout. Metrics server unavailable"
+  fi
 
   return $areMetricsAvailable
 }

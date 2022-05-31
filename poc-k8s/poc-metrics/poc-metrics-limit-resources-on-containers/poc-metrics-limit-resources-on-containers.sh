@@ -41,6 +41,11 @@ function main {
   checkArguments $@
   initialize
 
+  print_box "LIMIT CPU AND MEMORY RESOURCES" \
+    "" \
+    " - Checks the deployment behavior when CPU and RAM resources are limited."
+  checkInteractiveMode
+
   kubectl::showNodes
   kubectl::apply $CONFIGFILE_DEPLOYMENT
   kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME
@@ -54,7 +59,7 @@ function main {
   kubectl::resetMetricsServer
 
   print_info "Update the deployment to limit CPU and RAM resources"
-  kubectl::apply $CONFIGFILE_DEPLOYMENT_UPDATE && sleep 2
+  kubectl::apply $CONFIGFILE_DEPLOYMENT_UPDATE
   kubectl::waitForDeployment $DEPLOYMENT_SERVER_NAME && sleep 2
   kubectl::waitForDeployment $DEPLOYMENT_CLIENT_NAME && sleep 2
   kubectl::showDeployments
