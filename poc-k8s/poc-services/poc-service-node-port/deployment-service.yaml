@@ -1,0 +1,44 @@
+# server application service
+apiVersion: v1
+kind: Service
+metadata:
+  name: poc-service
+  labels:
+    poc: poc-service-node-port
+spec:
+  type: NodePort
+  selector:
+    app: poc-server
+  ports:
+    - port: 9000
+      protocol: TCP
+      targetPort: http-server
+      nodePort: 30000
+---
+# server application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-server
+  labels:
+    app: poc-server
+    poc: poc-service-node-port
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: poc-server
+  template:
+    metadata:
+      labels:
+        app: poc-server
+        poc: poc-service-node-port
+    spec:
+      containers:
+        - name: server
+          image: kalpeva/poc-golang-server-client:1.0
+          command:
+            - server
+          ports:
+            - name: http-server
+              containerPort: 8000
