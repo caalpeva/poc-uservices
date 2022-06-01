@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	folderPath string = "/srv/app/files"
+	folderPath string = "/srv/poc-app/files"
 	sleepTime  int    = 5
 )
 

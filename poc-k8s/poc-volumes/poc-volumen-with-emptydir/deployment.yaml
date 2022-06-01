@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-volume-emptydir
+  labels:
+    poc: poc-volume-emptydir
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      poc: poc-volume-emptydir
+  template:
+    metadata:
+      labels:
+        poc: poc-volume-emptydir
+    spec:
+      containers:
+        - name: poc-volume-emptydir
+          image: kalpeva/poc-golang-loop-file:1.0
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: poc-volume-emptydir
+              mountPath: /srv/poc-app/files
+      volumes:
+        - name: poc-volume-emptydir
+          emptyDir: {}

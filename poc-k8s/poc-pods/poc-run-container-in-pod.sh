@@ -43,7 +43,8 @@ function main {
   kubectl::apply $CONFIGURATION_FILE_POD
   kubectl::showPods
 
-  print_info "Show logs..."
+  print_info "Wait for a few seconds to show logs..."
+  sleep 5
   kubectl::showLogs $POD_NAME
 
   #print_info "Run command in the same running container with tty..."

@@ -230,6 +230,17 @@ function kubectl::waitForPodsByLabel() {
   checkInteractiveMode
 }
 
+function kubectl::waitForReadyPod() {
+  pod=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod
+  xtrace off
+  checkInteractiveMode
+}
+
+
 function kubectl::deletePod() {
   pod=$1
   shift
