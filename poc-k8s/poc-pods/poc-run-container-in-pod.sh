@@ -11,7 +11,7 @@ source "${DIR}/../utils/kubectl.src"
 CONFIGURATION_FILE_POD=${DIR}/config/pod.yaml
 POD_NAME="poc-pod-environment"
 
-IMAGE="poc-golang-message-loop"
+IMAGE="poc-golang-loop-message"
 SNAPSHOT="1.0-snapshot"
 TAG="1.0"
 

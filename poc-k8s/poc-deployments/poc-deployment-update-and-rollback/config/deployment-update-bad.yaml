@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: poc-app-message-loop
-          image: kalpeva/poc-golang-message-loop:bad
+          image: kalpeva/poc-golang-loop-message:bad
           env:
             - name: CHARACTER
               value: "un circo."

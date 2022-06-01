@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
     - name: poc-app-message-loop
-      image: kalpeva/poc-golang-message-loop:1.0
+      image: kalpeva/poc-golang-loop-message:1.0
       imagePullPolicy: Always
       env:
         - name: CHARACTER

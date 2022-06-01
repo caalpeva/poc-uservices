@@ -12,19 +12,6 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-package main
-
-import (
-        "context"
-        "fmt"
-        "os"
-        "path/filepath"
-
-        v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-        "k8s.io/client-go/kubernetes"
-        "k8s.io/client-go/tools/clientcmd"
-)
-
 var (
 	namespace string = "default"
 	sleepTime int    = 5
