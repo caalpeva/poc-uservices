@@ -8,9 +8,11 @@ source "${DIR}/../../../utils/microservices-utils.src"
 source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/config/deployment-volume.yaml
-DEPLOYMENT_NAME="poc-volume-emptydir"
+CONFIGURATION_FILE=${DIR}/config/deployment-volume-shared.yaml
+DEPLOYMENT_NAME="poc-volume-emptydir-shared"
 POC_LABEL_VALUE=$DEPLOYMENT_NAME
+CONTAINER1_NAME="$DEPLOYMENT_NAME-1"
+CONTAINER2_NAME="$DEPLOYMENT_NAME-2"
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -35,7 +37,7 @@ function main {
   checkArguments $@
   initialize
 
-  print_box "POC VOLUME EMPTYDIR" \
+  print_box "POC VOLUME EMPTYDIR SHARED" \
     "" \
     " - Checks the deployment behavior when using horizontal pod autoscaler."
   checkInteractiveMode
@@ -47,37 +49,13 @@ function main {
   kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Wait for a few seconds to show logs..."
-  sleep 5 && POD_NAME=$(kubectl::getRunningPods -l "poc=$POC_LABEL_VALUE" | grep ^$DEPLOYMENT_NAME)
-  kubectl::showLogs $POD_NAME
-
-  print_info "Check files"
-  kubectl::execUniqueContainer $POD_NAME ls /srv/poc-app/files
-
-  print_info "Kill the only container that has the pod"
-  kubectl::execUniqueContainer $POD_NAME kill 1
-  sleep 5 && kubectl::waitForReadyPod $POD_NAME
-
-  kubectl::showPods -l "poc=$POC_LABEL_VALUE"
-  print_debug "Check that the pod has not been deleted, only the container inside it has been restarted."
-
-  print_info "Show logs again..."
-  print_debug "Check that the count of the number of files does not start from zero."
-  print_debug "Therefore the volume has not been deleted during the container restart."
-  kubectl::showLogs $POD_NAME
-
-  print_info "Check files"
-  kubectl::execUniqueContainer $POD_NAME ls /srv/poc-app/files
-
-  print_info "Now, delete the pod"
-  kubectl::forceDeletePod $POD_NAME
-
-  print_info "Wait for a few seconds to show logs..."
-  print_debug "Confirm that the volume has been deleted."
   POD_NAME=$(kubectl::getRunningPods -l "poc=$POC_LABEL_VALUE" | grep ^$DEPLOYMENT_NAME)
-  sleep 5 && kubectl::showLogs $POD_NAME
+  sleep 5 && kubectl::showLogsByContainer $POD_NAME $CONTAINER1_NAME
+  kubectl::showLogsByContainer $POD_NAME $CONTAINER2_NAME
 
   print_info "Check files"
-  kubectl::execUniqueContainer $POD_NAME ls /srv/poc-app/files
+  kubectl::execContainer $POD_NAME $CONTAINER1_NAME ls /srv/poc-app/files
+  kubectl::execContainer $POD_NAME $CONTAINER2_NAME ls /srv/poc-app/files
 
   checkCleanupMode
   print_done "Poc completed successfully"

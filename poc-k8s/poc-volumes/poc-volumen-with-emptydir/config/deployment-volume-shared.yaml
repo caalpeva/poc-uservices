@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-volume-emptydir-shared
+  labels:
+    poc: poc-volume-emptydir-shared
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      poc: poc-volume-emptydir-shared
+  template:
+    metadata:
+      labels:
+        poc: poc-volume-emptydir-shared
+    spec:
+      containers:
+        - name: poc-volume-emptydir-shared-1
+          image: kalpeva/poc-golang-loop-file:1.0
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: poc-volume-emptydir-shared
+              mountPath: /srv/poc-app/files
+        - name: poc-volume-emptydir-shared-2
+          image: kalpeva/poc-golang-loop-file:1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SLEEP_TIME
+              value: "2"
+          volumeMounts:
+            - name: poc-volume-emptydir-shared
+              mountPath: /srv/poc-app/files
+      volumes:
+        - name: poc-volume-emptydir-shared
+          emptyDir: {}

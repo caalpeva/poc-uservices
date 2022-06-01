@@ -237,7 +237,6 @@ function kubectl::waitForReadyPod() {
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod
   xtrace off
-  checkInteractiveMode
 }
 
 
@@ -286,6 +285,7 @@ function kubectl::showLogsByContainer() {
   pod=$1
   container=$2
   shift
+  shift
   kubectl::manageArguments $@
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod
@@ -318,6 +318,17 @@ function kubectl::execUniqueContainerWithTty() {
   shift
   xtrace on
   kubectl exec -it $pod -- $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::execContainer() {
+  pod=$1
+  container=$2
+  shift
+  shift
+  xtrace on
+  kubectl exec $pod -c $container -- $*
   xtrace off
   checkInteractiveMode
 }
