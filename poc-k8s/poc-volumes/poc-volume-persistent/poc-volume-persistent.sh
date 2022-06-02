@@ -8,7 +8,9 @@ source "${DIR}/../../../utils/microservices-utils.src"
 source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/deployment-volume.yaml
+CONFIG_DIR=${DIR}/config
+CONFIGFILE_DEPLOYMENT=${CONFIG_DIR}/deployment-volume.yaml
+CONFIGFILE_PERSISTENT_VOLUMES=${CONFIG_DIR}/persistentvolumes.yaml
 DEPLOYMENT_NAME="poc-volume-persistent"
 POC_LABEL_VALUE=$DEPLOYMENT_NAME
 
@@ -27,7 +29,8 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  kubectl::unapply $CONFIGURATION_FILE
+  kubectl::unapply $CONFIGFILE_DEPLOYMENT \
+    $CONFIGFILE_PERSISTENT_VOLUMES
 }
 
 function main {
@@ -35,15 +38,22 @@ function main {
   checkArguments $@
   initialize
 
-  print_box "POC VOLUME HOSTPATH" \
+  print_box "POC PERSISTENT VOLUME" \
     "" \
-    " - Checks the deployment behavior when using horizontal pod autoscaler."
+    " - Checks the deployment behavior when using PV and PVC."
   checkInteractiveMode
 
   kubectl::showNodes
 
-  kubectl::apply $CONFIGURATION_FILE
+  kubectl::apply $CONFIGFILE_PERSISTENT_VOLUMES
+  print_info "Show persistent volumes"
+  kubectl::showPersistentVolumes
+
+  kubectl::apply $CONFIGFILE_DEPLOYMENT
   kubectl::waitForDeployment $DEPLOYMENT_NAME
+  print_info "Show persistent volume claims"
+  print_debug "Checks that the state is bound since the storage demand is satisfied"
+  kubectl::showPersistentVolumeClaims
   kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Wait for a few seconds to show logs..."
@@ -53,18 +63,9 @@ function main {
   print_info "Check files"
   kubectl::execUniqueContainer $POD_NAME ls /srv/poc-app/files
 
-  print_info "Now, delete the pod"
-  kubectl::forceDeletePod $POD_NAME
-  kubectl::waitForPodsByLabel -l "poc=$POC_LABEL_VALUE"
-  kubectl::showPods -l "poc=$POC_LABEL_VALUE"
-
-  print_info "Wait for a few seconds to show logs..."
-  print_debug "Confirm that the volume has not been deleted."
-  POD_NAME=$(kubectl::getRunningPods -l "poc=$POC_LABEL_VALUE" | grep ^$DEPLOYMENT_NAME)
-  sleep 5 && kubectl::showLogs $POD_NAME
-
-  print_info "Check files"
-  kubectl::execUniqueContainer $POD_NAME ls /srv/poc-app/files
+  print_info "Show persistent volumes again"
+  print_debug "Note that the assigned volume was the one with the closest storage capacity to the requested volume"
+  kubectl::showPersistentVolumes
 
   checkCleanupMode
   print_done "Poc completed successfully"

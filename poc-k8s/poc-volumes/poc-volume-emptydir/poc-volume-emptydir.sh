@@ -37,7 +37,7 @@ function main {
 
   print_box "POC VOLUME EMPTYDIR" \
     "" \
-    " - Checks the deployment behavior when using horizontal pod autoscaler."
+    " - Check that data persistence is maintained until the pod finishes its execution."
   checkInteractiveMode
 
   kubectl::showNodes

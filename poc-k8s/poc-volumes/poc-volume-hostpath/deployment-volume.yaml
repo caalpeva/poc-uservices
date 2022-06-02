@@ -14,8 +14,8 @@ spec:
       labels:
         poc: poc-volume-hostpath
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: node1
+      #nodeSelector:
+      #  kubernetes.io/hostname: node1
       containers:
         - name: poc-volume-hostpath
           image: kalpeva/poc-golang-loop-file:1.0
@@ -26,4 +26,4 @@ spec:
       volumes:
         - name: poc-volume-hostpath
           hostPath:
-            path: /vagrant/app-poc/files
+            path: /vagrant/poc-volume-hostpath

@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: poc-volume-persistent-claim
+  namespace: default
+  labels:
+    poc: poc-volume-persistent
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-volume-persistent
+  labels:
+    poc: poc-volume-persistent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      poc: poc-volume-persistent
+  template:
+    metadata:
+      labels:
+        poc: poc-volume-persistent
+    spec:
+      #nodeSelector:
+      #  kubernetes.io/hostname: node1
+      containers:
+        - name: poc-volume-persistent
+          image: kalpeva/poc-golang-loop-file:1.0
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: poc-volume-persistent
+              mountPath: /srv/poc-app/files
+      volumes:
+        - name: poc-volume-persistent
+          persistentVolumeClaim:
+            claimName: poc-volume-persistent-claim

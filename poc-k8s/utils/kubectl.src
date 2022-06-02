@@ -519,6 +519,26 @@ function kubectl::getNodePortByService() {
 }
 
 ##########################
+#   PERSISTENT VOLUMES   #
+##########################
+
+function kubectl::showPersistentVolumes() {  
+  xtrace on
+  kubectl get pv ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showPersistentVolumeClaims() {
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get pvc ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+##########################
 #   CONFIGMAP METHODS    #
 ##########################
 
