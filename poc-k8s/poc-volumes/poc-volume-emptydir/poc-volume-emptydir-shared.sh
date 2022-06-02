@@ -39,7 +39,8 @@ function main {
 
   print_box "POC VOLUME EMPTYDIR SHARED" \
     "" \
-    " - Checks the deployment behavior when using horizontal pod autoscaler."
+    " - Check that data persistence is maintained until the pod finishes its execution." \
+    " - Check that the containers can share files with each other."
   checkInteractiveMode
 
   kubectl::showNodes
@@ -49,11 +50,14 @@ function main {
   kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Wait for a few seconds to show logs..."
+  print_debug "Note that file generation will be faster in container 2"
   POD_NAME=$(kubectl::getRunningPods -l "poc=$POC_LABEL_VALUE" | grep ^$DEPLOYMENT_NAME)
   sleep 5 && kubectl::showLogsByContainer $POD_NAME $CONTAINER1_NAME
   kubectl::showLogsByContainer $POD_NAME $CONTAINER2_NAME
 
   print_info "Check files"
+  print_debug "Note that the same files is displayed in both containers at the same time,"
+  print_debug "except for concurrency problems."
   kubectl::execContainer $POD_NAME $CONTAINER1_NAME ls /srv/poc-app/files
   kubectl::execContainer $POD_NAME $CONTAINER2_NAME ls /srv/poc-app/files
 

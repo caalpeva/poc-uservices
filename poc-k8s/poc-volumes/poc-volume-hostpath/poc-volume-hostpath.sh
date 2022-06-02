@@ -59,7 +59,8 @@ function main {
   kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Wait for a few seconds to show logs..."
-  print_debug "Confirm that the volume has not been deleted."
+  print_debug "Check that the count of the number of files does not start from zero."
+  print_debug "Therefore the volume has not been deleted after deleting the pod."
   POD_NAME=$(kubectl::getRunningPods -l "poc=$POC_LABEL_VALUE" | grep ^$DEPLOYMENT_NAME)
   sleep 5 && kubectl::showLogs $POD_NAME
 

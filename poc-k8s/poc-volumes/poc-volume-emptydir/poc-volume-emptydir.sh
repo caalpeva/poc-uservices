@@ -70,9 +70,12 @@ function main {
 
   print_info "Now, delete the pod"
   kubectl::forceDeletePod $POD_NAME
+  kubectl::waitForPodsByLabel -l "poc=$POC_LABEL_VALUE"
+  kubectl::showPods -l "poc=$POC_LABEL_VALUE"
 
   print_info "Wait for a few seconds to show logs..."
-  print_debug "Confirm that the volume has been deleted."
+  print_debug "Check that the count of the number of files starts from zero."
+  print_debug "Therefore the volume has been deleted after deleting the pod."
   POD_NAME=$(kubectl::getRunningPods -l "poc=$POC_LABEL_VALUE" | grep ^$DEPLOYMENT_NAME)
   sleep 5 && kubectl::showLogs $POD_NAME
 
