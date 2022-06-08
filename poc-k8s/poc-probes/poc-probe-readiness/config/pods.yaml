@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: poc-probe-readiness
+    poc: poc-probe-readiness
+  name: poc-probe-readiness-01
+spec:
+  containers:
+  - name: poc-probe-readiness
+    #image: alpine # k8s.gcr.io/busybox
+    #image: k8s.gcr.io/goproxy:0.1
+    image: k8s.gcr.io/liveness
+    args:
+    - /server
+    ports:
+      - name: http-server
+        containerPort: 8000
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: poc-probe-readiness
+    poc: poc-probe-readiness
+  name: poc-probe-readiness-02
+spec:
+  containers:
+  - name: poc-probe-readiness
+    #image: alpine # k8s.gcr.io/busybox
+    #image: k8s.gcr.io/goproxy:0.1
+    image: k8s.gcr.io/liveness
+    args:
+    - /server
+    ports:
+      - name: http-server
+        containerPort: 8000
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: poc-probe-readiness
+    poc: poc-probe-readiness
+  name: poc-probe-readiness-03
+spec:
+  containers:
+  - name: poc-probe-readiness
+    #image: alpine # k8s.gcr.io/busybox
+    #image: k8s.gcr.io/goproxy:0.1
+    image: k8s.gcr.io/liveness
+    imagePullPolicy: IfNotPresent
+    args:
+    - /server
+    ports:
+      - name: http-server
+        containerPort: 80
+
+    # A first type of readiness probe uses a command
+    # readinessProbe:
+    #  exec:
+    #    command:
+    #    - cat
+    #    - /tmp/healthy
+    #  initialDelaySeconds: 3
+    #  periodSeconds: 3
+
+    # A second type of readiness probe uses a TCP socket
+    #readinessProbe:
+    #  tcpSocket:
+    #    port: 8080
+    #  initialDelaySeconds: 15
+    #  periodSeconds: 20
+
+    # A third type of readiness probe uses a HTTP request
+    readinessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+        httpHeaders:
+        - name: Custom-Header
+          value: Awesome
+      initialDelaySeconds: 3
+      periodSeconds: 3

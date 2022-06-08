@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: poc-probe-readiness
+  labels:
+    poc: poc-probe-readiness
+spec:
+  type: ClusterIP
+  selector:
+    app: poc-probe-readiness
+  ports:
+    - port: 9000
+      protocol: TCP
+      targetPort: http-server

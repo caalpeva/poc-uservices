@@ -26,4 +26,5 @@ spec:
       volumes:
         - name: poc-volume-hostpath
           hostPath:
-            path: /vagrant/poc-volume-hostpath
+            #path: /vagrant/poc-volume-hostpath
+            path: /tmp

@@ -522,7 +522,7 @@ function kubectl::getNodePortByService() {
 #   PERSISTENT VOLUMES   #
 ##########################
 
-function kubectl::showPersistentVolumes() {  
+function kubectl::showPersistentVolumes() {
   xtrace on
   kubectl get pv ${LABELS:+-l $LABELS}
   xtrace off
@@ -847,4 +847,21 @@ function kubectl::watchPodMetricsUntilPodRestarted() {
   PID=$!
   showProgressBar $PID
   wait $PID
+}
+
+function kubectl::waitForPodRestarted() {
+  declare -i isRestarted=0
+  previousRestartCount=$(kubectl::getRestartCountByPod $1)
+  previousRestartCount=${previousRestartCount:-0}
+  local endTime=$(( $(date +%s) + $RESTART_TIMEOUT_SECS )) # Calculate end time.
+  while [ $isRestarted -eq 0 -a $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
+    sleep $RESTART_INTERVAL_SECS
+    currentRestartCount=$(kubectl::getRestartCountByPod $1)
+    currentRestartCount=${currentRestartCount:-0}
+    if [ $currentRestartCount -gt $previousRestartCount ];then
+      isRestarted=1
+    fi
+  done
+
+  return $isRestarted
 }
