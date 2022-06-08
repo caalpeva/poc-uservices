@@ -38,9 +38,10 @@ function main {
   kubectl::showNodes
 
   kubectl::apply $CONFIGURATION_FILE_POD
+  kubectl::waitForReadyPod $POD_NAME
   kubectl::showPods
 
-  print_info "Wait a while for kubelet to use liveliness probes..."
+  print_info "Wait a while for kubelet to use liveness probes..."
   kubectl::waitForPodRestarted $POD_NAME &
   PID=$!
   showProgressBar $PID

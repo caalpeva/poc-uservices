@@ -12,7 +12,7 @@ NAMESPACE=""
 LABELS=""
 
 RESTART_TIMEOUT_SECS=300
-RESTART_INTERVAL_SECS=30   # Set interval (duration) in seconds
+RESTART_INTERVAL_SECS=25   # Set interval (duration) in seconds
 
 METRICS_TIMEOUT_SECS=150  # Set timeout in seconds
 METRICS_INTERVAL_SECS=10   # Set interval (duration) in seconds
