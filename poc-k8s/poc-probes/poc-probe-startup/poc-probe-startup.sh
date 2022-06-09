@@ -38,6 +38,7 @@ function handleTermSignal() {
 function cleanup {
   print_debug "Cleaning environment..."
   kubectl::unapplyReplacingPaths ${DIR} $CONFIGFILE_POD
+  kubectl::unapply ${TMP_DIRECTORY}/*
   xtrace on
   rm -rf ${TMP_DIRECTORY}
   xtrace off
