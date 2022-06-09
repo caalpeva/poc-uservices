@@ -34,8 +34,8 @@ spec:
         - -proot
         - -e
         - SELECT 1 FROM DUAL
-      initialDelaySeconds: 20
-      periodSeconds: 60
+      initialDelaySeconds: 10
+      periodSeconds: 20
 
     # A first type of startup probe uses a command
     startupProbe:
