@@ -37,7 +37,7 @@ function main {
   initialize
 
   kubectl::showNodes
-  kubectl::apply $CONFIGURATION_FILE
+  kubectl::applyWithRecord $CONFIGURATION_FILE
 
   kubectl::waitForDeployment $DEPLOYMENT_NAME
   kubectl::showDeployments
@@ -49,8 +49,9 @@ function main {
   kubectl::showLogs $POD_NAME
 
   print_info "Update the deployment..."
-  kubectl::apply $CONFIGURATION_UPDATE_FILE && sleep 5
-  kubectl::showDeployments
+  kubectl::apply $CONFIGURATION_UPDATE_FILE
+  kubectl::annotateDeploymentChangeCause $DEPLOYMENT_NAME "Change container image with wrong tag"
+  sleep 5 && kubectl::showDeployments
   kubectl::showReplicaSets
   kubectl::showPods
 
@@ -58,6 +59,7 @@ function main {
   print_debug "Note that logs cannot be displayed because the image is wrong."
   checkInteractiveMode
 
+  kubectl::showRolloutHistoryFromDeployment $DEPLOYMENT_NAME
   kubectl::rollbackDeployment $DEPLOYMENT_NAME && sleep 2
   kubectl::showDeployments
   kubectl::showReplicaSets

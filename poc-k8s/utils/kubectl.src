@@ -79,6 +79,17 @@ function kubectl::apply() {
   sleep 1
 }
 
+function kubectl::applyWithRecord() {
+  print_info "Apply configuration"
+  for file in $@
+  do
+    xtrace on
+    kubectl apply -f $file --record
+    xtrace off
+  done
+  sleep 1
+}
+
 function kubectl::unapply() {
   print_info "Unapply configuration"
   for file in $@
@@ -447,6 +458,33 @@ function kubectl::showRolloutStatusFromDeployment() {
   checkInteractiveMode
 }
 
+function kubectl::showRolloutHistoryFromDeployment() {
+  print_info "Show rollout history from deployment"
+  deploy=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    rollout history deployment $deploy
+    # --revision=$2
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::annotateDeploymentChangeCause() {
+  deploy=$1
+  shift
+  message=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    annotate deployment $deploy \
+    kubernetes.io/change-cause="$message"
+  xtrace off
+  checkInteractiveMode
+}
+
 function kubectl::rollbackDeployment() {
   print_info "Rollout undo deployment"
   deploy=$1
@@ -455,6 +493,7 @@ function kubectl::rollbackDeployment() {
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
     rollout undo deployment $deploy
+    # --to-revision=$2
   xtrace off
   checkInteractiveMode
 }

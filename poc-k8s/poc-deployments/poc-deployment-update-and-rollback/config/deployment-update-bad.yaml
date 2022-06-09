@@ -5,6 +5,7 @@ metadata:
   labels:
     poc: poc-deployment-update
 spec:
+  #revisionHistoryLimit: 10
   replicas: 10
   selector:
     matchLabels:

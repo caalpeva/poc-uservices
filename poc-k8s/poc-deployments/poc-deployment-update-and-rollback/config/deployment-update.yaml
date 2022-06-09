@@ -4,7 +4,10 @@ metadata:
   name: poc-deployment-update
   labels:
     poc: poc-deployment-update
+  annotations:
+    kubernetes.io/change-cause: "Change the value of the CHARACTER environment variable"
 spec:
+  #revisionHistoryLimit: 10
   replicas: 10
   selector:
     matchLabels:

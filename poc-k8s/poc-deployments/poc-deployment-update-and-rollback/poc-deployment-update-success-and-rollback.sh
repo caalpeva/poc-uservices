@@ -37,7 +37,7 @@ function main {
   initialize
 
   kubectl::showNodes
-  kubectl::apply $CONFIGURATION_FILE
+  kubectl::applyWithRecord $CONFIGURATION_FILE
 
   kubectl::waitForDeployment $DEPLOYMENT_NAME
   kubectl::showDeployments
@@ -68,6 +68,7 @@ function main {
   print_debug "Check that the logs correspond to the updated deployment."
   checkInteractiveMode
 
+  kubectl::showRolloutHistoryFromDeployment $DEPLOYMENT_NAME
   kubectl::rollbackDeployment $DEPLOYMENT_NAME && sleep 2
   kubectl::showDeployments
   kubectl::showReplicaSets
