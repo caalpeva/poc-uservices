@@ -9,7 +9,8 @@ source "${DIR}/../../poc-docker/utils/docker.src"
 source "${DIR}/../utils/kubectl.src"
 
 CONFIGURATION_FILE_POD=${DIR}/config/pod.yaml
-POD_NAME="poc-pod-environment"
+POC_LABEL_VALUE="poc-pod-environment"
+POD_NAME=$POC_LABEL_VALUE
 
 IMAGE="poc-golang-loop-message"
 SNAPSHOT="1.0-snapshot"
@@ -41,6 +42,7 @@ function main {
   kubectl::showNodes
 
   kubectl::apply $CONFIGURATION_FILE_POD
+  kubectl::waitForPodsByLabel -l "poc=$POC_LABEL_VALUE"
   kubectl::showPods
 
   print_info "Wait for a few seconds to show logs..."

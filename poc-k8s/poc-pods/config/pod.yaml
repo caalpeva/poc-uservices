@@ -2,13 +2,22 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: poc-pod-environment
+  labels:
+    poc: poc-pod-environment
 spec:
   containers:
     - name: poc-app-message-loop
       image: kalpeva/poc-golang-loop-message:1.0
       imagePullPolicy: Always
       env:
+        #- name: CHARACTER
+        #  value: "un caballero."
         - name: CHARACTER
-          value: "un caballero."
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+              #fieldPath: metadata.name
+              #fieldPath: metadata.namespace
+              #fieldPath: status.podIP
         - name: SLEEP_TIME
           value: "5s"
