@@ -79,6 +79,19 @@ function kubectl::apply() {
   sleep 1
 }
 
+function kubectl::applyReplacingPaths() {
+  print_info "Apply configuration"
+  DIR=$1
+  shift
+  for file in $@
+  do
+    xtrace on
+    cat $file | sed s+{{path}}+${DIR}+g | kubectl apply -f -
+    xtrace off
+  done
+  sleep 1
+}
+
 function kubectl::applyWithRecord() {
   print_info "Apply configuration"
   for file in $@
@@ -99,6 +112,19 @@ function kubectl::unapply() {
     xtrace off
   done
   sleep 3
+}
+
+function kubectl::unapplyReplacingPaths() {
+  print_info "Unapply configuration"
+  DIR=$1
+  shift
+  for file in $@
+  do
+    xtrace on
+    cat $file | sed s+{{path}}+${DIR}+g | kubectl delete -f - --wait=true --ignore-not-found=true
+    xtrace off
+  done
+  sleep 1
 }
 
 function kubectl::showAll() {
@@ -603,6 +629,23 @@ function kubectl::showConfigMapDescription() {
   checkInteractiveMode
 }
 
+function kubectl::createConfigMap() {
+  dstFile=$1
+  shift
+  configmap=$1
+  shift
+  pocLabel=$1
+  shift
+  xtrace on
+  kubectl create configmap $configmap $@ \
+    --dry-run=client -o yaml | \
+    sed -e 's|creationTimestamp: null|labels:|' | \
+    sed -e "s/labels:/& \n    $pocLabel/" | \
+    tee $dstFile | kubectl apply -f -
+  xtrace off
+  checkInteractiveMode
+}
+
 ##########################
 #    SECRETS METHODS     #
 ##########################
@@ -903,4 +946,41 @@ function kubectl::waitForPodRestarted() {
   done
 
   return $isRestarted
+}
+
+##########################
+#         PROBES         #
+##########################
+
+function kubectl::showLivenessProbe() {
+  pod=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} describe pod $pod \
+    ${LABELS:+-l $LABELS} | grep Liveness:
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showReadinessProbe() {
+  pod=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} describe pod $pod \
+    ${LABELS:+-l $LABELS} | grep Readiness:
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showStartupProbe() {
+  pod=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} describe pod $pod \
+    ${LABELS:+-l $LABELS} | grep Startup:
+  xtrace off
+  checkInteractiveMode
 }

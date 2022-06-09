@@ -38,6 +38,14 @@ function main {
   checkArguments $@
   initialize
 
+  print_box "READINESS PROBES" \
+    "" \
+    " - The kubelet uses readiness probes to know when a container is ready to start accepting traffic." \
+    "   A Pod is considered ready when all of its containers are ready." \
+    "   One use of this signal is to control which Pods are used as backends for Services." \
+    "   When a Pod is not ready, it is removed from Service load balancers."
+  checkInteractiveMode
+
   kubectl::showNodes
 
   kubectl::apply $CONFIGFILE_PODS $CONFIGFILE_SERVICE
@@ -46,10 +54,12 @@ function main {
   kubectl::showServices -l "poc=$POC_LABEL_VALUE"
   kubectl::showEndpointsByService $SERVICE_NAME
 
-  print_info "Wait a while for kubelet to use readiness probes..." && sleep 30
-  print_debug "Check that when readiness probe fails the pod is not restarted but"
-  print_debug "the pod will be marked as not ready and its IP will be removed from the service endpoints"
+  print_info "Wait a while for kubelet to use readiness probes..."
+  kubectl::showReadinessProbe $POD_NAME && sleep 30
   kubectl::showPods
+
+  print_info "Check that when readiness probe fails the pod is not restarted"
+  print_debug "The pod will be marked as not ready and its IP will be removed from the service endpoints"
   kubectl::showServices -l "poc=$POC_LABEL_VALUE"
   kubectl::showEndpointsByService $SERVICE_NAME
 

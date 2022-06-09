@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: poc-probe-startup-configmap-environment
+  labels:
+    poc: poc-probe-startup
+data:
+  MYSQL_ROOT_PASSWORD: "root"
+  MYSQL_DATABASE: "SIMPSONS"
+  MYSQL_USER: "user"
+  MYSQL_PASSWORD: "password"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    poc: poc-probe-startup
+  name: poc-probe-startup
+spec:
+  containers:
+  - name: poc-probe-startup
+    image: mysql:5.7.28 # k8s.gcr.io/busybox
+    #image: k8s.gcr.io/goproxy:0.1
+    #image: k8s.gcr.io/liveness
+    imagePullPolicy: IfNotPresent
+    envFrom:
+      - configMapRef:
+          name: poc-probe-startup-configmap-environment
+    livenessProbe:
+      exec:
+        command:
+        - mysql
+        - -uroot
+        - -proot
+        - -e
+        - SELECT 1 FROM DUAL
+      initialDelaySeconds: 20
+      periodSeconds: 60
+
+    # A first type of startup probe uses a command
+    startupProbe:
+      exec:
+        command:
+        - mysql
+        - -uroot
+        - -proot
+        - -e
+        - SELECT 1 FROM DUAL
+      initialDelaySeconds: 5
+      periodSeconds: 3
+
+    # A second type of startup probe uses a TCP socket
+    #startupProbe:
+    #  tcpSocket:
+    #    port: 8080
+    #  initialDelaySeconds: 15
+    #  periodSeconds: 20
+
+    # A third type of startup probe uses a HTTP request
+    #startupProbe:
+    #  httpGet:
+    #    path: /healthz
+    #    port: 8080
+    #    httpHeaders:
+    #    - name: Custom-Header
+    #      value: Awesome
+    #  initialDelaySeconds: 3
+    #  periodSeconds: 3
+
+    volumeMounts:
+      - name: poc-probe-startup-volume-scripts
+        mountPath: /docker-entrypoint-initdb.d
+      - name: poc-probe-startup-volume-database
+        mountPath: /var/lib/mysql
+  volumes:
+    - name: poc-probe-startup-volume-scripts
+      configMap:
+        name: poc-probe-startup-configmap-file
+    - name: poc-probe-startup-volume-database
+      hostPath:
+        #path: {{path}}/mount/mysql
+        path: /tmp/mysql5
