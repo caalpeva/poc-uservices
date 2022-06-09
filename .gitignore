@@ -5,3 +5,4 @@ poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/app/.git
 poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/mount/**
 poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/tmp/**
 poc-k8s/poc-rbac/tmp/**
+poc-k8s/poc-probes/poc-probe-startup/tmp/**
