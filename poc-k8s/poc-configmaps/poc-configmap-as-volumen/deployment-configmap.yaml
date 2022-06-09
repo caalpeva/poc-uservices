@@ -35,3 +35,7 @@ spec:
         - name: poc-configmap-as-volume
           configMap:
             name: poc-configmap-as-volume
+            # To indicate a specific file
+            #items:
+            #  - key: text.txt
+            #    path: text.txt
