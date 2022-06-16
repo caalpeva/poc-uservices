@@ -184,21 +184,25 @@ function kubectl::showPodsInAllNamespaces() {
 function kubectl::getRunningPods() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po --no-headers | grep Running | awk '{print $1}'
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po ${LABELS:+-l $LABELS} \
+    --no-headers | grep Running | awk '{print $1}'
+  #kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po --no-headers --field-selector=status.phase=Running | awk '{print $1}'
   xtrace off
 }
 
 function kubectl::getAllPods() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po --no-headers | awk '{print $1}'
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po ${LABELS:+-l $LABELS} \
+    --no-headers | awk '{print $1}'
   xtrace off
 }
 
 function kubectl::getPodNames() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get pods --no-headers -o custom-columns=":metadata.name"
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get pods ${LABELS:+-l $LABELS} \
+    --no-headers -o custom-columns=":metadata.name"
   xtrace off
 }
 
@@ -559,6 +563,16 @@ function kubectl::showEndpointsByService() {
   checkInteractiveMode
 }
 
+function kubectl::showEndpointsByLabels() {
+  print_info "Show endpoints filtered by service"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get endpoints ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
 function kubectl::getPortByService() {
   service=$1
   targetPort=$2
@@ -575,12 +589,39 @@ function kubectl::getNodePortByService() {
   service=$1
   targetPort=$2
   shift
+  shift
   kubectl::manageArguments $@
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
     get svc $service --no-headers \
     -o custom-columns=":spec.ports[?(@.targetPort == '$targetPort')].nodePort"
   xtrace off
+}
+
+##########################
+#     INGRESS METHODS    #
+##########################
+
+function kubectl::showIngresses() {
+  print_info "Show ingresses"
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get ingress ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
+}
+
+function kubectl::showIngressesDescription() {
+  print_info "Show ingress description"
+  ingress=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    describe ingress $ingress ${LABELS:+-l $LABELS}
+  xtrace off
+  checkInteractiveMode
 }
 
 ##########################

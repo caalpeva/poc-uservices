@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: poc-ingress-from-external-ip
+  labels:
+    poc: poc-ingress-from-external-ip
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /webapp-server-01(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: poc-service-01
+                port:
+                  name: http
+                  #number: 9000
+          - path: /webapp-server-02(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: poc-service-02
+                port:
+                  name: http
+                  #number: 7777
