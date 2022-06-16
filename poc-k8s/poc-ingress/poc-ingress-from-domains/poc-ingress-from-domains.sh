@@ -69,7 +69,7 @@ function main {
   echo $NODE_PORT
   checkInteractiveMode
 
-  print_info "check access to an application with external ip and another via domain"
+  print_info "check access to an application via domains"
   print_debug "Note that the port has been enabled on all nodes"
   NODE_ADDRESSES=$(kubectl::getNodeAddresses)
   for NODE_ADDRESS in ${NODE_ADDRESSES[@]}
