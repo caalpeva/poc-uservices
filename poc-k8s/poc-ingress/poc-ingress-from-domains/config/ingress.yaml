@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: poc-ingress-from-domains
+  labels:
+    poc: poc-ingress-from-domains
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: myk8s.poc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: poc-service-01
+                port:
+                  name: http
+                  #number: 8888
+    - host: myk8s2.poc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: poc-service-02
+                port:
+                  name: http
+                  #number: 7557

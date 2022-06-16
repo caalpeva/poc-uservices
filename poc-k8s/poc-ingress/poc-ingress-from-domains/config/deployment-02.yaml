@@ -1,0 +1,42 @@
+# server application service
+apiVersion: v1
+kind: Service
+metadata:
+  name: poc-service-02
+  labels:
+    poc: poc-ingress-from-domains
+spec:
+  type: ClusterIP
+  selector:
+    app: poc-server-02
+  ports:
+    - name: http
+      port: 7557
+      protocol: TCP
+      targetPort: http-server
+---
+# server application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-deployment-02
+  labels:
+    app: poc-server-02
+    poc: poc-ingress-from-domains
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: poc-server-02
+  template:
+    metadata:
+      labels:
+        app: poc-server-02
+        poc: poc-ingress-from-domains
+    spec:
+      containers:
+        - name: server
+          image: httpd
+          ports:
+            - name: http-server
+              containerPort: 80

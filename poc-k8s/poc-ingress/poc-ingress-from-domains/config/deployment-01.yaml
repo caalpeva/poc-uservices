@@ -1,0 +1,44 @@
+# server application service
+apiVersion: v1
+kind: Service
+metadata:
+  name: poc-service-01
+  labels:
+    poc: poc-ingress-from-domains
+spec:
+  type: ClusterIP
+  selector:
+    app: poc-server-01
+  ports:
+    - name: http
+      port: 8888
+      protocol: TCP
+      targetPort: http-server
+---
+# server application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-deployment-01
+  labels:
+    app: poc-server-01
+    poc: poc-ingress-from-domains
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: poc-server-01
+  template:
+    metadata:
+      labels:
+        app: poc-server-01
+        poc: poc-ingress-from-domains
+    spec:
+      containers:
+        - name: server
+          image: kalpeva/poc-golang-server-client:1.0
+          command:
+            - server
+          ports:
+            - name: http-server
+              containerPort: 8000

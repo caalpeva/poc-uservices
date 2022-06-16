@@ -19,8 +19,10 @@ INGRESS_SERVICE_NAME="ingress-nginx-controller"
 
 DEPLOYMENT_SERVER_01_NAME="poc-deployment-01"
 DEPLOYMENT_SERVER_02_NAME="poc-deployment-02"
-INGRESS_NAME="poc-ingress-from-external-ip"
+INGRESS_NAME="poc-ingress-from-domains"
 POC_LABEL_VALUE=$INGRESS_NAME
+DOMAIN_01="myk8s.poc"
+DOMAIN_02="myk8s2.poc"
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -67,21 +69,23 @@ function main {
   echo $NODE_PORT
   checkInteractiveMode
 
-  print_info "Check access to each application via external ip"
+  print_info "check access to an application with external ip and another via domain"
   print_debug "Note that the port has been enabled on all nodes"
   NODE_ADDRESSES=$(kubectl::getNodeAddresses)
   for NODE_ADDRESS in ${NODE_ADDRESSES[@]}
   do
-    executeCurl http://$NODE_ADDRESS:$NODE_PORT/webapp-server-01/echo
+    RESOLVE_STRING="--resolve '$DOMAIN_01:$NODE_PORT:$NODE_ADDRESS'"
+    executeCurl http://$DOMAIN_01:$NODE_PORT/echo $RESOLVE_STRING
     if [ $? -ne 0 ]
     then
-      print_error "Http server from $NODE_ADDRESS:$NODE_PORT is not available"
+      print_error "Http server from $DOMAIN_01:$NODE_PORT is not available"
       SERVER_AVAILABLE=false
     fi
-    executeCurl http://$NODE_ADDRESS:$NODE_PORT/webapp-server-02/
+    RESOLVE_STRING="--resolve '$DOMAIN_02:$NODE_PORT:$NODE_ADDRESS'"
+    executeCurl http://$DOMAIN_02:$NODE_PORT/ $RESOLVE_STRING
     if [ $? -ne 0 ]
     then
-      print_error "Http server from $NODE_ADDRESS:$NODE_PORT is not available"
+      print_error "Http server from $DOMAIN_02:$NODE_PORT is not available"
       SERVER_AVAILABLE=false
     fi
   done
@@ -95,16 +99,18 @@ function main {
   NODE_ADDRESSES=$(kubectl::getNodeAddresses)
   for NODE_ADDRESS in ${NODE_ADDRESSES[@]}
   do
-    executeCurl http://$NODE_ADDRESS:$NODE_PORT/webapp-server-01/echo
+    RESOLVE_STRING="--resolve '$DOMAIN_01:$NODE_PORT:$NODE_ADDRESS'"
+    executeCurl http://$DOMAIN_01:$NODE_PORT/echo $RESOLVE_STRING
     if [ $? -ne 0 ]
     then
-      print_warn "Http server from $NODE_ADDRESS:$NODE_PORT is not available"
+      print_warn "Http server from $DOMAIN_01:$NODE_PORT is not available"
       SERVER_AVAILABLE=false
     fi
-    executeCurl http://$NODE_ADDRESS:$NODE_PORT/webapp-server-02/
+    RESOLVE_STRING="--resolve '$DOMAIN_02:$NODE_PORT:$NODE_ADDRESS'"
+    executeCurl http://$DOMAIN_02:$NODE_PORT/ $RESOLVE_STRING
     if [ $? -ne 0 ]
     then
-      print_warn "Http server from $NODE_ADDRESS:$NODE_PORT is not available"
+      print_warn "Http server from $DOMAIN_02:$NODE_PORT is not available"
       SERVER_AVAILABLE=false
     fi
   done
