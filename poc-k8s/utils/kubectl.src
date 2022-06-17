@@ -68,6 +68,14 @@ function kubectl::getNodeAddresses() {
   xtrace off
 }
 
+function kubectl::getMasterNodeAddresses() {
+  xtrace on
+  kubectl get nodes --no-headers \
+    --selector=node-role.kubernetes.io/master \
+    -o custom-columns=":status.addresses[?(@.type == 'InternalIP')].address"
+  xtrace off
+}
+
 function kubectl::apply() {
   print_info "Apply configuration"
   for file in $@
