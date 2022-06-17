@@ -50,14 +50,12 @@ function checkServicesAvailable {
     executeCurl http://${NODE_ADDRESS}:${NODE_PORT}/webapp-server-01/echo
     if [ $? -ne 0 ]
     then
-      print_error "Http server from ${NODE_ADDRESS}:${NODE_PORT} is not available"
-      SERVER_AVAILABLE=false
+      print_error "Http server from ${NODE_ADDRESS}:${NODE_PORT}/webapp-server-01/echo is not available"
     fi
     executeCurl http://${NODE_ADDRESS}:${NODE_PORT}/webapp-server-02/
     if [ $? -ne 0 ]
     then
-      print_error "Http server from ${NODE_ADDRESS}:${NODE_PORT} is not available"
-      SERVER_AVAILABLE=false
+      print_error "Http server from ${NODE_ADDRESS}:${NODE_PORT}/webapp-server-02/ is not available"
     fi
   done
   checkInteractiveMode
@@ -67,6 +65,11 @@ function main {
   print_info "$(basename $0) [PID = $$]"
   checkArguments $@
   initialize
+
+  print_box "INGRESS FROM EXTERNAL IP" \
+    "" \
+    " - Checks the ingress behavior from an external IP."
+  checkInteractiveMode
 
   kubectl::showNodes
   kubectl::apply $CONFIGFILE_DEPLOYMENT_01 \
@@ -79,18 +82,18 @@ function main {
   kubectl::showServices -l "poc=$POC_LABEL_VALUE"
   kubectl::showEndpointsByLabels -l "poc=$POC_LABEL_VALUE"
 
+  print_info "Extract node port from ingress controller service"
+  NODE_PORT=$(kubectl::getNodePortByService ${INGRESS_SERVICE_NAME} http -n $INGRESS_CONTROLLER_NAMESPACE)
+  checkInteractiveMode
+
   print_info "Check that the applications are still not accessible from the external IP (master node address)"
   print_debug "Note that the ingress controller is working correctly. The '404 not found' message indicates"
   print_debug "that ingress has not been configured for the application services."
-  checkServicesAvailable
+  checkServicesAvailable $NODE_PORT
 
   kubectl::apply $CONFIGFILE_INGRESS && sleep 5
   kubectl::showIngresses
   kubectl::showIngressesDescription $INGRESS_NAME
-
-  print_info "Extract node port from ingress controller service"
-  NODE_PORT=$(kubectl::getNodePortByService ${INGRESS_SERVICE_NAME} http -n $INGRESS_CONTROLLER_NAMESPACE)
-  checkInteractiveMode
 
   print_info "Check that now the applications are accessible from the external IP (master node address)"
   checkServicesAvailable $NODE_PORT

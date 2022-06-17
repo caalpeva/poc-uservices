@@ -37,7 +37,7 @@ function main {
 
   print_box "INGRESS CONTROLLER INSTALLATION" \
     "" \
-    " - Installs the ingress controller with nginx that allows..."
+    " - Installs the ingress controller with nginx that manages external access to the services in a cluster."
   checkInteractiveMode
 
   kubectl::showNodes
