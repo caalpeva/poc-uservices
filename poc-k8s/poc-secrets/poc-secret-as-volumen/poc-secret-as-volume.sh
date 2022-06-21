@@ -10,7 +10,8 @@ source "${DIR}/../../utils/kubectl.src"
 
 TMP_DIRECTORY="${DIR}/tmp"
 
-CONFIGURATION_FILE=${DIR}/deployment.yaml
+CONFIG_DIR=${DIR}/config
+CONFIGURATION_FILE=${CONFIG_DIR}/deployment.yaml
 SECRET_NAME="poc-secret-as-volume"
 DEPLOYMENT_NAME=$SECRET_NAME
 POC_LABEL_VALUE=$SECRET_NAME
@@ -53,7 +54,7 @@ function main {
 
   kubectl::createGenericSecret ${TMP_DIRECTORY}/secret.yaml \
     ${SECRET_NAME} "poc: $POC_LABEL_VALUE" \
-    --from-file=${DIR}/text.txt
+    --from-file=${CONFIG_DIR}/text.txt
   kubectl::showSecrets -l "poc=$POC_LABEL_VALUE"
   kubectl::showSecretDescription ${SECRET_NAME}
 

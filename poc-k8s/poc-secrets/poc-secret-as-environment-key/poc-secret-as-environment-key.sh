@@ -10,7 +10,8 @@ source "${DIR}/../../utils/kubectl.src"
 
 TMP_DIRECTORY="${DIR}/tmp"
 
-CONFIGURATION_FILE=${DIR}/deployment.yaml
+CONFIG_DIR=${DIR}/config
+CONFIGURATION_FILE=${CONFIG_DIR}/deployment.yaml
 SECRET_NAME="poc-secret-as-environment-key"
 DEPLOYMENT_NAME=$SECRET_NAME
 POC_LABEL_VALUE=$SECRET_NAME
