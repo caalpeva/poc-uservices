@@ -8,7 +8,8 @@ source "${DIR}/../../../utils/microservices-utils.src"
 source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/deployment-configmap.yaml
+CONFIG_DIR=${DIR}/config
+CONFIGURATION_FILE=${CONFIG_DIR}/deployment.yaml
 CONFIGMAP_NAME="poc-configmap-environment-file"
 DEPLOYMENT_NAME=$CONFIGMAP_NAME
 POC_LABEL_VALUE=$CONFIGMAP_NAME
