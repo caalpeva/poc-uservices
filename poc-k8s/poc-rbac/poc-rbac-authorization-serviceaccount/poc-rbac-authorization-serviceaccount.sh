@@ -66,6 +66,7 @@ function main {
      $CONFIGFILE_SERVICEACCOUNT \
      $CONFIGFILE_DEPLOYMENT
 
+  kubectl::waitForPodsByLabel -n $NAMESPACE -l "poc=$POC_LABEL_VALUE"
   kubectl::showPods -n $NAMESPACE
 
   print_info "Show logs"
@@ -87,6 +88,7 @@ function main {
   print_info "Delete the pod to ensure the new pod starts properly configured"
   kubectl::forceDeletePod ${PODS[0]} -n $NAMESPACE
 
+  kubectl::waitForPodsByLabel -n $NAMESPACE -l "poc=$POC_LABEL_VALUE"
   kubectl::showPods -n $NAMESPACE
 
   print_info "Show logs"
