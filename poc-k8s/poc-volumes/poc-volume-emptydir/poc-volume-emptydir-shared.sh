@@ -8,7 +8,8 @@ source "${DIR}/../../../utils/microservices-utils.src"
 source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/config/deployment-volume-shared.yaml
+CONFIG_DIR=${DIR}/config
+CONFIGURATION_FILE=${CONFIG_DIR}/deployments-with-volume-shared.yaml
 DEPLOYMENT_NAME="poc-volume-emptydir-shared"
 POC_LABEL_VALUE=$DEPLOYMENT_NAME
 CONTAINER1_NAME="$DEPLOYMENT_NAME-1"

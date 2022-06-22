@@ -9,7 +9,7 @@ source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
 CONFIG_DIR=${DIR}/config
-CONFIGFILE_DEPLOYMENT=${CONFIG_DIR}/deployment-volume.yaml
+CONFIGFILE_DEPLOYMENT=${CONFIG_DIR}/deployment.yaml
 CONFIGFILE_PERSISTENT_VOLUMES=${CONFIG_DIR}/persistentvolumes.yaml
 DEPLOYMENT_NAME="poc-volume-persistent"
 POC_LABEL_VALUE=$DEPLOYMENT_NAME

@@ -8,7 +8,8 @@ source "${DIR}/../../../utils/microservices-utils.src"
 source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
-CONFIGURATION_FILE=${DIR}/deployment-volume.yaml
+CONFIG_DIR=${DIR}/config
+CONFIGURATION_FILE=${CONFIG_DIR}/deployment.yaml
 DEPLOYMENT_NAME="poc-volume-hostpath"
 POC_LABEL_VALUE=$DEPLOYMENT_NAME
 
