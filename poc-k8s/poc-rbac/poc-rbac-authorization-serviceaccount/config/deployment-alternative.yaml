@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-rbac-service-account
+  labels:
+    poc: poc-rbac-service-account
+  namespace: poc-rbac-service-account-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      poc: poc-rbac-service-account
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        poc: poc-rbac-service-account
+    spec:
+      serviceAccountName: poc-rbac-service-account
+      containers:
+        - name: poc-app-access-k8s
+          #image: kalpeva/poc-ubuntu-utils:1.0
+          #imagePullPolicy: Always
+          #command: ["/bin/bash", "-c", "sleep 3600"]
+          image: ubuntu
+          command: ["/bin/bash", "-c", "apt update -y -qq > /dev/null && apt install -qq -y curl > /dev/null && curl -s https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT/api/v1/namespaces/poc-rbac-service-account-ns/pods --header \"Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\" --insecure && sleep 3600"]
+          #args:
+          #  - apt update -y -qq;
+          #    apt install -qq -y curl;
+          #    while true;
+          #    do echo "Prueba";
+          #    sleep 100;
+          #    done;
+          readinessProbe:
+            exec:
+              command:
+                - curl
+                - --version
+            initialDelaySeconds: 5
+            periodSeconds: 10

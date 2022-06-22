@@ -166,6 +166,17 @@ function kubectl::manageArguments() {
 }
 
 ##########################
+#    NAMESPACE METHODS   #
+##########################
+
+function kubectl::deleteNamespace() {
+  print_info "Delete namespace"
+  xtrace on
+  kubectl delete ns $1
+  xtrace off
+}
+
+##########################
 #       POD METHODS      #
 ##########################
 
