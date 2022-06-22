@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-limit-range-for-container-resources-01
+  namespace: poc-limit-range-for-container-resources-ns
+  labels:
+    app: poc-client
+    poc: poc-limit-range-for-container-resources
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poc-client-01
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: poc-client-01
+        poc: poc-limit-range-for-container-resources
+    spec:
+      containers:
+        - name: poc-app-loop-message-1
+          image: kalpeva/poc-golang-loop-message:1.0
+          imagePullPolicy: Always
+          env:
+            - name: CHARACTER
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: SLEEP_TIME
+              value: "5s"
+        - name: poc-app-message-loop-2
+          image: kalpeva/poc-golang-loop-message:1.0
+          imagePullPolicy: Always
+          env:
+            - name: CHARACTER
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: SLEEP_TIME
+              value: "1s"
+          resources:
+            requests:
+              cpu: 40m
+              memory: 40Mi
+            limits:
+              cpu: 40m
+              memory: 40Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-limit-range-for-container-resources-02
+  namespace: poc-limit-range-for-container-resources-ns
+  labels:
+    app: poc-client
+    poc: poc-limit-range-for-container-resources
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poc-client-02
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: poc-client-02
+        poc: poc-limit-range-for-container-resources
+    spec:
+      containers:
+          - name: poc-app-message-loop-3
+            image: kalpeva/poc-golang-loop-message:1.0
+            imagePullPolicy: Always
+            env:
+              - name: CHARACTER
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.name
+              - name: SLEEP_TIME
+                value: "2s"
+            resources:
+              requests:
+                cpu: 60m
+                memory: 60Mi
+              limits:
+                cpu: 100m
+                memory: 100Mi

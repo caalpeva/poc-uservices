@@ -10,8 +10,8 @@ source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
 CONFIG_DIR=${DIR}/config
-CONFIGFILE_DEPLOYMENT=${CONFIG_DIR}/deployment-service.yaml
-CONFIGFILE_DEPLOYMENT_UPDATE=${CONFIG_DIR}/deployment-service-update.yaml
+CONFIGFILE_DEPLOYMENT=${CONFIG_DIR}/deployment.yaml
+CONFIGFILE_DEPLOYMENT_UPDATE=${CONFIG_DIR}/deployment-update.yaml
 
 DEPLOYMENT_CLIENT_NAME="poc-client"
 DEPLOYMENT_SERVER_NAME="poc-server"

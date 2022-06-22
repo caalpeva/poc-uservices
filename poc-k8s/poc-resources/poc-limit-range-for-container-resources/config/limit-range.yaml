@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: poc-limit-range-for-container-resources
+  namespace: poc-limit-range-for-container-resources-ns
+spec:
+  limits:
+  - default:
+      cpu: 30m
+      memory: 30Mi
+    defaultRequest:
+      cpu: 20m
+      memory: 20Mi
+    max:
+      cpu: 50m
+      memory: 50Mi
+    min:
+      cpu: 10m
+      memory: 10Mi
+    type: Container

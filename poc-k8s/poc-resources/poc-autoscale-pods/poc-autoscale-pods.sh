@@ -10,7 +10,7 @@ source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
 CONFIG_DIR=${DIR}/config
-CONFIGFILE_DEPLOYMENT=${CONFIG_DIR}/deployment-service.yaml
+CONFIGFILE_DEPLOYMENT=${CONFIG_DIR}/deployment.yaml
 CONFIGFILE_HORIZONTAL_POD_AUTOSCALER=${CONFIG_DIR}/hpa.yaml
 
 DEPLOYMENT_CLIENT_NAME="poc-client"

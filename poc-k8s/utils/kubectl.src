@@ -169,6 +169,14 @@ function kubectl::manageArguments() {
 #    NAMESPACE METHODS   #
 ##########################
 
+function kubectl::describeNamespace() {
+  print_info "Describe namespace"
+  xtrace on
+  kubectl describe ns $1
+  xtrace off
+  checkInteractiveMode
+}
+
 function kubectl::deleteNamespace() {
   print_info "Delete namespace"
   xtrace on
@@ -257,6 +265,16 @@ function kubectl::getCpuLimitFromDeployment() {
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
     get deploy $deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{..resources.limits.cpu}{"\n"}'
+  xtrace off
+}
+
+function kubectl::getResourceLimitFromPod() {
+  pod=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+    get pod $pod -o yaml | grep limits: -A 5
   xtrace off
 }
 
