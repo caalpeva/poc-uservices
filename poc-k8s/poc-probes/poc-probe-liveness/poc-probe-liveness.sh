@@ -9,7 +9,8 @@ source "${DIR}/../../../utils/microservices-utils.src"
 source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
-CONFIGURATION_FILE_POD=${DIR}/pod.yaml
+CONFIG_DIR=${DIR}/config
+CONFIGFILE_POD=${CONFIG_DIR}/pod.yaml
 POD_NAME="poc-probe-liveness"
 
 function initialize() {
@@ -27,7 +28,7 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  kubectl::unapply $CONFIGURATION_FILE_POD
+  kubectl::unapply $CONFIGFILE_POD
 }
 
 function main {
@@ -45,7 +46,7 @@ function main {
 
   kubectl::showNodes
 
-  kubectl::apply $CONFIGURATION_FILE_POD
+  kubectl::apply $CONFIGFILE_POD
   kubectl::waitForReadyPod $POD_NAME
   kubectl::showPods
 

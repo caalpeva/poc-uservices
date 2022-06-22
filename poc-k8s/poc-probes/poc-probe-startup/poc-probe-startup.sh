@@ -11,7 +11,8 @@ source "${DIR}/../../utils/kubectl.src"
 
 TMP_DIRECTORY="${DIR}/tmp"
 
-CONFIGFILE_POD=${DIR}/pod.yaml
+CONFIG_DIR=${DIR}/config
+CONFIGFILE_POD=${CONFIG_DIR}/pod.yaml
 POC_LABEL_VALUE="poc-probe-startup"
 POD_NAME=$POC_LABEL_VALUE
 CONFIGMAP_NAME="$POC_LABEL_VALUE-configmap-file"
@@ -63,7 +64,7 @@ function main {
   print_info "Create configmap from sql file and edit labels"
   kubectl::createConfigMap ${TMP_DIRECTORY}/configmap.yaml \
     ${CONFIGMAP_NAME} "poc: $POC_LABEL_VALUE" \
-    --from-file=${DIR}/init-db.sql
+    --from-file=${CONFIG_DIR}/init-db.sql
 
   kubectl::applyReplacingPaths ${DIR} $CONFIGFILE_POD && sleep 1
   kubectl::showConfigMaps -l "poc=$POC_LABEL_VALUE"
