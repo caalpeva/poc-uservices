@@ -11,5 +11,5 @@ roleRef:
   name: poc-rbac-role
 subjects:
 - apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: developers
+  kind: $POC_ROLE_TYPE # Group, User or ServiceAccount
+  name: $POC_ROLE_TYPE_NAME

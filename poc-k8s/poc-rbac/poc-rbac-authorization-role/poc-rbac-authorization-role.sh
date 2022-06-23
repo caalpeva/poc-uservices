@@ -8,6 +8,11 @@ source "${DIR}/../../../utils/microservices-utils.src"
 source "${DIR}/../../../poc-docker/utils/docker.src"
 source "${DIR}/../../utils/kubectl.src"
 
+export POC_ROLE_TYPE=Group
+export POC_ROLE_TYPE_NAME=developers
+#export POC_ROLE_TYPE=User
+#export POC_ROLE_TYPE_NAME=$USER
+
 CONFIGURATION1_FILE=${DIR}/config/role.yaml
 CONFIGURATION2_FILE=${DIR}/config/rolebinding.yaml
 ROLE_NAME="poc-rbac-role"
@@ -15,7 +20,6 @@ ROLEBINDING_NAME="poc-rbac-rolebinding"
 POC_LABEL_VALUE=poc-rbac-authorization
 
 TMP_DIRECTORY="${DIR}/../tmp"
-USERNAME=user
 KUBECONFIG_FILE=${TMP_DIRECTORY}/${USERNAME}-config
 
 function initialize() {
@@ -34,7 +38,10 @@ function handleTermSignal() {
 function cleanup {
   print_debug "Cleaning environment..."
   kubectl::unsetKubeconfig
-  kubectl::unapply $CONFIGURATION2_FILE $CONFIGURATION1_FILE
+  kubectl::unapply $CONFIGURATION1_FILE
+  kubectl::unapplyReplacingEnvVars $CONFIGURATION2_FILE
+  unset $POC_ROLE_TYPE
+  unset $POC_ROLE_TYPE_NAME
 }
 
 function main {
@@ -55,7 +62,9 @@ function main {
   kubectl::showKubeconfig
   kubectl::showNodes
 
-  kubectl::apply $CONFIGURATION1_FILE $CONFIGURATION2_FILE
+  kubectl::apply $CONFIGURATION1_FILE
+  kubectl::applyReplacingEnvVars $CONFIGURATION2_FILE
+  print_debug "Role configuration for: $POC_ROLE_TYPE, $POC_ROLE_TYPE_NAME"
 
   kubectl::showRoles -l "poc=$POC_LABEL_VALUE"
   kubectl::showRoleDescription $ROLE_NAME

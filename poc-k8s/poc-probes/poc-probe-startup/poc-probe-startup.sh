@@ -38,7 +38,7 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  kubectl::unapplyReplacingPaths ${DIR} $CONFIGFILE_POD
+  kubectl::unapply $CONFIGFILE_POD
   kubectl::unapply ${TMP_DIRECTORY}/*
   xtrace on
   rm -rf ${TMP_DIRECTORY}
@@ -66,7 +66,7 @@ function main {
     ${CONFIGMAP_NAME} "poc: $POC_LABEL_VALUE" \
     --from-file=${CONFIG_DIR}/init-db.sql
 
-  kubectl::applyReplacingPaths ${DIR} $CONFIGFILE_POD && sleep 1
+  kubectl::apply $CONFIGFILE_POD && sleep 1
   kubectl::showConfigMaps -l "poc=$POC_LABEL_VALUE"
   kubectl::showPods
 

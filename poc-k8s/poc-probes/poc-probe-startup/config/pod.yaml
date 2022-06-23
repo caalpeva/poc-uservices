@@ -78,5 +78,4 @@ spec:
         name: poc-probe-startup-configmap-file
     - name: poc-probe-startup-volume-database
       hostPath:
-        #path: {{path}}/mount/mysql
         path: /tmp/mysql5
