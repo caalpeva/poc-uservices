@@ -44,10 +44,14 @@ function main {
   checkArguments $@
   initialize
 
-  echo "el namespace es: $NAMESPACE"
-  print_box "LIMIT CPU AND MEMORY RESOURCES FROM NAMESPACE" \
+  #echo "el namespace es: $NAMESPACE"
+  print_box "LIMIT CPU AND MEMORY RESOURCES WITH CONSTRAINT POLICY" \
     "" \
-    " - Checks the deployment behavior when CPU and RAM resources are limited with LimitRange from namespaces."
+    " A LimitRange is a resource restriction policy that allows:" \
+    "   - Specify default resource requirements and limits for pods or containers in a namespace." \
+    "   - Impose resource requirement restrictions on pods or containers in a namespace." \
+    "   - Enforce min/max resource limitations for pods or containers within a namespace." \
+    " Checks the deployment behavior when CPU and RAM resources are limited with LimitRange from namespace."
   checkInteractiveMode
 
   kubectl::showNodes
@@ -71,6 +75,7 @@ function main {
   print_info "Check the maximum and minimum limits of the resources"
   print_debug "Note that second deployment could not be started"
   print_debug "The requested resources are outside the limits allowed"
+  kubectl::getReplicaSetEventsFromDeployment $DEPLOYMENT2_NAME -n $NAMESPACE
   checkInteractiveMode
 
   checkCleanupMode

@@ -443,6 +443,15 @@ function kubectl::getReplicasFromReplicaSet() {
   xtrace off
 }
 
+function kubectl::getReplicaSetEventsFromDeployment() {
+  deployment=$1
+  shift
+  kubectl::manageArguments $@
+  xtrace on
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} describe rs $deployment | grep Events: -A5
+  xtrace off
+}
+
 function kubectl::scaleReplicaSet() {
   replicaSet=$1
   replicas=$2

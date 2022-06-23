@@ -41,9 +41,9 @@ function main {
   checkArguments $@
   initialize
 
-  print_box "LIMIT CPU AND MEMORY RESOURCES" \
+  print_box "ADJUST CPU AND MEMORY RESOURCES" \
     "" \
-    " - Checks the deployment behavior when CPU and RAM resources are limited."
+    " - Checks the deployment behavior when CPU and RAM resources are configured."
   checkInteractiveMode
 
   kubectl::showNodes
