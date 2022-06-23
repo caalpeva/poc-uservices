@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poc-set-resource-quota-for-namespace
+  namespace: poc-set-resource-quota-for-namespace-ns
+  labels:
+    app: poc-client
+    poc: poc-set-resource-quota-for-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: poc-client-02
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: poc-client-02
+        poc: poc-set-resource-quota-for-namespace
+    spec:
+      containers:
+          - name: poc-app-message-loop-3
+            image: nginx:alpine
+            imagePullPolicy: IfNotPresent
+            resources:
+              requests:
+                cpu: 50m
+                memory: 300Mi
+              limits:
+                cpu: 50m
+                memory: 300Mi

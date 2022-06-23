@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: poc-set-resource-quota-for-namespace-ns
+  labels:
+    poc: poc-set-resource-quota-for-namespace
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: poc-set-resource-quota-for-namespace
+  namespace: poc-set-resource-quota-for-namespace-ns
+spec:
+    hard:
+      cpu: "1"
+      memory: 1Gi
+      #pods: "2" # max pods allowed

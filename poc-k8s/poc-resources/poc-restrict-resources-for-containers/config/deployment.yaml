@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: poc-limit-range-for-container-resources-01
-  namespace: poc-limit-range-for-container-resources-ns
+  name: poc-restrict-resources-for-containers-01
+  namespace: poc-restrict-resources-for-containers-ns
   labels:
     app: poc-client
-    poc: poc-limit-range-for-container-resources
+    poc: poc-restrict-resources-for-containers
 spec:
   replicas: 1
   selector:
@@ -17,7 +17,7 @@ spec:
     metadata:
       labels:
         app: poc-client-01
-        poc: poc-limit-range-for-container-resources
+        poc: poc-restrict-resources-for-containers
     spec:
       containers:
         - name: poc-app-loop-message-1
@@ -51,11 +51,11 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: poc-limit-range-for-container-resources-02
-  namespace: poc-limit-range-for-container-resources-ns
+  name: poc-restrict-resources-for-containers-02
+  namespace: poc-restrict-resources-for-containers-ns
   labels:
     app: poc-client
-    poc: poc-limit-range-for-container-resources
+    poc: poc-restrict-resources-for-containers
 spec:
   replicas: 1
   selector:
@@ -67,7 +67,7 @@ spec:
     metadata:
       labels:
         app: poc-client-02
-        poc: poc-limit-range-for-container-resources
+        poc: poc-restrict-resources-for-containers
     spec:
       containers:
           - name: poc-app-message-loop-3

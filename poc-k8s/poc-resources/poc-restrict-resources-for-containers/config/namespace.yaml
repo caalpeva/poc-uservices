@@ -1,8 +1,15 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: poc-restrict-resources-for-containers-ns
+  labels:
+    poc: poc-restrict-resources-for-containers
+---
+apiVersion: v1
 kind: LimitRange
 metadata:
-  name: poc-limit-range-for-container-resources
-  namespace: poc-limit-range-for-container-resources-ns
+  name: poc-restrict-resources-for-containers
+  namespace: poc-restrict-resources-for-containers-ns
 spec:
   limits:
   - default:

@@ -443,12 +443,13 @@ function kubectl::getReplicasFromReplicaSet() {
   xtrace off
 }
 
-function kubectl::getReplicaSetEventsFromDeployment() {
+function kubectl::getLastReplicaSetEventsFromDeployment() {
+  print_info "Show events from replicaset"
   deployment=$1
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} describe rs $deployment | grep Events: -A5
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} describe rs $deployment | tail -2
   xtrace off
 }
 
@@ -501,6 +502,7 @@ function kubectl::getReplicasFromDeployment() {
 function kubectl::scaleDeployment() {
   deploy=$1
   replicas=$2
+  shift
   shift
   print_info "Scale replicas to $replicas"
   kubectl::manageArguments $@

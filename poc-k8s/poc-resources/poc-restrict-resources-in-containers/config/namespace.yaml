@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: poc-limit-range-for-container-resources-ns
-  labels:
-    poc: poc-limit-range-for-container-resources

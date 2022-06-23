@@ -14,9 +14,9 @@ CONFIGFILE_DEPLOYMENT=${CONFIG_DIR}/deployment.yaml
 CONFIGFILE_NAMESPACE=${CONFIG_DIR}/namespace.yaml
 CONFIGFILE_LIMIT_RANGE=${CONFIG_DIR}/limit-range.yaml
 
-DEPLOYMENT1_NAME="poc-limit-range-for-container-resources-01"
-DEPLOYMENT2_NAME="poc-limit-range-for-container-resources-02"
-POC_LABEL_VALUE="poc-limit-range-for-container-resources"
+DEPLOYMENT1_NAME="poc-restrict-resources-for-containers-01"
+DEPLOYMENT2_NAME="poc-restrict-resources-for-containers-02"
+POC_LABEL_VALUE="poc-restrict-resources-for-containers"
 NAMESPACE="$POC_LABEL_VALUE-ns"
 
 function initialize() {
@@ -34,9 +34,7 @@ function handleTermSignal() {
 
 function cleanup {
   print_debug "Cleaning environment..."
-  kubectl::unapply $CONFIGFILE_DEPLOYMENT \
-    $CONFIGFILE_LIMIT_RANGE
-    #$CONFIGFILE_NAMESPACE
+  kubectl::unapply $CONFIGFILE_DEPLOYMENT $CONFIGFILE_NAMESPACE
 }
 
 function main {
@@ -44,20 +42,16 @@ function main {
   checkArguments $@
   initialize
 
-  #echo "el namespace es: $NAMESPACE"
   print_box "LIMIT CPU AND MEMORY RESOURCES WITH CONSTRAINT POLICY" \
     "" \
     " A LimitRange is a resource restriction policy that allows:" \
     "   - Specify default resource requirements and limits for pods or containers in a namespace." \
     "   - Impose resource requirement restrictions on pods or containers in a namespace." \
-    "   - Enforce min/max resource limitations for pods or containers within a namespace." \
-    " Checks the deployment behavior when CPU and RAM resources are limited with LimitRange from namespace."
+    "   - Enforce min/max resource limitations for pods or containers within a namespace."
   checkInteractiveMode
 
   kubectl::showNodes
-  kubectl::apply $CONFIGFILE_LIMIT_RANGE \
-    $CONFIGFILE_DEPLOYMENT
-    #$CONFIGFILE_NAMESPACE \
+  kubectl::apply $CONFIGFILE_NAMESPACE $CONFIGFILE_DEPLOYMENT
   kubectl::waitForDeployment $DEPLOYMENT1_NAME -n $NAMESPACE
   kubectl::showDeployments -n $NAMESPACE -l "poc=$POC_LABEL_VALUE"
   kubectl::showReplicaSets -n $NAMESPACE -l "poc=$POC_LABEL_VALUE"
@@ -75,7 +69,7 @@ function main {
   print_info "Check the maximum and minimum limits of the resources"
   print_debug "Note that second deployment could not be started"
   print_debug "The requested resources are outside the limits allowed"
-  kubectl::getReplicaSetEventsFromDeployment $DEPLOYMENT2_NAME -n $NAMESPACE
+  kubectl::getLastReplicaSetEventsFromDeployment $DEPLOYMENT2_NAME -n $NAMESPACE
   checkInteractiveMode
 
   checkCleanupMode
