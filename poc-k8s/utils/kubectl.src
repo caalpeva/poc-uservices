@@ -329,7 +329,8 @@ function kubectl::waitForReadyPod() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod
+  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait \
+    --for=condition=ready pod $pod --timeout=45s
   xtrace off
 }
 

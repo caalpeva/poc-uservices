@@ -73,7 +73,7 @@ function main {
   print_info "Wait a while for kubelet to use startup probes..."
   print_debug "Note that while the server is not available, the pod is marked as not ready"
   kubectl::showStartupProbe $POD_NAME
-  kubectl::waitForReadyPod $POD_NAME
+  kubectl::waitForReadyPod $POD_NAME && sleep 2
   kubectl::showPods
 
   print_info "Show database"
@@ -87,7 +87,7 @@ function main {
 
   print_info "Wait a while for kubelet to use liveness probes..."
   kubectl::showLivenessProbe $POD_NAME && sleep 3
-  kubectl::waitForReadyPod $POD_NAME
+  kubectl::waitForReadyPod $POD_NAME && sleep 2
   kubectl::showPods
   print_debug "Note that when liveness probe fails the pod is restarted"
 

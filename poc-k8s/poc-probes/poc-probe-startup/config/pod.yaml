@@ -47,7 +47,7 @@ spec:
         - -e
         - SELECT 1 FROM DUAL
       initialDelaySeconds: 5
-      periodSeconds: 3
+      periodSeconds: 5
 
     # A second type of startup probe uses a TCP socket
     #startupProbe:
@@ -78,4 +78,4 @@ spec:
         name: poc-probe-startup-configmap-file
     - name: poc-probe-startup-volume-database
       hostPath:
-        path: /tmp/mysql5
+        path: /tmp/mysql
