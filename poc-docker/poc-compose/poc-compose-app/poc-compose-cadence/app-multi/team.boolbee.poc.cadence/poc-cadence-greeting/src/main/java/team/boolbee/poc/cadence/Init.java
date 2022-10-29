@@ -2,18 +2,24 @@ package team.boolbee.poc.cadence;
 
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowClientOptions;
+import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.WorkflowServiceTChannel;
 import com.uber.cadence.worker.Worker;
 import com.uber.cadence.worker.WorkerFactory;
 import com.uber.cadence.workflow.Workflow;
 import org.slf4j.Logger;
+import team.boolbee.poc.cadence.activities.GreetingWithDelayActivities;
 import team.boolbee.poc.cadence.workflows.GreetingWorkflow;
+import team.boolbee.poc.cadence.workflows.IGreetingWorkflow;
+
+import java.time.Duration;
+
+import static team.boolbee.poc.cadence.Constants.DOMAIN;
+import static team.boolbee.poc.cadence.Constants.TASK_LIST;
 
 public class Init {
     private static Logger logger = Workflow.getLogger(Init.class);
-    private static String DOMAIN = "test-domain";
-    private static String TASK_LIST = "PocTaskList";
 
     public static void main(String[] args) {
         WorkflowClient workflowClient =
@@ -24,12 +30,21 @@ public class Init {
         WorkerFactory factory = WorkerFactory.newInstance(workflowClient);
         Worker worker = factory.newWorker(TASK_LIST);
         worker.registerWorkflowImplementationTypes(GreetingWorkflow.class);
+        worker.registerActivitiesImplementations(new GreetingWithDelayActivities());
         factory.start();
 
-//      The code is slightly different if you are using client version prior to 3.0.0:
-//        Worker.Factory factory = new Worker.Factory(DOMAIN);
-//        Worker worker = factory.newWorker(TASK_LIST);
-//        worker.registerWorkflowImplementationTypes(PocWorkflowImpl.class);
-//        factory.start();
+        // Get a workflow stub using the same task list the worker uses.
+//        IGreetingWorkflow workflow = workflowClient.newWorkflowStub(IGreetingWorkflow.class);
+        IGreetingWorkflow workflow = workflowClient.newWorkflowStub(IGreetingWorkflow.class,
+                new WorkflowOptions.Builder()
+                        .setTaskList(TASK_LIST)
+                        .setExecutionStartToCloseTimeout(Duration.ofSeconds(30))
+                        .build());
+        // Execute a workflow waiting for it to complete.
+        String greeting = workflow.getGreeting("World");
+        System.out.println(greeting);
+
+        System.exit(0);
+
     }
 }
