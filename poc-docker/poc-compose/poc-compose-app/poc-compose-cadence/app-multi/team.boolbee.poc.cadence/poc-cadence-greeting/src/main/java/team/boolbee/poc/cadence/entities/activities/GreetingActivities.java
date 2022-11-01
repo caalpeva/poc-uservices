@@ -1,4 +1,4 @@
-package team.boolbee.poc.cadence.activities;
+package team.boolbee.poc.cadence.entities.activities;
 
 public class GreetingActivities implements IGreetingActivities {
 
@@ -6,4 +6,4 @@ public class GreetingActivities implements IGreetingActivities {
     public String composeGreeting(String greeting, String name) {
         return greeting + " " + name + "!";
     }
-  }
+}

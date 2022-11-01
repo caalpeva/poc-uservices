@@ -1,11 +1,11 @@
-package team.boolbee.poc.cadence.activities;
+package team.boolbee.poc.cadence.entities.activities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GreetingWithDelayActivities implements IGreetingActivities {
+public class GreetingActivitiesWithDelay implements IGreetingActivities {
 
-    private static Logger logger = LoggerFactory.getLogger(GreetingWithDelayActivities.class);
+    private static Logger logger = LoggerFactory.getLogger(GreetingActivitiesWithDelay.class);
     private int callCount;
     private long lastInvocationTime;
 

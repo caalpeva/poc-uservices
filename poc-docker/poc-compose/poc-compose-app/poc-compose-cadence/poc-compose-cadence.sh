@@ -13,6 +13,7 @@ PROJECT_NAME="poc_cadence"
 NETWORK_NAME="${PROJECT_NAME}_network"
 
 CONTAINER_PREFIX="poc_cadence"
+DOMAIN_NAME="poc-domain"
 
 TIMEOUT_SECS=90 # Set timeout in seconds
 INTERVAL_SECS=5   # Set interval (duration) in seconds
@@ -61,7 +62,7 @@ function main {
   xtrace on
   docker run --network=host \
     --rm ubercadence/cli:master \
-      --do test-domain domain register -rd 1
+      --do $DOMAIN_NAME domain register -rd 1
   xtrace off
   sleep 5 && checkInteractiveMode
 
@@ -69,7 +70,7 @@ function main {
   xtrace on
   docker run --network=host \
     --rm ubercadence/cli:master \
-      --do test-domain domain describe
+      --do $DOMAIN_NAME domain describe
   xtrace off
   checkInteractiveMode
 
@@ -77,7 +78,7 @@ function main {
   xtrace on
   docker run --network=host \
     --rm ubercadence/cli:master \
-      --do test-domain workflow start \
+      --do $DOMAIN_NAME workflow start \
       --tasklist PocTaskList \
       --workflow_type PocWorkflow::greeting \
       --execution_timeout 3600 --input \"$USER\"
@@ -88,9 +89,9 @@ function main {
   xtrace on
   docker run --network=host \
     --rm ubercadence/cli:master \
-      --do test-domain workflow list
+      --do $DOMAIN_NAME workflow list
   xtrace off
-  #docker run --network=host --rm ubercadence/cli:master --do test-domain workflow showid <WORKFLOW_ID>
+  #docker run --network=host --rm ubercadence/cli:master --do $DOMAIN_NAME workflow showid <WORKFLOW_ID>
   #checkInteractiveMode
 
   checkCleanupMode
