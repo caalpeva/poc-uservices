@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import team.boolbee.poc.cadence.entities.activities.IGreetingActivities;
 import team.boolbee.poc.cadence.starters.GreetingWorkflowStarter;
 
-public class GreetingWorkflowWithAsyncActivities implements IGreetingWorkflow {
+public class GreetingWorkflowWithAsyncActivity implements IGreetingWorkflow {
     private static Logger logger = Workflow.getLogger(GreetingWorkflowStarter.class);
 
     private final IGreetingActivities activities =
