@@ -7,6 +7,7 @@ import team.boolbee.poc.cadence.entities.CadenceHelper;
 import team.boolbee.poc.cadence.entities.activities.GreetingActivities;
 import team.boolbee.poc.cadence.entities.workflows.GreetingChildWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflow;
+import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflowWithChildWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingWorkflow;
 
 import static team.boolbee.poc.cadence.entities.CadenceConstants.DOMAIN;
@@ -19,7 +20,7 @@ public class GreetingChildWorkflowStarter {
         var workflowClient = CadenceHelper.createWorkflowClient(DOMAIN);
         CadenceHelper.startOneWorker(workflowClient,
                 TASK_LIST,
-                new Class<?>[] { GreetingWorkflow.class, GreetingChildWorkflow.class },
+                new Class<?>[] { GreetingWorkflowWithChildWorkflow.class, GreetingChildWorkflow.class },
                 new Object[] {});
 
         // Get a workflow stub using the same task list the worker uses.
