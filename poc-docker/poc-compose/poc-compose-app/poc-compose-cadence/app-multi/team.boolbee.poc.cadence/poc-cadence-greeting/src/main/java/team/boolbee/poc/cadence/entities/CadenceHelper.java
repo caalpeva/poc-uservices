@@ -3,6 +3,7 @@ package team.boolbee.poc.cadence.entities;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowClientOptions;
 import com.uber.cadence.serviceclient.ClientOptions;
+import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.serviceclient.WorkflowServiceTChannel;
 import com.uber.cadence.worker.Worker;
 import com.uber.cadence.worker.WorkerFactory;
@@ -12,9 +13,15 @@ import org.slf4j.Logger;
 public class CadenceHelper {
     private static Logger logger = Workflow.getLogger(CadenceHelper.class);
 
-    public static WorkflowClient createWorkflowClient(String domain) {
+
+    public static WorkflowClient createDefaultWorkflowClient(String domain) {
+        return createWorkflowClient(domain,
+                new WorkflowServiceTChannel(ClientOptions.defaultInstance()));
+    }
+
+    public static WorkflowClient createWorkflowClient(String domain, IWorkflowService service) {
         return WorkflowClient.newInstance(
-                new WorkflowServiceTChannel(ClientOptions.defaultInstance()),
+                service,
                 WorkflowClientOptions.newBuilder()
                         .setDomain(domain)
                         .build());

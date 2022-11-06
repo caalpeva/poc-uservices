@@ -5,7 +5,6 @@ import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.workflow.Workflow;
 import org.slf4j.Logger;
 import team.boolbee.poc.cadence.entities.CadenceHelper;
-import team.boolbee.poc.cadence.entities.activities.GreetingActivities;
 import team.boolbee.poc.cadence.entities.activities.GreetingActivitiesWithCompletion;
 import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingWorkflow;
@@ -20,7 +19,7 @@ public class GreetingWorkflowWithActivityCompletionStarter {
     public static final String TASK_LIST = "poc-tl-greeting-with-activity-completion";
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        var workflowClient = CadenceHelper.createWorkflowClient(DOMAIN);
+        var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
         CadenceHelper.startOneWorker(workflowClient,
                 TASK_LIST,
                 new Class<?>[] { GreetingWorkflow.class },

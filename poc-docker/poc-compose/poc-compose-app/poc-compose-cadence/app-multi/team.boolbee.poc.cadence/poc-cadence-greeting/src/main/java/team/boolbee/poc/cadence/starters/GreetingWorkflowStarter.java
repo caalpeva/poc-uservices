@@ -15,7 +15,7 @@ public class GreetingWorkflowStarter {
 
     public static final String TASK_LIST = "poc-tl-greeting";
     public static void main(String[] args) {
-        var workflowClient = CadenceHelper.createWorkflowClient(DOMAIN);
+        var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
         CadenceHelper.startOneWorker(workflowClient,
                 TASK_LIST,
                 new Class<?>[] { GreetingWorkflow.class },

@@ -18,7 +18,7 @@ public class GreetingWorkflowCancellationStarter {
     public static final String TASK_LIST = "poc-tl-greeting-cancellation";
 
     public static void main(String[] args) {
-        var workflowClient = CadenceHelper.createWorkflowClient(DOMAIN);
+        var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
         var activities = new GreetingActivities();
         CadenceHelper.startOneWorker(workflowClient,
                 TASK_LIST,
