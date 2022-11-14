@@ -8,19 +8,22 @@ import org.slf4j.Logger;
 import team.boolbee.poc.cadence.entities.activities.IGreetingActivities;
 import team.boolbee.poc.cadence.starters.GreetingWorkflowStarter;
 
-public class GreetingWorkflowWithChildWorkflow implements IGreetingWorkflow {
+public class GreetingParentWorkflow implements IGreetingParentWorkflow {
     private static Logger logger = Workflow.getLogger(GreetingWorkflowStarter.class);
 
     private final IGreetingActivities activities =
             Workflow.newActivityStub(IGreetingActivities.class);
 
     @Override
-    public String getGreeting(String name) {
+    public String getGreeting(String name, boolean parallel) {
         // Workflows are stateful. So a new stub must be created for each new child.
         IGreetingChildWorkflow childWorkflow = Workflow.newChildWorkflowStub(IGreetingChildWorkflow.class);
 
-        //return waitForChildWorkflowExecution(childWorkflow, name);
-        return executeChildWorkflowParallel(childWorkflow, name);
+        if (parallel) {
+            return executeChildWorkflowParallel(childWorkflow, name);
+        } else {
+            return waitForChildWorkflowExecution(childWorkflow, name);
+        }
     }
 
     private String waitForChildWorkflowExecution(IGreetingChildWorkflow childWorkflow, String name) {
