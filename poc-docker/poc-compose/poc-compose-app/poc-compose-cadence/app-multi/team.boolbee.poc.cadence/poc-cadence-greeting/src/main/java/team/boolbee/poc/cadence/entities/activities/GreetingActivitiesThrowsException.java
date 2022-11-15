@@ -20,4 +20,4 @@ public class GreetingActivitiesThrowsException implements IGreetingActivities {
             throw Workflow.wrap(e);
         }
     }
-  }
+}
