@@ -28,7 +28,6 @@ public class GreetingQueryableWorkflowStarter {
                 new Object[] {});
 
         // Get a workflow stub using the same task list the worker uses.
-        //IGreetingWorkflowWithTaskList workflow = workflowClient.newWorkflowStub(IGreetingWorkflowWithTaskList.class);
         IGreetingQueryableWorkflow workflow = workflowClient.newWorkflowStub(
                 IGreetingQueryableWorkflow.class,
                 new WorkflowOptions.Builder()
