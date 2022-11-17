@@ -26,7 +26,7 @@ public class GreetingQueryableAndConsistentWorkflowStarter {
         var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
         CadenceHelper.startOneWorker(workflowClient,
                 TASK_LIST,
-                new Class<?>[]{GreetingQueryableAndConsistentWorkflow.class},
+                new Class<?>[]{ GreetingQueryableAndConsistentWorkflow.class },
                 new Object[]{});
 
         // Start a workflow execution. Usually this is done from another program.
@@ -77,6 +77,7 @@ public class GreetingQueryableAndConsistentWorkflowStarter {
                         Integer.class,
                         Integer.class)); // Should print 5
 
+        Thread.sleep(2500);
         System.exit(0);
     }
 }
