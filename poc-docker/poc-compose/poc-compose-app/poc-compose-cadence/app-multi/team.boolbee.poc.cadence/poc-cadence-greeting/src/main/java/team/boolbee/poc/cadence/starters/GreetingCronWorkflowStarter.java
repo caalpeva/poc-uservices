@@ -38,7 +38,7 @@ public class GreetingCronWorkflowStarter {
                         .setWorkflowId(WORKFLOW_ID)
                         .build());
 
-        // Execute a workflow waiting for it to complete.
+        // Start a workflow execution async. Usually this is done from another program.
         WorkflowClient.start(workflow::greetPeriodically, "World");
         //workflow.greetPeriodically("World");
         logger.info("Cron workflow is running");
