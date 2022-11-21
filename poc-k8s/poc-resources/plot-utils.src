@@ -1,0 +1,242 @@
+#!/bin/echo "source me !"
+#############
+# FUNCTIONS #
+#############
+# Print info formatted
+print_info() {
+  date_time=$(date '+%Y-%m-%d %H:%M:%S,%3N')
+  echo -e "\e[33m${date_time}    [INFO] ${1}\e[0m"
+}
+# Print error formatted
+print_error() {
+  date_time=$(date '+%Y-%m-%d %H:%M:%S,%3N')
+  echo -e "\e[31m${date_time}    [ERROR] ${1}\e[0m"
+  return 1
+}
+# Print done formatted
+print_done() {
+  date_time=$(date '+%Y-%m-%d %H:%M:%S,%3N')
+  echo -e "\e[92m${date_time}    [DONE] ${1}\e[0m"
+}
+# Get Pod name for a given namespace/prefix
+# $1: namespace; $2: app prefix (if provided)
+get_pod_names() {
+  local filter="-o=custom-columns=:.metadata.name"
+  [ -n "$2" ] && filter+=" -l app=${2}"
+  kubectl --namespace=${1} get pod --no-headers ${filter}
+  return $?
+}
+# Generate test results directory
+generate_results_dir() {
+  local traffic_generator=$1
+  local test=$2
+  local theDate=$(date +'%d-%m-%Y-%H-%M-%S')
+  # Global variable for results directory
+  RESULTS_DIR="$path/${traffic_generator}-${test}-Results-${theDate}"
+  mkdir -p $RESULTS_DIR
+  exec &> >(tee -a $RESULTS_DIR/console.log)
+  print_info "$RESULTS_DIR directory created \n"
+}
+# Get metrics from all containers by pod
+# $1 - Array of pod names
+# $2 - Filename path to save results
+get_metrics_from_pods() {
+  local resultsDir=$1
+  local pods=($2)
+  for podName in "${pods[@]}"
+  do
+    get_metrics_from_pod_only $podName $resultsDir
+    data=$(kubectl top pod ${podName} -n ${COMMON__NAMESPACE} --containers --no-headers | awk '{print $2}')
+    containers=($data)
+    for container in "${containers[@]}"
+    do
+      get_metrics_from_container $podName $container $resultsDir
+    done
+  done
+  return 0
+}
+# Get metrics from pod specified
+# $1 - Pod name
+# $2 - Filename path to save results
+get_metrics_from_pod_only() {
+  local podName=$1
+  local resultsDir=$2
+  # Get metrics from pod
+  local data=$(kubectl top pod ${podName} -n ${COMMON__NAMESPACE} --no-headers)
+  extract_and_save_metrics $podName "$data" $resultsDir
+  return 0
+}
+# Get metrics from container specified
+# $1 - Pod name
+# $2 - Container name
+# $3 - Filename path to save results
+get_metrics_from_container() {
+  local podName=$1
+  local containerName=$2
+  local resultsDir=$3
+  # Get metrics from container
+  local data=$(kubectl top pod -n ${COMMON__NAMESPACE} ${podName} --containers --no-headers \
+    | awk '{for(i=2;i<=NF;i++){printf "%s ", $i};printf "\n"}')
+  extract_and_save_metrics $containerName "$data" $resultsDir
+  return 0
+}
+# Extract and save metrics from container specified
+# $1 - Kubernetes object name
+# $2 - "kubectl top" command output
+# $3 - Filename path to save results
+extract_and_save_metrics() {
+  local object=$1
+  local data="$2"
+  local resultsDir=$3
+  cpu_=$(echo "$data" | grep "${object} " | tail -1 | awk '{print $2}')
+  if  [ -n cpu_ ]; then
+    cpu=${cpu_:-1}
+  else
+    cpu=-1
+  fi
+  memory_=$(echo "$data" | grep "${object} " | tail -1 | awk '{print $3}')
+  if  [ -n memory_ ]; then
+    memory=${memory_:-2}
+  else
+    memory=-1
+  fi
+  # Insert values in .dat files
+  echo "$theTime $cpu" >> $resultsDir/cpu_${object}.dat
+  echo "$theTime $memory" >> $resultsDir/memory_${object}.dat
+  print_info "extract_and_save_metrics - Saving data from $object ..."
+  return 0
+}
+# Filter pod names
+filter_podnames() {
+  echo ${COMMON__COMPONENTS_FOR_PLOTS[*]} | tr ' ' '\n'| sed 's/^/\^/' - > $resultsDir/components.txt
+  get_pod_names ${COMMON__NAMESPACE} | grep - -f $resultsDir/components.txt
+  return 0
+}
+# Get SUT metrics
+get_metrics() {
+  local max_time=$1
+  local resultsDir=$2
+  local slot=${COMMON__GETMETRICS_SLOT}
+  print_info "Get_metrics - Collecting metrics for $max_time seconds"
+  SUTarray=($(filter_podnames))
+  echo "${SUTarray[*]}"
+  # Init value
+  local theTime=0
+  get_metrics_from_pods $resultsDir "${SUTarray[*]}"
+  while [ "$theTime" -ne "$max_time" ]
+  do
+    sleep $slot
+    let theTime+=$slot
+    local time_remaining=$(($max_time-$theTime))
+    print_info "Get_metrics - Time remaining: $time_remaining seconds"
+    get_metrics_from_pods $resultsDir "${SUTarray[*]}"
+  done
+  rm -f $resultsDir/components.txt
+  return 0
+}
+# Generate response time, CPU and memory plots
+plots() {
+  # Check if gnuplot package is installed
+  print_info "Checking Gnuplot package ..."
+  type gnuplot &> /dev/null
+  if [ $? -eq 0 ]; then
+    print_done "Gnuplot installed! \n"
+  else
+    print_error "Gnuplot package not found"
+    print_info "You can install Gnuplot package and generate plots using 'plots' option"
+    sudo apt-get update
+    sudo apt-get install gnuplot
+    return 1
+  fi
+  gnuplot --version
+
+  # Generate plots
+  print_info "Generating plots ... "
+  for FILE in $1/*.dat
+  do
+    filename="$(echo $FILE | rev | cut -d '/' -f 1 | rev| cut -d '.' -f 1)"
+    f="$(echo $filename|  head -c 3)"
+    container="$(echo $filename| cut -d'_' -f 2)"
+    [ "$f" = "cpu" ] && ylabel="CPU (mCore)" && title="Time vs CPU"
+    [ "$f" = "mem" ] && ylabel="Memory (Mi)" && title="Time vs Memory"
+    gnuplot <<- EOF
+    set xlabel "Time (sec)"
+    set ylabel "$ylabel"
+    set title "$container\n$title"
+    set nokey
+    unset border
+    set grid
+    set term png
+    set output "${FILE}.png"
+    plot "${FILE}" using 1:2 with line
+EOF
+  done
+  print_done "Plots generated!"
+return 0
+}
+# Generate logs functions
+logs() {
+  local remove="false"
+  local dtg_disabled="false"
+  while test $# -gt 0
+  do
+     _key="$1"
+     case "$_key" in
+       -r|--remove)
+         remove="true"
+         rm -rf logs/${COMMON__NAMESPACE}/*
+         rc=$?
+         if [ $rc -eq 0 ]; then
+           print_done "Logs removed.\n"
+           return $rc
+         else
+           print_error "Logs not removed. \n"
+           return $rc
+         fi
+       ;;
+       -d|--directory)
+         shift
+         COMMON__LOGS_DIR=$1
+       ;;
+       jcat)
+         dtg_disabled="true"
+         ;;
+       *)
+         print_error "Unexpected argument $_key!"
+         return 1
+       ;;
+     esac
+     shift
+  done
+  if [ ${remove} == "false" ]; then
+    if [ ${dtg_disabled} == "true" ];then
+      jcat_pod="$(get_pod_names ${COMMON__NAMESPACE} | grep "${JCAT__POD}")"
+      if [ -z "${jcat_pod}" ]; then
+        print_error "Helm chart is not deployed. \n"
+        return 1
+      else
+        print_info "Generating JCAT logs ..."
+        mkdir -p ${COMMON__LOGS_DIR}
+        cd ${COMMON__LOGS_DIR}
+        kubectl cp ${COMMON__NAMESPACE}/${jcat_pod}:/target/jcat-logs jcat-logs
+        cd - &> /dev/null
+        print_done "JCAT logs generated at '${COMMON__LOGS_DIR}'. \n"
+        return 0
+      fi
+    else
+      dtg_pod="$(get_pod_names ${COMMON__NAMESPACE} | grep "${DTG__POD}")"
+      if [ -z "${dtg_pod}" ]; then
+        print_error "Helm chart is not deployed. \n"
+        return 1
+      else
+        print_info "Generating DTG logs ..."
+        mkdir -p ${COMMON__LOGS_DIR}
+        cd ${COMMON__LOGS_DIR}
+        kubectl cp ${COMMON__NAMESPACE}/${dtg_pod}:/data/logs dtg-logs
+        cd - &> /dev/null
+        print_done "DTG logs generated at '${COMMON__LOGS_DIR}'. \n"
+        return 0
+      fi
+    fi
+  fi
+}
