@@ -36,7 +36,12 @@ public class GreetingSignaledAndPollResponseWorkflowStarter {
         String workflowId = RandomStringUtils.randomAlphabetic(10);
 
         // Get a workflow stub using the same task list the worker uses.
-        IGreetingWorkflowWithSignals workflow = workflowClient.newWorkflowStub(IGreetingWorkflowWithSignals.class, new WorkflowOptions.Builder().setTaskList(TASK_LIST).setWorkflowId(workflowId).setExecutionStartToCloseTimeout(Duration.ofSeconds(30)).build());
+        IGreetingWorkflowWithSignals workflow = workflowClient.newWorkflowStub(
+                IGreetingWorkflowWithSignals.class,
+                new WorkflowOptions.Builder().setTaskList(TASK_LIST)
+                        .setWorkflowId(workflowId)
+                        .setExecutionStartToCloseTimeout(Duration.ofSeconds(30))
+                        .build());
 
         // Start workflow asynchronously to not use another thread to signal.
         WorkflowClient.start(workflow::getGreetings);
@@ -45,9 +50,14 @@ public class GreetingSignaledAndPollResponseWorkflowStarter {
         // This workflow keeps receiving signals until exit is called
         String signal = "World";
 
-        final SignaledWorkflowStatus workflowStatus = CadenceHelper.signalAndWait(workflowClient, DOMAIN, workflowId, "", () -> {
-            workflow.waitForName(signal); // sends waitForName signal
-        }, JsonDataConverter.getInstance(), "IGreetingWorkflowWithSignals::receiveName", signal);
+        final SignaledWorkflowStatus workflowStatus = CadenceHelper.signalAndWait(workflowClient,
+                DOMAIN,
+                workflowId,
+                "",
+                () -> { workflow.waitForName(signal); }, // sends waitForName signal
+                JsonDataConverter.getInstance(),
+                "IGreetingWorkflowWithSignals::waitForName",
+                signal);
 
         System.out.printf("result: isReceived: %b, isProccessed: %b, isRunning: %b, runID: %s \n",
                 workflowStatus.isSignalReceived(),

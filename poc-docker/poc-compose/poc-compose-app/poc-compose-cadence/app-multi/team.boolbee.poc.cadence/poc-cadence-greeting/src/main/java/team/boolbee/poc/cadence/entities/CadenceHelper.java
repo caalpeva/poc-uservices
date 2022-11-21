@@ -4,6 +4,8 @@ import com.uber.cadence.*;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowClientOptions;
 import com.uber.cadence.converter.DataConverter;
+import com.uber.cadence.internal.compatibility.Thrift2ProtoAdapter;
+import com.uber.cadence.internal.compatibility.proto.serviceclient.IGrpcServiceStubs;
 import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.serviceclient.WorkflowServiceTChannel;
@@ -22,6 +24,7 @@ public class CadenceHelper {
 
     public static WorkflowClient createDefaultWorkflowClient(String domain) {
         return createWorkflowClient(domain,
+                //new Thrift2ProtoAdapter(IGrpcServiceStubs.newInstance()));
                 new WorkflowServiceTChannel(ClientOptions.defaultInstance()));
     }
 
