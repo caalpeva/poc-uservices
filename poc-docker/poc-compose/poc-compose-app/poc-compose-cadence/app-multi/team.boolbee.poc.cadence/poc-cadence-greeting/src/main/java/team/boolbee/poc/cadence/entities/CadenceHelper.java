@@ -11,6 +11,8 @@ import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.serviceclient.WorkflowServiceTChannel;
 import com.uber.cadence.worker.Worker;
 import com.uber.cadence.worker.WorkerFactory;
+import com.uber.cadence.worker.WorkerFactoryOptions;
+import com.uber.cadence.worker.WorkerOptions;
 import com.uber.cadence.workflow.Workflow;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -41,10 +43,23 @@ public class CadenceHelper {
                                       String taskList,
                                       Class<?>[] workflowImplementationTypes,
                                       Object[] activitiesImplementations) {
-        WorkerFactory factory = WorkerFactory.newInstance(workflowClient);
-        Worker worker = factory.newWorker(taskList);
+        //WorkerFactory factory = WorkerFactory.newInstance(workflowClient);
+        WorkerFactory factory = WorkerFactory.newInstance(workflowClient,
+                WorkerFactoryOptions.newBuilder()
+                        .setMaxWorkflowThreadCount(1000)
+                        .setStickyCacheSize(100)
+                        .setDisableStickyExecution(false)
+                        .build());
+
+        //Worker worker = factory.newWorker(taskList);
+        Worker worker = factory.newWorker(taskList,
+                WorkerOptions.newBuilder()
+                        .setMaxConcurrentActivityExecutionSize(100)
+                        .setMaxConcurrentWorkflowExecutionSize(100)
+                        .build());
         worker.registerWorkflowImplementationTypes(workflowImplementationTypes);
         worker.registerActivitiesImplementations(activitiesImplementations);
+
         // Start all workers created by this factory
         factory.start();
     }
