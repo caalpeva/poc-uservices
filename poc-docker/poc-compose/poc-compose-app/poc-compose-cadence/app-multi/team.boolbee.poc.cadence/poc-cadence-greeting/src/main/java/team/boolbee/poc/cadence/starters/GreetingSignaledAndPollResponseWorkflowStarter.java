@@ -10,16 +10,13 @@ import com.uber.cadence.converter.JsonDataConverter;
 import com.uber.cadence.workflow.Workflow;
 import com.uber.cadence.workflow.WorkflowUtils;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import team.boolbee.poc.cadence.entities.CadenceHelper;
 import team.boolbee.poc.cadence.entities.SignaledWorkflowStatus;
-import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflowWithSignals;
 import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflowWithSignalsAndPollResponse;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingWorkflowWithSignals;
 
 import java.time.Duration;
-import java.util.List;
 
 import static team.boolbee.poc.cadence.entities.CadenceConstants.DOMAIN;
 
@@ -28,18 +25,20 @@ public class GreetingSignaledAndPollResponseWorkflowStarter {
 
     public static final String TASK_LIST = "poc-tl-greeting-with-signals";
 
+    public static final String WORKFLOW_ID = RandomStringUtils.randomAlphabetic(10); // In a real application use a business ID like customer ID or order ID
+
     public static void main(String[] args) throws Exception {
         var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
-        CadenceHelper.startOneWorker(workflowClient, TASK_LIST, new Class<?>[]{GreetingWorkflowWithSignalsAndPollResponse.class}, new Object[]{});
-
-        // In a real application use a business ID like customer ID or order ID
-        String workflowId = RandomStringUtils.randomAlphabetic(10);
+        CadenceHelper.startOneWorker(workflowClient,
+                TASK_LIST,
+                new Class<?>[] { GreetingWorkflowWithSignalsAndPollResponse.class },
+                new Object[] {});
 
         // Get a workflow stub using the same task list the worker uses.
         IGreetingWorkflowWithSignals workflow = workflowClient.newWorkflowStub(
                 IGreetingWorkflowWithSignals.class,
                 new WorkflowOptions.Builder().setTaskList(TASK_LIST)
-                        .setWorkflowId(workflowId)
+                        .setWorkflowId(WORKFLOW_ID)
                         .setExecutionStartToCloseTimeout(Duration.ofSeconds(30))
                         .build());
 
@@ -52,7 +51,7 @@ public class GreetingSignaledAndPollResponseWorkflowStarter {
 
         final SignaledWorkflowStatus workflowStatus = CadenceHelper.signalAndWait(workflowClient,
                 DOMAIN,
-                workflowId,
+                WORKFLOW_ID,
                 "",
                 () -> { workflow.waitForName(signal); }, // sends waitForName signal
                 JsonDataConverter.getInstance(),
@@ -68,7 +67,7 @@ public class GreetingSignaledAndPollResponseWorkflowStarter {
         if (workflowStatus.isSignalProcessed()) {
             // Get results from search attribute `CustomKeywordField`
             WorkflowExecution execution = new WorkflowExecution();
-            execution.setWorkflowId(workflowId);
+            execution.setWorkflowId(WORKFLOW_ID);
             execution.setRunId(workflowStatus.getRunId()); // make sure to sure the same runID in case the current run changes
 
             DescribeWorkflowExecutionRequest request = new DescribeWorkflowExecutionRequest();
