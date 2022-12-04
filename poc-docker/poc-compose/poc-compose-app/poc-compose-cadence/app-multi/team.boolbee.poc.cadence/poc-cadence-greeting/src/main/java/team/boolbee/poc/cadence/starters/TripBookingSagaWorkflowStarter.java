@@ -7,38 +7,34 @@ import com.uber.cadence.workflow.Workflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.boolbee.poc.cadence.entities.CadenceHelper;
-import team.boolbee.poc.cadence.entities.activities.GreetingActivities;
-import team.boolbee.poc.cadence.entities.activities.GreetingActivitiesThrowsException;
-import team.boolbee.poc.cadence.entities.workflows.GreetingChildWorkflow;
-import team.boolbee.poc.cadence.entities.workflows.GreetingParentWorkflow;
-import team.boolbee.poc.cadence.entities.workflows.IGreetingParentWorkflow;
-
-import java.time.Duration;
+import team.boolbee.poc.cadence.entities.activities.TripBookingActivities;
+import team.boolbee.poc.cadence.entities.workflows.ITripBookingSagaWorkflow;
+import team.boolbee.poc.cadence.entities.workflows.TripBookingSagaWorkflow;
 
 import static team.boolbee.poc.cadence.entities.CadenceConstants.DOMAIN;
 
-public class GreetingWorkflowWithExceptionStarter {
-    private static Logger logger = LoggerFactory.getLogger(GreetingWorkflowWithExceptionStarter.class);
+public class TripBookingSagaWorkflowStarter {
+    private static Logger logger = LoggerFactory.getLogger(TripBookingSagaWorkflowStarter.class);
 
-    public static final String TASK_LIST = "poc-tl-greeting-exception";
+    private static final String TASK_LIST = "poc-tl-trip-booking-saga";
+
     public static void main(String[] args) {
         var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
         CadenceHelper.startOneWorker(workflowClient,
                 TASK_LIST,
-                new Class<?>[] { GreetingParentWorkflow.class, GreetingChildWorkflow.class },
-                new Object[] { new GreetingActivitiesThrowsException() });
+                new Class<?>[] { TripBookingSagaWorkflow.class },
+                new Object[] { new TripBookingActivities() });
 
         // Get a workflow stub using the same task list the worker uses.
-        IGreetingParentWorkflow workflow = workflowClient.newWorkflowStub(
-                IGreetingParentWorkflow.class,
+        ITripBookingSagaWorkflow workflow = workflowClient.newWorkflowStub(
+                ITripBookingSagaWorkflow.class,
                 new WorkflowOptions.Builder()
                         .setTaskList(TASK_LIST)
-                        //.setExecutionStartToCloseTimeout(Duration.ofSeconds(30))
                         .build());
 
+        // Start a workflow execution. Usually this is done from another program.
         try {
-            String greeting = workflow.getGreeting("World", false);
-            throw new IllegalStateException("unreachable");
+            workflow.bookTrip(System.getenv("USERNAME"), false);
         } catch (WorkflowException e) {
             Throwable cause = Throwables.getRootCause(e);
             logger.error(cause.getMessage());
