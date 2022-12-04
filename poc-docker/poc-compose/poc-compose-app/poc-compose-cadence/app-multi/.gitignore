@@ -1,1 +1,3 @@
 team.boolbee.poc.cadence/poc-cadence-greeting/target/classes/*
+team.boolbee.poc.cadence/poc-cadence-greeting/target/test-classes/*
+team.boolbee.poc.cadence/.idea/*
