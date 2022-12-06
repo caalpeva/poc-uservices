@@ -1,26 +1,24 @@
 package team.boolbee.poc.cadence.starters;
 
-import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowOptions;
-import com.uber.cadence.workflow.Workflow;
 import org.slf4j.Logger;
-import team.boolbee.poc.cadence.entities.CadenceHelper;
-import team.boolbee.poc.cadence.entities.workflows.GreetingQueryableWorkflow;
+import org.slf4j.LoggerFactory;
+import team.boolbee.poc.cadence.entities.CadenceManager;
 import team.boolbee.poc.cadence.entities.workflows.GreetingSideEffectWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingQueryableWorkflow;
 
 import java.time.Duration;
 
-import static team.boolbee.poc.cadence.entities.CadenceConstants.DOMAIN;
+import static team.boolbee.poc.cadence.Constants.CADENCE_DOMAIN;
 
 public class GreetingSideEffectWorkflowStarter {
-    private static Logger logger = Workflow.getLogger(GreetingSideEffectWorkflowStarter.class);
+    private static Logger logger = LoggerFactory.getLogger(GreetingSideEffectWorkflowStarter.class);
 
     public static final String TASK_LIST = "poc-tl-greeting-side-effect";
 
     public static void main(String[] args) throws InterruptedException {
-        var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
-        CadenceHelper.startOneWorker(workflowClient,
+        var workflowClient = CadenceManager.createDefaultWorkflowClient(CADENCE_DOMAIN);
+        CadenceManager.startOneWorker(workflowClient,
                 TASK_LIST,
                 new Class<?>[] {GreetingSideEffectWorkflow.class },
                 new Object[] {});

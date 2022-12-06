@@ -10,7 +10,7 @@ import com.uber.cadence.internal.compatibility.proto.serviceclient.IGrpcServiceS
 import com.uber.cadence.workflow.WorkflowUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import team.boolbee.poc.cadence.entities.CadenceHelper;
+import team.boolbee.poc.cadence.entities.CadenceManager;
 import team.boolbee.poc.cadence.entities.activities.GreetingActivities;
 import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflowWithSearchAttributes;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingWorkflow;
@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static team.boolbee.poc.cadence.entities.CadenceConstants.DOMAIN;
+import static team.boolbee.poc.cadence.Constants.CADENCE_DOMAIN;
 
 public class GreetingWorkflowWithSearchAttributesStarter {
     private static Logger logger = LoggerFactory.getLogger(GreetingWorkflowWithSearchAttributesStarter.class);
@@ -31,8 +31,8 @@ public class GreetingWorkflowWithSearchAttributesStarter {
 
     public static void main(String[] args) throws InterruptedException {
         Thrift2ProtoAdapter cadenceService = new Thrift2ProtoAdapter(IGrpcServiceStubs.newInstance());
-        var workflowClient = CadenceHelper.createWorkflowClient(DOMAIN, cadenceService);
-        CadenceHelper.startOneWorker(workflowClient,
+        var workflowClient = CadenceManager.createWorkflowClient(CADENCE_DOMAIN, cadenceService);
+        CadenceManager.startOneWorker(workflowClient,
                 TASK_LIST,
                 new Class<?>[] { GreetingWorkflowWithSearchAttributes.class },
                 new Object[] { new GreetingActivities() });
@@ -57,7 +57,7 @@ public class GreetingWorkflowWithSearchAttributesStarter {
         execution.setWorkflowId(WORKFLOW_ID);
 
         DescribeWorkflowExecutionRequest request = new DescribeWorkflowExecutionRequest();
-        request.setDomain(DOMAIN);
+        request.setDomain(CADENCE_DOMAIN);
         request.setExecution(execution);
 
         try {

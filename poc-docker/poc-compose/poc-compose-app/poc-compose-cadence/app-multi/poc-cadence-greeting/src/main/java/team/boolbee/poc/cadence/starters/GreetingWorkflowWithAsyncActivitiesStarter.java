@@ -1,23 +1,23 @@
 package team.boolbee.poc.cadence.starters;
 
 import com.uber.cadence.client.WorkflowOptions;
-import com.uber.cadence.workflow.Workflow;
 import org.slf4j.Logger;
-import team.boolbee.poc.cadence.entities.CadenceHelper;
+import org.slf4j.LoggerFactory;
+import team.boolbee.poc.cadence.entities.CadenceManager;
 import team.boolbee.poc.cadence.entities.activities.GreetingActivities;
 import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflowWithAsyncActivity;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingWorkflow;
 
-import static team.boolbee.poc.cadence.entities.CadenceConstants.*;
+import static team.boolbee.poc.cadence.Constants.*;
 
 public class GreetingWorkflowWithAsyncActivitiesStarter {
-    private static Logger logger = Workflow.getLogger(GreetingWorkflowWithAsyncActivitiesStarter.class);
+    private static Logger logger = LoggerFactory.getLogger(GreetingWorkflowWithAsyncActivitiesStarter.class);
 
     public static final String TASK_LIST = "poc-tl-greeting-with-async-activities";
 
     public static void main(String[] args) {
-        var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
-        CadenceHelper.startOneWorker(workflowClient,
+        var workflowClient = CadenceManager.createDefaultWorkflowClient(CADENCE_DOMAIN);
+        CadenceManager.startOneWorker(workflowClient,
                 TASK_LIST,
                 new Class<?>[] { GreetingWorkflowWithAsyncActivity.class },
                 new Object[] { new GreetingActivities() });

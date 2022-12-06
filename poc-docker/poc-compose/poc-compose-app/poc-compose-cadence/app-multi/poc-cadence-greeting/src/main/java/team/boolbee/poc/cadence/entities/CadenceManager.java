@@ -3,9 +3,9 @@ package team.boolbee.poc.cadence.entities;
 import com.uber.cadence.*;
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowClientOptions;
+import com.uber.cadence.client.WorkflowStub;
 import com.uber.cadence.converter.DataConverter;
-import com.uber.cadence.internal.compatibility.Thrift2ProtoAdapter;
-import com.uber.cadence.internal.compatibility.proto.serviceclient.IGrpcServiceStubs;
+import com.uber.cadence.internal.common.WorkflowExecutionUtils;
 import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
 import com.uber.cadence.serviceclient.WorkflowServiceTChannel;
@@ -16,13 +16,35 @@ import com.uber.cadence.worker.WorkerOptions;
 import com.uber.cadence.workflow.Workflow;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Optional;
 
-public class CadenceHelper {
-    private static Logger logger = Workflow.getLogger(CadenceHelper.class);
+public class CadenceManager {
+    private static Logger logger = LoggerFactory.getLogger(CadenceManager.class);
 
+    public static boolean registerDomain(String name) {
+        int retentionPeriodInDays = 1;
+        IWorkflowService cadenceService = new WorkflowServiceTChannel(ClientOptions.defaultInstance());
+        RegisterDomainRequest request = new RegisterDomainRequest();
+        //request.setDescription("Proof of concept");
+        request.setEmitMetric(false);
+        request.setName(name);
+        request.setWorkflowExecutionRetentionPeriodInDays(retentionPeriodInDays);
+        try {
+            cadenceService.RegisterDomain(request);
+            logger.info(String.format("Successfully registered domain %s with retentionDays=%s", name, retentionPeriodInDays));
+            return true;
+        } catch (DomainAlreadyExistsError e) {
+            logger.warn(String.format("Domain %s is already registered", name));
+        } catch (TException e) {
+            logger.warn(e.getCause().getCause().getMessage());
+        }
+
+        return false;
+    }
 
     public static WorkflowClient createDefaultWorkflowClient(String domain) {
         return createWorkflowClient(domain,
@@ -62,6 +84,25 @@ public class CadenceHelper {
 
         // Start all workers created by this factory
         factory.start();
+    }
+
+    public static String queryWorkflowExecution(String domain, String queryType, String workflowId, String runId) {
+        WorkflowExecution workflowExecution = new WorkflowExecution();
+        workflowExecution.setWorkflowId(workflowId);
+        workflowExecution.setRunId(runId);
+
+        WorkflowClient workflowClient = createDefaultWorkflowClient(domain);
+        WorkflowStub untypedWorkflow = workflowClient.newUntypedWorkflowStub(workflowExecution, Optional.empty());
+        return untypedWorkflow.query(queryType, String.class);
+    }
+
+    public static String printWorkflowExecutionHistory(String domain, String queryType, String workflowId, String runId) {
+        WorkflowExecution workflowExecution = new WorkflowExecution();
+        workflowExecution.setWorkflowId(workflowId);
+        workflowExecution.setRunId(runId);
+
+        IWorkflowService cadenceService = new WorkflowServiceTChannel(ClientOptions.defaultInstance());
+        return WorkflowExecutionUtils.prettyPrintHistory(cadenceService, domain, workflowExecution, true);
     }
 
     public static SignaledWorkflowStatus signalAndWait(WorkflowClient workflowClient,

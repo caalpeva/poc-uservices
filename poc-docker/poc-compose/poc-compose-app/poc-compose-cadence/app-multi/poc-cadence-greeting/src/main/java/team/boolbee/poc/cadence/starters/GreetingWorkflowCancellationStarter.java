@@ -4,23 +4,23 @@ import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.client.WorkflowStub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import team.boolbee.poc.cadence.entities.CadenceHelper;
+import team.boolbee.poc.cadence.entities.CadenceManager;
 import team.boolbee.poc.cadence.entities.activities.GreetingActivities;
 import team.boolbee.poc.cadence.entities.workflows.GreetingCancellableWorkflow;
 
 import java.time.Duration;
 import java.util.concurrent.CancellationException;
 
-import static team.boolbee.poc.cadence.entities.CadenceConstants.DOMAIN;
+import static team.boolbee.poc.cadence.Constants.CADENCE_DOMAIN;
 
 public class GreetingWorkflowCancellationStarter {
     private static Logger logger = LoggerFactory.getLogger(GreetingWorkflowCancellationStarter.class);
     public static final String TASK_LIST = "poc-tl-greeting-cancellation";
 
     public static void main(String[] args) {
-        var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
+        var workflowClient = CadenceManager.createDefaultWorkflowClient(CADENCE_DOMAIN);
         var activities = new GreetingActivities();
-        CadenceHelper.startOneWorker(workflowClient,
+        CadenceManager.startOneWorker(workflowClient,
                 TASK_LIST,
                 new Class<?>[] { GreetingCancellableWorkflow.class },
                 new Object[] { activities });

@@ -1,24 +1,17 @@
 package team.boolbee.poc.cadence.starters;
 
-import com.google.common.base.Throwables;
-import com.uber.cadence.TerminateWorkflowExecutionRequest;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.client.*;
-import com.uber.cadence.internal.compatibility.Thrift2ProtoAdapter;
-import com.uber.cadence.internal.compatibility.proto.serviceclient.IGrpcServiceStubs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import team.boolbee.poc.cadence.entities.CadenceHelper;
+import team.boolbee.poc.cadence.entities.CadenceManager;
 import team.boolbee.poc.cadence.entities.activities.GreetingActivities;
-import team.boolbee.poc.cadence.entities.workflows.GreetingCronWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.GreetingPeriodicWorkflow;
-import team.boolbee.poc.cadence.entities.workflows.IGreetingCronWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingPeriodicWorkflow;
 
 import java.time.Duration;
-import java.util.Optional;
 
-import static team.boolbee.poc.cadence.entities.CadenceConstants.DOMAIN;
+import static team.boolbee.poc.cadence.Constants.CADENCE_DOMAIN;
 
 public class GreetingPeriodicWorkflowStarter {
     private static Logger logger = LoggerFactory.getLogger(GreetingPeriodicWorkflowStarter.class);
@@ -27,8 +20,8 @@ public class GreetingPeriodicWorkflowStarter {
     public static final String WORKFLOW_ID = "PeriodicWorkflowId";
 
     public static void main(String[] args) throws InterruptedException {
-        var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
-        CadenceHelper.startOneWorker(workflowClient,
+        var workflowClient = CadenceManager.createDefaultWorkflowClient(CADENCE_DOMAIN);
+        CadenceManager.startOneWorker(workflowClient,
                 TASK_LIST,
                 new Class<?>[] { GreetingPeriodicWorkflow.class },
                 new Object[] { new GreetingActivities() });

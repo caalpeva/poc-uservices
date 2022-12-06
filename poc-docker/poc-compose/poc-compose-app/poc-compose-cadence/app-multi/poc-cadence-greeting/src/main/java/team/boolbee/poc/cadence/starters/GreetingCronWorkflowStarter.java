@@ -6,15 +6,14 @@ import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.internal.compatibility.Thrift2ProtoAdapter;
 import com.uber.cadence.internal.compatibility.proto.serviceclient.IGrpcServiceStubs;
-import com.uber.cadence.workflow.Workflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import team.boolbee.poc.cadence.entities.CadenceHelper;
+import team.boolbee.poc.cadence.entities.CadenceManager;
 import team.boolbee.poc.cadence.entities.activities.GreetingActivities;
 import team.boolbee.poc.cadence.entities.workflows.GreetingCronWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingCronWorkflow;
 
-import static team.boolbee.poc.cadence.entities.CadenceConstants.DOMAIN;
+import static team.boolbee.poc.cadence.Constants.CADENCE_DOMAIN;
 
 public class GreetingCronWorkflowStarter {
     private static Logger logger = LoggerFactory.getLogger(GreetingCronWorkflowStarter.class);
@@ -24,8 +23,8 @@ public class GreetingCronWorkflowStarter {
 
     public static void main(String[] args) throws InterruptedException {
         Thrift2ProtoAdapter cadenceService = new Thrift2ProtoAdapter(IGrpcServiceStubs.newInstance());
-        var workflowClient = CadenceHelper.createWorkflowClient(DOMAIN, cadenceService);
-        CadenceHelper.startOneWorker(workflowClient,
+        var workflowClient = CadenceManager.createWorkflowClient(CADENCE_DOMAIN, cadenceService);
+        CadenceManager.startOneWorker(workflowClient,
                 TASK_LIST,
                 new Class<?>[] { GreetingCronWorkflow.class },
                 new Object[] { new GreetingActivities() });
@@ -51,7 +50,7 @@ public class GreetingCronWorkflowStarter {
         WorkflowExecution execution = new WorkflowExecution();
         execution.setWorkflowId(WORKFLOW_ID);
         TerminateWorkflowExecutionRequest request = new TerminateWorkflowExecutionRequest();
-        request.setDomain(DOMAIN);
+        request.setDomain(CADENCE_DOMAIN);
         request.setReason("Terminate cron workflow");
         request.setWorkflowExecution(execution);
         try {

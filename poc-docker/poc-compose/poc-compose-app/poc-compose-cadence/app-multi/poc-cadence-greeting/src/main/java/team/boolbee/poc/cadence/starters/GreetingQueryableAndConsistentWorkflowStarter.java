@@ -3,28 +3,25 @@ package team.boolbee.poc.cadence.starters;
 import com.uber.cadence.QueryConsistencyLevel;
 import com.uber.cadence.WorkflowExecution;
 import com.uber.cadence.client.QueryOptions;
-import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.client.WorkflowStub;
-import com.uber.cadence.workflow.Workflow;
 import org.slf4j.Logger;
-import team.boolbee.poc.cadence.entities.CadenceHelper;
+import org.slf4j.LoggerFactory;
+import team.boolbee.poc.cadence.entities.CadenceManager;
 import team.boolbee.poc.cadence.entities.workflows.GreetingQueryableAndConsistentWorkflow;
-import team.boolbee.poc.cadence.entities.workflows.GreetingQueryableWorkflow;
-import team.boolbee.poc.cadence.entities.workflows.IGreetingQueryableWorkflow;
 
 import java.time.Duration;
 
-import static team.boolbee.poc.cadence.entities.CadenceConstants.DOMAIN;
+import static team.boolbee.poc.cadence.Constants.CADENCE_DOMAIN;
 
 public class GreetingQueryableAndConsistentWorkflowStarter {
-    private static Logger logger = Workflow.getLogger(GreetingQueryableAndConsistentWorkflowStarter.class);
+    private static Logger logger = LoggerFactory.getLogger(GreetingQueryableAndConsistentWorkflowStarter.class);
 
     public static final String TASK_LIST = "poc-tl-greeting-queryable-and-consistent";
 
     public static void main(String[] args) throws InterruptedException {
-        var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
-        CadenceHelper.startOneWorker(workflowClient,
+        var workflowClient = CadenceManager.createDefaultWorkflowClient(CADENCE_DOMAIN);
+        CadenceManager.startOneWorker(workflowClient,
                 TASK_LIST,
                 new Class<?>[]{ GreetingQueryableAndConsistentWorkflow.class },
                 new Object[]{});

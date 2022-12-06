@@ -3,15 +3,14 @@ package team.boolbee.poc.cadence.starters;
 import com.google.common.base.Throwables;
 import com.uber.cadence.client.WorkflowException;
 import com.uber.cadence.client.WorkflowOptions;
-import com.uber.cadence.workflow.Workflow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import team.boolbee.poc.cadence.entities.CadenceHelper;
+import team.boolbee.poc.cadence.entities.CadenceManager;
 import team.boolbee.poc.cadence.entities.activities.TripBookingActivities;
 import team.boolbee.poc.cadence.entities.workflows.ITripBookingSagaWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.TripBookingSagaWorkflow;
 
-import static team.boolbee.poc.cadence.entities.CadenceConstants.DOMAIN;
+import static team.boolbee.poc.cadence.Constants.CADENCE_DOMAIN;
 
 public class TripBookingSagaWorkflowStarter {
     private static Logger logger = LoggerFactory.getLogger(TripBookingSagaWorkflowStarter.class);
@@ -19,8 +18,8 @@ public class TripBookingSagaWorkflowStarter {
     private static final String TASK_LIST = "poc-tl-trip-booking-saga";
 
     public static void main(String[] args) {
-        var workflowClient = CadenceHelper.createDefaultWorkflowClient(DOMAIN);
-        CadenceHelper.startOneWorker(workflowClient,
+        var workflowClient = CadenceManager.createDefaultWorkflowClient(CADENCE_DOMAIN);
+        CadenceManager.startOneWorker(workflowClient,
                 TASK_LIST,
                 new Class<?>[] { TripBookingSagaWorkflow.class },
                 new Object[] { new TripBookingActivities() });
