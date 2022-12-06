@@ -1,0 +1,34 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>team.boolbee.poc</groupId>
+  <artifactId>team.boolbee.poc.cadence</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Archetype - team.boolbee.poc.cadence</name>
+  <url>http://maven.apache.org</url>
+  <packaging>pom</packaging>
+  <modules>
+    <module>poc-cadence-greeting</module>
+    <module>poc-remote-debug</module>
+  </modules>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.uber.cadence</groupId>
+        <artifactId>cadence-client</artifactId>
+        <version>3.7.2</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-configuration</groupId>
+        <artifactId>commons-configuration</artifactId>
+        <version>1.9</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.3</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+</project>
