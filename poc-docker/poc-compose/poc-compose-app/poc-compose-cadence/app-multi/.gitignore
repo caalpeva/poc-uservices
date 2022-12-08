@@ -1,2 +1,2 @@
-team.boolbee.poc.cadence/poc-cadence-greeting/target/*
-team.boolbee.poc.cadence/.idea/*
+poc-cadence-greeting/target/**
+team.boolbee.poc.cadence/.idea/**
