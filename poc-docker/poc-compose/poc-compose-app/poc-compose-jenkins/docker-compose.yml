@@ -8,6 +8,7 @@ services:
       dockerfile: dockerfile-jenkins-docker
     ports:
       - "8080:8080"
+    #restart: always
     volumes:
       - $PWD/mount/jenkins:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
@@ -21,6 +22,7 @@ services:
       context: .
       dockerfile: dockerfile-jenkins-agent-ssh
     env_file: $PWD/tmp/common.env
+    #restart: always
     networks:
       - network
 
@@ -31,6 +33,7 @@ services:
     ports:
       - "443:443"
       - "80:80"
+    #restart: always
     volumes:
       - "$PWD/mount/gitlab/config:/etc/gitlab"
       - "$PWD/mount/gitlab/logs:/var/log/gitlab"
@@ -44,6 +47,7 @@ services:
     restart: always
     ports:
       - "5000:5000"
+    #restart: always
     volumes:
       - $PWD/mount/docker-registry/:/var/lib/registry
     networks:
@@ -52,6 +56,7 @@ services:
   machine_ssh:
     container_name: poc_server_ssh
     image: poc-centos-server-ssh:keys
+    #restart: always
     networks:
       - network
 
