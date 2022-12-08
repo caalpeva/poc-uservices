@@ -10,7 +10,7 @@ import team.boolbee.poc.cadence.starters.GreetingWorkflowStarter;
 import java.time.Duration;
 
 public class GreetingWorkflowWithRetries implements IGreetingWorkflow {
-    private static Logger logger = Workflow.getLogger(GreetingWorkflowStarter.class);
+    private static Logger logger = Workflow.getLogger(GreetingWorkflowWithRetries.class);
     private final IGreetingActivities activities =
             Workflow.newActivityStub(IGreetingActivities.class,
                     new ActivityOptions.Builder()

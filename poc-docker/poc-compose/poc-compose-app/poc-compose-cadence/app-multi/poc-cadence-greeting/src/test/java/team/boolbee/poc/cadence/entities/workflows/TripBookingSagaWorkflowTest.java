@@ -8,6 +8,7 @@ import com.uber.cadence.worker.Worker;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import team.boolbee.poc.cadence.entities.activities.ITripBookingActivities;
 import team.boolbee.poc.cadence.entities.activities.TripBookingActivities;
 
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -85,5 +87,10 @@ public class TripBookingSagaWorkflowTest {
         }
 
         verify(activities).cancelCar(eq(CAR_RESERVATION_ID), eq(CUSTOMER));
+
+        InOrder inOrder = inOrder(activities);
+        inOrder.verify(activities).reserveCar(eq(CUSTOMER));
+        inOrder.verify(activities).reserveHotel(eq(CUSTOMER));
+        inOrder.verify(activities).cancelCar(eq(CAR_RESERVATION_ID), eq(CUSTOMER));
     }
 }
