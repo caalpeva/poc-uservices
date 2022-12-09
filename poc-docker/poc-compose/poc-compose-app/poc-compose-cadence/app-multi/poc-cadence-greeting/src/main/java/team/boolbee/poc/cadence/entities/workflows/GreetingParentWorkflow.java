@@ -27,7 +27,7 @@ public class GreetingParentWorkflow implements IGreetingParentWorkflow {
     }
 
     private String waitForChildWorkflowExecution(IGreetingChildWorkflow childWorkflow, String name) {
-        // Use child.composeGreeting("Hello", name) to call synchronously.
+        // Use childWorkflow.composeGreeting("Hello", name) to call synchronously.
         // This is a non blocking call that returns immediately.
         Promise<String> greeting = Async.function(childWorkflow::composeGreeting, "Hello", name);
         // Do something else here.
@@ -35,7 +35,7 @@ public class GreetingParentWorkflow implements IGreetingParentWorkflow {
     }
 
     private String executeChildWorkflowParallel(IGreetingChildWorkflow childWorkflow, String name) {
-        IGreetingChildWorkflow child = Workflow.newChildWorkflowStub(IGreetingChildWorkflow.class);
+        // non blocking call that initiated child workflow
         Promise<String> greeting = Async.function(childWorkflow::composeGreeting, "Hello", name);
         // Instead of using greeting.get() to block till child complete,
         // sometimes we just want to return parent immediately and keep child running
