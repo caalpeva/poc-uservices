@@ -77,6 +77,6 @@ public class GreetingActivitiesWithDelayTest {
         String greeting = workflow.getGreeting("World");
         assertEquals("Hello World!", greeting);
 
-        verify(activities, times(4)).composeGreeting(anyString(), anyString());
+        verify(activities, times(4)).composeGreeting("Hello", "World");
     }
 }

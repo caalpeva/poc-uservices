@@ -85,11 +85,11 @@ public class TripBookingSagaWorkflowTest {
             assertEquals("Hotel booking did not work", e.getCause().getCause().getMessage());
         }
 
-        verify(activities).cancelCar(eq(CAR_RESERVATION_ID), eq(CUSTOMER));
+        verify(activities).cancelCar(CAR_RESERVATION_ID, CUSTOMER);
 
         InOrder inOrder = inOrder(activities);
-        inOrder.verify(activities).reserveCar(eq(CUSTOMER));
-        inOrder.verify(activities).reserveHotel(eq(CUSTOMER));
-        inOrder.verify(activities).cancelCar(eq(CAR_RESERVATION_ID), eq(CUSTOMER));
+        inOrder.verify(activities).reserveCar(CUSTOMER);
+        inOrder.verify(activities).reserveHotel(CUSTOMER);
+        inOrder.verify(activities).cancelCar(CAR_RESERVATION_ID, CUSTOMER);
     }
 }
