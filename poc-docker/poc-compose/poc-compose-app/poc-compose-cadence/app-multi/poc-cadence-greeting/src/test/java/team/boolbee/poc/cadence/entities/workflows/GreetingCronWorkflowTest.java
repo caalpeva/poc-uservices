@@ -1,8 +1,7 @@
-package team.boolbee.poc.cadence.entities.activities;
+package team.boolbee.poc.cadence.entities.workflows;
 
 import com.uber.cadence.*;
 import com.uber.cadence.client.WorkflowClient;
-import com.uber.cadence.client.WorkflowException;
 import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.testing.TestWorkflowEnvironment;
 import com.uber.cadence.worker.Worker;
@@ -10,18 +9,18 @@ import org.apache.thrift.TException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import team.boolbee.poc.cadence.entities.activities.GreetingActivities;
 import team.boolbee.poc.cadence.entities.workflows.GreetingCronWorkflow;
-import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingCronWorkflow;
-import team.boolbee.poc.cadence.entities.workflows.IGreetingWorkflow;
 
 import java.time.Duration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class GreetingCronActivitiesTest {
+public class GreetingCronWorkflowTest {
 
     private  final String TASK_LIST = "poc-tl-greeting-cron-test";
     private final String WORKFLOW_ID = "WorkflowId";
@@ -72,5 +71,40 @@ public class GreetingCronActivitiesTest {
         for (WorkflowExecutionInfo e : listResponse.getExecutions()) {
             assertEquals(WorkflowExecutionCloseStatus.CONTINUED_AS_NEW, e.getCloseStatus());
         }
+    }
+
+    @Test
+    public void testGreetingWithMockActivities() throws TException {
+        GreetingActivities activities = mock(GreetingActivities.class);
+        worker.registerActivitiesImplementations(activities);
+        testWorkflowEnvironment.start();
+
+        // Get a workflow stub using the same task list the worker uses.
+        IGreetingCronWorkflow workflow = workflowClient.newWorkflowStub(
+                IGreetingCronWorkflow.class,
+                new WorkflowOptions.Builder()
+                        .setTaskList(TASK_LIST)
+                        .setWorkflowId(WORKFLOW_ID)
+                        .build());
+
+        // Start a workflow execution async
+        WorkflowExecution workflowExecution = WorkflowClient.start(workflow::greetPeriodically,"World");
+        assertEquals(WORKFLOW_ID, workflowExecution.getWorkflowId());
+
+        // Validate that workflow was continued as new at least once.
+        // Use TestWorkflowEnvironment.sleep to execute the unit test without really sleeping.
+        testWorkflowEnvironment.sleep(Duration.ofMinutes(2));
+        ListClosedWorkflowExecutionsRequest request =
+                new ListClosedWorkflowExecutionsRequest()
+                        .setDomain(testWorkflowEnvironment.getDomain())
+                        .setExecutionFilter(new WorkflowExecutionFilter().setWorkflowId(WORKFLOW_ID));
+        ListClosedWorkflowExecutionsResponse listResponse =
+                testWorkflowEnvironment.getWorkflowService().ListClosedWorkflowExecutions(request);
+        assertTrue(listResponse.getExecutions().size() > 1);
+        for (WorkflowExecutionInfo e : listResponse.getExecutions()) {
+            assertEquals(WorkflowExecutionCloseStatus.CONTINUED_AS_NEW, e.getCloseStatus());
+        }
+
+        verify(activities, atLeast(3)).composeGreeting(anyString(), anyString());
     }
 }
