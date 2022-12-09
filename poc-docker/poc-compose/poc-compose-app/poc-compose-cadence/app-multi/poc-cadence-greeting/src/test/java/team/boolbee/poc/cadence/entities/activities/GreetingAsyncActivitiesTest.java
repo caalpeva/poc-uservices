@@ -70,5 +70,7 @@ public class GreetingAsyncActivitiesTest {
         assertEquals("Hello World!\nBye World!", greeting);
 
         verify(activities, times(2)).composeGreeting(anyString(), anyString());
+        verify(activities, times(1)).composeGreeting("Hello", "World");
+        verify(activities, times(1)).composeGreeting("Bye", "World");
     }
 }
