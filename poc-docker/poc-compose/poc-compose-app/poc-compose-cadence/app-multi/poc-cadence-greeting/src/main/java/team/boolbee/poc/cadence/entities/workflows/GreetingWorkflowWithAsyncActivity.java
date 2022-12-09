@@ -17,7 +17,16 @@ public class GreetingWorkflowWithAsyncActivity implements IGreetingWorkflow {
     public String getGreeting(String name) {
         // Async.invoke takes method reference and activity parameters and returns Promise.
         Promise<String> hello = Async.function(activities::composeGreeting, "Hello", name);
-        Promise<String> bye = Async.function(activities::composeGreeting, "Bye", name);
+        /*Promise<String> hello = Async.function(() -> {
+            return activities.composeGreeting("Hello", name);
+        });*/
+        // Async.invoke accepts not only activity or child workflow method references
+        // but lambda functions as well. Behind the scene it allocates a thread
+        // to execute it asynchronously.
+        //Promise<String> bye = Async.function(activities::composeGreeting, "Bye", name);
+        Promise<String> bye = Async.function(() -> {
+            return activities.composeGreeting("Bye", name);
+        });
 
         // Promise is similar to the Java Future. Promise#get blocks until result is ready.
         return hello.get() + "\n" + bye.get();

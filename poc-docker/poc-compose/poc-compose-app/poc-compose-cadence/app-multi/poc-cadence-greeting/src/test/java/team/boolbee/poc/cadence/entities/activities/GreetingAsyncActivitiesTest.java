@@ -7,7 +7,6 @@ import com.uber.cadence.worker.Worker;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflowWithAsyncActivity;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingWorkflow;
 

@@ -6,11 +6,7 @@ import com.uber.cadence.testing.TestWorkflowEnvironment;
 import com.uber.cadence.worker.Worker;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
-import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflow;
 import team.boolbee.poc.cadence.entities.workflows.GreetingWorkflowWithRetries;
 import team.boolbee.poc.cadence.entities.workflows.IGreetingWorkflow;
 
