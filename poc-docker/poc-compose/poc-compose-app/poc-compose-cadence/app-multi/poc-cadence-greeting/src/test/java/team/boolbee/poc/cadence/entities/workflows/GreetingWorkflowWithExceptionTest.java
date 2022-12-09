@@ -30,7 +30,6 @@ import static org.mockito.Mockito.*;
 public class GreetingWorkflowWithExceptionTest {
 
     private  final String TASK_LIST = "poc-tl-greeting-exception-test";
-    private final String WORKFLOW_ID = "WorkflowId";
     private TestWorkflowEnvironment testWorkflowEnvironment;
     private WorkflowClient workflowClient;
     private Worker worker;
