@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GreetingWorkflowWithSignals implements IGreetingWorkflowWithSignals {
-    private static Logger logger = Workflow.getLogger(GreetingWorkflowStarter.class);
+    private static Logger logger = Workflow.getLogger(GreetingWorkflowWithSignals.class);
 
     List<String> messages = new ArrayList<>(10);
     boolean exit = false;
@@ -17,10 +17,8 @@ public class GreetingWorkflowWithSignals implements IGreetingWorkflowWithSignals
     @Override
     public List<String> getGreetings() {
         logger.info(Workflow.getWorkflowInfo().getWorkflowId());
-        while (true) {
-            Workflow.await(() -> exit);
-            return messages;
-        }
+        Workflow.await(() -> exit);
+        return messages;
     }
 
     @Override

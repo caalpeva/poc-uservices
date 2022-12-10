@@ -26,8 +26,9 @@ public class GreetingQueryableWorkflowTest {
     @Before
     public void setUp() {
         testWorkflowEnvironment = TestWorkflowEnvironment.newInstance();
-        workflowClient = testWorkflowEnvironment.newWorkflowClient();
         worker = testWorkflowEnvironment.newWorker(TASK_LIST);
+        worker.registerWorkflowImplementationTypes(GreetingQueryableWorkflow.class);
+        workflowClient = testWorkflowEnvironment.newWorkflowClient();
     }
 
     @After
@@ -36,8 +37,7 @@ public class GreetingQueryableWorkflowTest {
     }
 
     @Test
-    public void testGreeting() {
-        worker.registerWorkflowImplementationTypes(GreetingQueryableWorkflow.class);
+    public void testGreetings() {
         testWorkflowEnvironment.start();
 
         // Get a workflow stub using the same task list the worker uses.
