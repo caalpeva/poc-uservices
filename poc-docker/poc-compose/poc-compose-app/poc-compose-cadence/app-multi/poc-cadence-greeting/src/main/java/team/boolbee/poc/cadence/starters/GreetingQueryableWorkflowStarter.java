@@ -40,7 +40,7 @@ public class GreetingQueryableWorkflowStarter {
         System.out.println(workflow.queryGreeting()); // Should print Hello...
         // Note that inside a workflow only WorkflowThread.sleep is allowed. Outside
         // WorkflowThread.sleep is not allowed.
-        Thread.sleep(2500);
+        Thread.sleep(3000);
         System.out.println(workflow.queryGreeting()); // Should print Bye ...
         System.exit(0);
     }
