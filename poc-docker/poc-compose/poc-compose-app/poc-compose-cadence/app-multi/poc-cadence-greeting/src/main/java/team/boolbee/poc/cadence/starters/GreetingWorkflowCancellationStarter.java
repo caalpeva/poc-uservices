@@ -26,7 +26,7 @@ public class GreetingWorkflowCancellationStarter {
                 new Object[] { activities });
 
         // NOTE: strongly typed workflow stub doesn't cancel method.
-        WorkflowStub workflow = workflowClient.newUntypedWorkflowStub(
+        WorkflowStub untypedWorkflow = workflowClient.newUntypedWorkflowStub(
                 "IGreetingWorkflow::getGreeting",
                 new WorkflowOptions.Builder()
                         .setTaskList(TASK_LIST)
@@ -34,9 +34,9 @@ public class GreetingWorkflowCancellationStarter {
                         .build());
 
         try {
-            workflow.start("World");
-            workflow.cancel(); // Issue cancellation request. This will trigger a CancellationException on the workflow.
-            workflow.getResult(String.class);
+            untypedWorkflow.start("World");
+            untypedWorkflow.cancel(); // Issue cancellation request. This will trigger a CancellationException on the workflow.
+            untypedWorkflow.getResult(String.class);
         } catch (CancellationException e) {
             logger.warn("Workflow cancelled");
         }

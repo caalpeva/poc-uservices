@@ -34,6 +34,7 @@ public class GreetingWorkflowWithExceptionStarter {
 
         try {
             String greeting = workflow.getGreeting("World", false);
+            System.out.println(greeting);
             throw new IllegalStateException("unreachable");
         } catch (WorkflowException e) {
             Throwable cause = Throwables.getRootCause(e);

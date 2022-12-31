@@ -17,6 +17,7 @@ public class GreetingWorkflow implements IGreetingWorkflow {
 
     @Override
     public String getGreeting(String name) {
+        //return "Hello " + name + "!";
         // This is a blocking call that returns only after the activity has completed.
         return activities.composeGreeting("Hello", name);
     }

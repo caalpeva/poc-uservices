@@ -20,6 +20,7 @@ public class GreetingChildWorkflow implements IGreetingChildWorkflow {
     @Override
     public String composeGreeting(String greeting, String name) {
         //return greeting + " " + name + "!";
+        // This is a blocking call that returns only after the activity has completed.
         return activities.composeGreeting(greeting, name);
     }
 }
