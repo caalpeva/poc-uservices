@@ -1,3 +1,4 @@
+.idea/
 dependencies/downloads/**
 poc-docker/poc-images/poc-push-images-to-registry-alternate/data/**
 poc-docker/poc-images/poc-push-images-to-registry-alternate/backups/**
@@ -7,3 +8,5 @@ poc-docker/poc-compose/poc-compose-app/poc-compose-jenkins/tmp/**
 poc-k8s/poc-rbac/ca/**
 poc-k8s/poc-rbac/tmp/**
 poc-k8s/poc-probes/poc-probe-startup/tmp/**
+poc-docker/poc-compose/poc-compose-app/poc-compose-java/target/
+
