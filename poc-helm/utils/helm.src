@@ -1,0 +1,525 @@
+#!/bin/echo "source me !"
+# Requires: /../../dependencies/downloads/poc-bash-master/includes/print-utils.src
+# 	    /../../dependencies/downloads/poc-bash-master/includes/trace-utils.src
+#       /../../dependencies/downloads/poc-bash-master/includes/progress-bar-utils.src
+#           /../../utils/microservices-utils.src
+
+##########################
+#   BASIC HELM METHODS   #
+##########################
+
+function helm::showSearchUsage() {
+  print_info "Show helm search usage"
+  xtrace on
+  helm search --help
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::searchChartsFromHub() {
+  print_info "Search helm charts from hub: $1"
+  xtrace on
+  helm search hub $1 --burst-limit 5
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::searchChartsFromRepos() {
+  print_info "Search helm charts from repositories: $1"
+  xtrace on
+  helm search repo $1 --burst-limit 5
+  xtrace off
+  checkInteractiveMode
+}
+
+
+function helm::showPullUsage() {
+  print_info "Show docker pull usage"
+  xtrace on
+  docker pull --help
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::getNetworkList() {
+  print_info "Show docker networks"
+  xtrace on
+  docker network ls
+  xtrace off
+  checkInteractiveMode
+}
+
+
+function docker::pullImage() {
+  local option=${2:-}
+  print_info "Download docker image: $1"
+  xtrace on
+  docker pull $1 $option
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::showHistoryUsage() {
+  print_info "Show docker history usage"
+  xtrace on
+  docker history --help
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::getImageHistory() {
+  local option=${2:-}
+  print_info "Show docker image history: $1"
+  xtrace on
+  docker history $1 $option
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::showImagesUsage() {
+  print_info "Show docker images usage"
+  xtrace on
+  docker images --help
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::getImages() {
+  local option=${1:-}
+  print_info "Show docker images"
+  xtrace on
+  docker images $option
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::getImagesWithTags() {
+  xtrace on
+  docker images | grep $@ | awk '{ print $1":"$2}'
+  xtrace off
+}
+
+function docker::getImagesByPrefix() {
+  xtrace on
+  docker images | grep $1
+  xtrace off
+}
+
+function docker::showImagesByPrefix {
+  status=$(docker::getImagesByPrefix $1)
+  docker images | head -1
+  echo "$status"
+  checkInteractiveMode
+}
+
+function docker::createImageFromDockerfile() {
+  print_info "Create image from Dockerfile"
+  xtrace on
+  docker build -t $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::createBuilderImageFromDockerfile() {
+  print_info "Create builder image from Dockerfile"
+  xtrace on
+  docker build --target builder -t  $1 $2
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::removeImages() {
+  print_info "Remove images: $*"
+  xtrace on
+  docker rmi $@
+  xtrace off
+}
+
+function docker::removeAllImages() {
+  print_info "Removing all images..."
+  xtrace on
+  docker rmi $(docker images -aq)
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::copyFiles() {
+  xtrace on
+  docker cp $1 $2
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::saveImage() {
+  xtrace on
+  docker save -o $1 $2
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::loadImage() {
+  xtrace on
+  docker load -i $1
+  xtrace off
+  checkInteractiveMode
+}
+
+
+##############################
+#  AUXILIARY DOCKER METHODS  #
+##############################
+
+function docker::getContainerStatus() {
+  xtrace on
+  docker ps -a
+  xtrace off
+}
+
+function docker::getContainerStatusByPrefix() {
+  xtrace on
+  docker ps -a | grep $1
+  xtrace off
+}
+
+function docker::showContainersByPrefix {
+  status=$(docker::getContainerStatusByPrefix $1)
+  docker ps -a | head -1
+  echo "$status"
+  checkInteractiveMode
+}
+
+function docker::getContainerLongIdByName() {
+  docker inspect --format="{{.Id}}" $1
+}
+
+function docker::getRunningContainerIdsByPrefix {
+  xtrace on
+  docker ps -qf "name=^$1*"
+  xtrace off
+}
+
+function docker::getExitedContainerIdsByPrefix {
+  xtrace on
+  docker ps -q \
+    --filter "status=exited" \
+    --filter "name=^$1*"
+  xtrace off
+}
+
+function docker::getAllContainerIdsByPrefix {
+  #docker ps --format 'CONTAINER ID : {{.ID}} | Name: {{.Names}} | Image:  {{.Image}} |  Ports: {{.Ports}}'
+  xtrace on
+  docker ps -aqf "name=^$1*"
+  xtrace off
+}
+
+function docker::showLogs() {
+  xtrace on
+  docker logs $1
+  xtrace off
+}
+
+function docker::removeContainersOneByOne() {
+  echo "Containers: $*"
+  if [ $# -gt 0 ]
+  then
+    for containerId in $@
+    do
+      xtrace on
+      docker rm -f $containerId
+      xtrace off
+    done
+  fi
+}
+
+function docker::removeContainers() {
+  echo "Containers: $*"
+  if [ $# -gt 0 ]
+  then
+      xtrace on
+      docker rm -f $*
+      xtrace off
+  fi
+}
+
+function docker::removeAllContainers {
+  docker rm -f $(docker ps -aq)
+}
+
+function docker::getIpAddressFromContainer {
+  local container=$1
+  local network=$2
+  if [ -z $network ]; then
+    xtrace on
+    docker inspect -f "{{ .NetworkSettings.IPAddress }}" $container
+    xtrace off
+  else
+    xtrace on
+    docker inspect -f "{{ .NetworkSettings.Networks.$network.IPAddress }}" $container
+    xtrace off
+  fi
+}
+
+function docker::getRestartCountFromContainer {
+  local container=$1
+  xtrace on
+  docker inspect -f "{{ .RestartCount }}" $container
+  xtrace off
+}
+
+function docker::getContainerStatus {
+  local container=$1
+  xtrace on
+  docker inspect -f "{{ .State.Status }}" $container
+  xtrace off
+}
+
+function docker::getFirstHostPortFromContainerData {
+  xtrace on
+  docker inspect --format "{{ (index (index .NetworkSettings.Ports \"$2/tcp\") 0).HostPort }}" $1
+  xtrace off
+}
+
+function docker::getContainerMounts() {
+  print_info "Checking mounts from container $1..."
+  xtrace on
+  docker inspect -f '{{ json .Mounts }}' $1
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::attachContainer() {
+  xtrace on
+  docker attach $1
+  xtrace off
+}
+
+function docker::createVolume() {
+  xtrace on
+  docker volume create $1
+  xtrace off
+}
+
+function docker::listVolumes() {
+  xtrace on
+  docker volume list
+  xtrace off
+}
+
+function docker::removeVolumes() {
+  xtrace on
+  docker volume rm $*
+  xtrace off
+}
+
+function docker::createNetwork() {
+  local options=$1
+  local name=$2
+  xtrace on
+  docker network create $options $name
+  xtrace off
+}
+
+function docker::removeNetwork() {
+  xtrace on
+  docker network rm $*
+  xtrace off
+}
+
+function docker::execContainer() {
+  xtrace on
+  docker exec $1 $2
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::execContainerAsRoot() {
+  container=$1
+  shift
+  command="docker exec -u root $container $@"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
+function docker::execContainerAsRootDos() {
+  container=$1
+  shift
+  xtrace on
+  docker exec -u root $container $@
+  xtrace off
+}
+
+function docker::execContainerWithTty() {
+  xtrace on
+  docker exec -it $1 $2
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::execContainerPing() {
+  from=$1
+  to=$2
+  command="docker exec $from ping $to -c 3"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
+function docker::execContainerPingAsRoot() {
+  from=$1
+  to=$2
+  command="docker exec -u root $from ping $to -c 3"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
+function docker::startContainers() {
+  xtrace on
+  docker start $@
+  xtrace off
+}
+
+function docker::stopContainers() {
+  xtrace on
+  docker stop $@
+  xtrace off
+}
+
+function docker::checkUrl  {
+  command="curl $1"
+  echo "+ $command"
+  eval "$command"
+  return $?
+}
+
+function docker::checkHttpServerAvailability  {
+  declare -i result=0
+  print_info "Check that the Http server from $1 is available..."
+  print_debug "Extract host port from container data..."
+  port=$(docker::getFirstHostPortFromContainerData $1 $2)
+
+  docker::checkUrl "http://localhost:${port}"
+  if [ $? -ne 0 ]
+  then
+    print_error "Http server from $1 is not available"
+    result=1
+  fi
+
+  checkInteractiveMode
+  return $result
+}
+
+function docker::pushImage() {
+  xtrace on
+  docker push $1
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::tagImage() {
+  local localImage=$1
+  local newLocalImage=$2
+
+  xtrace on
+  docker tag $localImage $newLocalImage
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::networkInspect() {
+  xtrace on
+  docker network inspect $1 | grep -iE 'subnet|gateway'
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::connectToNetwork() {
+  local network=$1
+  local container=$2
+  xtrace on
+  docker network connect $network $container
+  xtrace off
+}
+
+function docker::disconnectToNetwork() {
+  local network=$1
+  local container=$2
+  xtrace on
+  docker network disconnect $network $container
+  xtrace off
+}
+
+function docker::showNetworkInterfaces() {
+  container=$1
+  xtrace on
+  docker exec $container hostname
+  docker exec $container ip addr
+  docker exec $container ip route
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::stats() {
+  container=$1
+  xtrace on
+  docker stats $container hostname
+  docker exec $container ip addr
+  docker exec $container ip route
+  xtrace off
+  checkInteractiveMode
+}
+
+function docker::stats() {
+  xtrace on
+  docker stats $@
+  xtrace off
+}
+
+function docker::getStatsByPrefix() {
+  xtrace on
+  docker stats --no-stream | grep $1
+  xtrace off
+}
+
+function docker::showStatsByPrefix {
+  stats=$(docker::getStatsByPrefix $1)
+  docker stats --no-stream | head -1
+  echo "$stats"
+  checkInteractiveMode
+}
+
+function docker::createImageAndPushToDockerHub {
+  image=$1
+  snapshot=$2
+  tag=$3
+  username=$4
+  dir=$5
+  docker::createImageFromDockerfile "$image:$snapshot" $dir
+
+  print_info "Retag image for Docker Hub with username"
+  docker::tagImage "$image:$snapshot" "$username/$image:$tag"
+
+  print_info "Filter images by name"
+  docker::showImagesByPrefix $image
+
+  print_info "Push image to Docker Hub"
+  docker::pushImage "$username/$image:$tag"
+}
+
+##########################
+#  DOCKER LOGIN METHODS  #
+##########################
+
+function docker::loginPrompt {
+  read -p "Username: " username
+  echo $username
+}
+
+function docker::login {
+  xtrace on
+  docker login --username $1
+  xtrace off
+  checkInteractiveMode
+}
