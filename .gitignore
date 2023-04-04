@@ -9,4 +9,5 @@ poc-k8s/poc-rbac/ca/**
 poc-k8s/poc-rbac/tmp/**
 poc-k8s/poc-probes/poc-probe-startup/tmp/**
 poc-docker/poc-compose/poc-compose-app/poc-compose-java/target/
+poc-helm/poc-charts/poc-create-chart/nginx
 

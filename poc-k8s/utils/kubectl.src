@@ -623,7 +623,8 @@ function kubectl::showEndpointsByService() {
   kubectl::manageArguments $@
   xtrace on
   kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get endpoints $service
+    get endpoints $service \
+    ${LABELS:+-l $LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -641,6 +642,7 @@ function kubectl::showEndpointsByLabels() {
 function kubectl::getPortByService() {
   service=$1
   targetPort=$2
+  shift
   shift
   kubectl::manageArguments $@
   xtrace on
