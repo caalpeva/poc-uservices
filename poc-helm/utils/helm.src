@@ -38,6 +38,30 @@ function helm::searchChartsFromRepos() {
   checkInteractiveMode
 }
 
+function helm::packageChart() {
+  print_info "Package a chart directory into a chart archive"
+  xtrace on
+  helm package $@
+  xtrace off
+  checkInteractiveMode
+}
+
+# echo "mypass" | helm registry login $REGISTRY_URL -u myuser --password-stdin
+
+function helm::pullChart() {
+  xtrace on
+  helm pull $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::pushChart() {
+  xtrace on
+  helm push $@
+  xtrace off
+  checkInteractiveMode
+}
+
 function helm::createChart() {
   print_info "Create chart"
   xtrace on
