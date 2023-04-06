@@ -53,14 +53,14 @@ function main() {
   helm::showSearchUsage
   helm::searchChartsFromHub $CHART_FILTER
 
-  print_info "Add one repositories to local helm client"
+  print_info "Add a repository reference"
   helm::addRepo stable https://charts.helm.sh/stable
   checkInteractiveMode
 
   helm::listRepos
   helm::searchChartsFromRepos $CHART_FILTER
 
-  print_info "Add more repositories to local helm client"
+  print_info "Add more repository references"
   helm::addRepo incubator https://charts.helm.sh/incubator
   helm::addRepo bitnami	https://charts.bitnami.com/bitnami
   checkInteractiveMode

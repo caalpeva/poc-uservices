@@ -49,14 +49,11 @@ function cleanup() {
   print_debug "Cleaning environment..."
   if [ -n "$PORT_FORWARD_PID" ]; then
     print_info "Kill the execution of the port-forward command"
-    xtrace on
-    kill -9 $PORT_FORWARD_PID
-    xtrace off
+    evalCommand kill -9 $PORT_FORWARD_PID
   fi
   helm::uninstallChart $CHART_RELEASE
   kubectl delete ns $NAMESPACE
   evalCommand rm -rf ${TMP_DIRECTORY}
-  xtrace off
 }
 
 function main() {

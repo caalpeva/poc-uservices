@@ -12,6 +12,8 @@ source "${DIR}/../../utils/helm.src"
 # VARIABLES #
 #############
 
+TMP_DIRECTORY="${DIR}/tmp"
+
 NAMESPACE="poc-charts"
 
 CHART_NAME="nginx"
@@ -34,6 +36,10 @@ function initialize() {
   setTerminalSignals
   check_mandatory_command_installed tree
   cleanup
+  print_debug "Creating temporal directory..."
+  if [ ! -d ${TMP_DIRECTORY} ]; then
+    evalCommand mkdir ${TMP_DIRECTORY}
+  fi
 }
 
 function handleTermSignal() {
@@ -47,12 +53,11 @@ function cleanup() {
   print_debug "Cleaning environment..."
   if [ -n "$PORT_FORWARD_PID" ]; then
     print_info "Kill the execution of the port-forward command"
-    xtrace on
-    kill -9 $PORT_FORWARD_PID
-    xtrace off
+    evalCommand -9 $PORT_FORWARD_PID
   fi
   helm::uninstallChart $CHART_RELEASE
   kubectl delete ns $NAMESPACE
+  evalCommand rm -rf ${TMP_DIRECTORY}
 }
 
 function main() {
