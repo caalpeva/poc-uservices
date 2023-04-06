@@ -61,7 +61,7 @@ function main() {
   checkArguments $@
   initialize
 
-  print_box "CREATE CHART STRUCTURE" \
+  print_box "CHART STRUCTURE CREATION" \
     "" \
     " - Proof of concept about creation of a chart directory"
   checkInteractiveMode

@@ -13,6 +13,7 @@ source "${DIR}/../../utils/helm.src"
 #############
 
 TMP_DIRECTORY="${DIR}/tmp"
+CHARTS_DIRECTORY="${DIR}/charts"
 
 NAMESPACE="poc-charts"
 
@@ -65,20 +66,23 @@ function main() {
   checkArguments $@
   initialize
 
-  print_box "PACKAGE CHART ARCHIVE" \
+  print_box "CHART PACKAGE" \
     "" \
-    " - Proof of concept about chart archive package"
+    " - Proof of concept about chart archive packaging"
   checkInteractiveMode
 
   kubectl::showNodes
 
   print_info "Show the content of the chart directory"
-  evalCommand tree -a "${DIR}/$CHART_NAME"
+  evalCommand tree -a "${CHARTS_DIRECTORY}/$CHART_NAME"
   checkInteractiveMode
 
-  helm::packageChart $CHART_NAME --version $CHART_VERSION
+  helm::lintChart "${CHARTS_DIRECTORY}/$CHART_NAME"
+  helm::packageChart "${CHARTS_DIRECTORY}/$CHART_NAME" \
+    --version $CHART_VERSION \
+    --destination $TMP_DIRECTORY
 
-  helm::installChart $CHART_RELEASE $CHART_FILENAME \
+  helm::installChart $CHART_RELEASE "$TMP_DIRECTORY/$CHART_FILENAME" \
     --namespace $NAMESPACE --create-namespace
 
   print_info "Show chart instance"
