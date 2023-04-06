@@ -23,20 +23,48 @@ function helm::showSearchUsage() {
 }
 
 function helm::searchChartsFromHub() {
-  print_info "Search helm charts from hub: $1"
+  print_info "Search helm charts from Artifact Hub"
   xtrace on
-  helm search hub $1 --burst-limit 5
+  helm search hub $1
   xtrace off
   checkInteractiveMode
 }
 
 function helm::searchChartsFromRepos() {
-  print_info "Search helm charts from repositories: $1"
+  print_info "Search helm charts from repositories"
   xtrace on
-  helm search repo $1 --burst-limit 5
+  helm search repo $1
   xtrace off
   checkInteractiveMode
 }
+
+function helm::addRepo() {
+  xtrace on
+  helm repo add $1 $2
+  xtrace off
+}
+
+function helm::listRepos() {
+  print_info "List the repositories"
+  xtrace on
+  helm repo list
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::updateRepos() {
+  print_info "Update repositories"
+  xtrace on
+  helm repo update
+  xtrace off
+}
+
+function helm::removeRepo() {
+  xtrace on
+  helm repo remove $1
+  xtrace off
+}
+
 
 function helm::packageChart() {
   print_info "Package a chart directory into a chart archive"
