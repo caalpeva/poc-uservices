@@ -6,7 +6,7 @@ source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-ut
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/network-utils.src"
 source "${DIR}/../../utils/docker.src"
-source "${DIR}/../../../utils/microservices-utils.src"
+source "${DIR}/../../../utils/uservices.src"
 
 #############
 # VARIABLES #

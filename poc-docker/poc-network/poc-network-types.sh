@@ -4,7 +4,7 @@ DIR=$(dirname $(readlink -f $0))
 
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../utils/microservices-utils.src"
+source "${DIR}/../../utils/uservices.src"
 source "${DIR}/../utils/docker.src"
 
 CONTAINER_PREFIX="poc_alpine"
