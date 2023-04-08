@@ -53,7 +53,7 @@ function helm::listRepos() {
 }
 
 function helm::updateRepos() {
-  print_info "Update repositories"
+  print_info "Update information of available charts locally from chart repositories"
   xtrace on
   helm repo update
   xtrace off
@@ -88,16 +88,41 @@ function helm::packageChart() {
   checkInteractiveMode
 }
 
+function helm::showDefaultAllChartValues() {
+  print_debug "Inspect chart and display the content of the default values.yaml file"
+  xtrace on
+  helm show values $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::showDefaultLimitedChartValues() {
+  lines=$1
+  shift
+  xtrace on
+  helm show values $@ | head -$lines
+  xtrace off
+  checkInteractiveMode
+}
+
 function helm::installChart() {
   print_info "Install chart"
   xtrace on
-  helm install $@ --wait
+  helm install $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::installChartSilently() {
+  print_info "Install chart (silently)"
+  xtrace on
+  helm install $@ > /dev/null
   xtrace off
   checkInteractiveMode
 }
 
 function helm::getChartReleases() {
-  print_info "Show chart instances"
+  print_info "List chart releases"
   xtrace on
   helm ls
   xtrace off
@@ -120,8 +145,56 @@ function helm::showChartReleasesByPrefix {
   checkInteractiveMode
 }
 
+function helm::getReleaseStatus() {
+  print_info "Check the status of release"
+  xtrace on
+  helm status $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::getCustomValues() {
+  print_info "Get custom values"
+  xtrace on
+  helm get values $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::upgradeChart() {
+  print_info "Upgrade chart release"
+  xtrace on
+  helm upgrade $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::upgradeChartSilently() {
+  print_info "Upgrade chart release (silently)"
+  xtrace on
+  helm upgrade $@ > /dev/null
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::historyChart() {
+  print_info "Show chart release history"
+  xtrace on
+  helm history $@
+  xtrace off
+  checkInteractiveMode
+}
+
+function helm::rollbackChart() {
+  print_info "Rollback chart release"
+  xtrace on
+  helm rollback $@
+  xtrace off
+  checkInteractiveMode
+}
+
 function helm::uninstallChart() {
-  print_info "Uninstall chart"
+  print_info "Uninstall chart release"
   xtrace on
   helm uninstall $@
   xtrace off

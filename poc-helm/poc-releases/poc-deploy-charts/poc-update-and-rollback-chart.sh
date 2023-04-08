@@ -12,11 +12,11 @@ source "${DIR}/../../utils/helm.src"
 # VARIABLES #
 #############
 
-TMP_DIRECTORY="${DIR}/tmp"
+CHARTS_DIRECTORY="${DIR}/charts"
 
 NAMESPACE="poc-charts"
 
-CHART_NAME="nginx"
+CHART_NAME="tomcat"
 CHART_RELEASE="poc-$CHART_NAME"
 SERVICE_NAME=$CHART_RELEASE
 
@@ -32,10 +32,6 @@ function initialize() {
   setTerminalSignals
   check_mandatory_command_installed tree
   cleanup
-  print_debug "Creating temporal directory..."
-  if [ ! -d ${TMP_DIRECTORY} ]; then
-    evalCommand mkdir ${TMP_DIRECTORY}
-  fi
 }
 
 function handleTermSignal() {
@@ -53,7 +49,6 @@ function cleanup() {
   fi
   helm::uninstallChart $CHART_RELEASE --namespace $NAMESPACE
   kubectl delete ns $NAMESPACE
-  evalCommand rm -rf ${TMP_DIRECTORY}
 }
 
 function main() {
@@ -61,30 +56,65 @@ function main() {
   checkArguments $@
   initialize
 
-  print_box "CHART STRUCTURE CREATION" \
+  print_box "UPDATE AND ROLLBACK CHART" \
     "" \
-    " - Proof of concept about creation of a chart directory"
+    " - Proof of concept about chat update and rollback"
   checkInteractiveMode
 
   kubectl::showNodes
-  helm::createChart "${TMP_DIRECTORY}/$CHART_NAME" #--namespace $NAMESPACE
 
-  print_info "Show the content of the directory created"
-  evalCommand tree -a "${TMP_DIRECTORY}/$CHART_NAME"
-  checkInteractiveMode
+  print_info "Before installing the chart, find out what values can be set."
+  helm::showDefaultLimitedChartValues 25 "${CHARTS_DIRECTORY}/$CHART_NAME"
 
-  helm::installChart $CHART_RELEASE "${TMP_DIRECTORY}/$CHART_NAME" \
+  helm::installChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
-    --wait
+    --values ${DIR}/custom-values.yaml \
+    #--wait
 
-  print_info "Show chart instance"
+  print_info "List chart releases"
   helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
   kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
   kubectl::showPods -n $NAMESPACE -l $LABELS
   kubectl::showServices -n $NAMESPACE -l $LABELS
   kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
+
+  helm::upgradeChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
+    --namespace $NAMESPACE \
+    --version 10.6.3 \
+    -f custom-values2.yaml
+
+  print_info "List chart releases"
+  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
+
+  kubectl::showDeployments -n $NAMESPACE -l $LABELS
+  kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
+  kubectl::showPods -n $NAMESPACE -l $LABELS
+  kubectl::showServices -n $NAMESPACE -l $LABELS
+  kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
+
+  print_info "Check chart upgrade"
+  print_debug "Note that service type has changed to nodePort."
+  checkInteractiveMode
+
+  helm::historyChart $CHART_RELEASE \
+    --namespace $NAMESPACE
+
+  helm::rollbackChart $CHART_RELEASE 1 \
+    --namespace $NAMESPACE
+
+  kubectl::showDeployments -n $NAMESPACE -l $LABELS
+  kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
+  kubectl::showPods -n $NAMESPACE -l $LABELS
+  kubectl::showServices -n $NAMESPACE -l $LABELS
+  kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
+
+  print_info "Check chart rollback"
+  print_debug "Note that service type has changed to ClusterIP again."
+  checkInteractiveMode
 
   checkCleanupMode
   print_done "Poc completed successfully"

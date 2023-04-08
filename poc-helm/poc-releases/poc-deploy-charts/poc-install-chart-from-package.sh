@@ -13,14 +13,19 @@ source "${DIR}/../../utils/helm.src"
 #############
 
 TMP_DIRECTORY="${DIR}/tmp"
+CHARTS_DIRECTORY="${DIR}/charts"
 
 NAMESPACE="poc-charts"
 
 CHART_NAME="nginx"
+CHART_VERSION="3.0.0"
+CHART_FILENAME="$CHART_NAME-$CHART_VERSION.tgz"
 CHART_RELEASE="poc-$CHART_NAME"
+
 SERVICE_NAME=$CHART_RELEASE
 
 LABELS="app.kubernetes.io/name=$CHART_NAME,app.kubernetes.io/instance=$CHART_RELEASE"
+
 LOCAL_PORT=8080
 
 #############
@@ -49,7 +54,7 @@ function cleanup() {
   print_debug "Cleaning environment..."
   if [ -n "$PORT_FORWARD_PID" ]; then
     print_info "Kill the execution of the port-forward command"
-    evalCommand kill -9 $PORT_FORWARD_PID
+    evalCommand -9 $PORT_FORWARD_PID
   fi
   helm::uninstallChart $CHART_RELEASE --namespace $NAMESPACE
   kubectl delete ns $NAMESPACE
@@ -61,19 +66,23 @@ function main() {
   checkArguments $@
   initialize
 
-  print_box "CHART STRUCTURE CREATION" \
+  print_box "INSTALL CHART FROM PACKAGE" \
     "" \
-    " - Proof of concept about creation of a chart directory"
+    " - Proof of concept about chat installation from package"
   checkInteractiveMode
 
   kubectl::showNodes
-  helm::createChart "${TMP_DIRECTORY}/$CHART_NAME" #--namespace $NAMESPACE
 
-  print_info "Show the content of the directory created"
-  evalCommand tree -a "${TMP_DIRECTORY}/$CHART_NAME"
+  print_info "Show the content of the chart directory"
+  evalCommand tree -a "${CHARTS_DIRECTORY}/$CHART_NAME"
   checkInteractiveMode
 
-  helm::installChart $CHART_RELEASE "${TMP_DIRECTORY}/$CHART_NAME" \
+  helm::lintChart "${CHARTS_DIRECTORY}/$CHART_NAME"
+  helm::packageChart "${CHARTS_DIRECTORY}/$CHART_NAME" \
+    --version $CHART_VERSION \
+    --destination $TMP_DIRECTORY
+
+  helm::installChart $CHART_RELEASE "$TMP_DIRECTORY/$CHART_FILENAME" \
     --namespace $NAMESPACE --create-namespace \
     --wait
 
@@ -86,7 +95,33 @@ function main() {
   kubectl::showServices -n $NAMESPACE -l $LABELS
   kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
 
+  print_info "Extract port from service"
+  SERVICE_PORT=$(kubectl::getPortByService ${SERVICE_NAME} http -n $NAMESPACE)
+  checkInteractiveMode
+
+  print_info "Forward local port to service port"
+  evalCommand kubectl --namespace poc-charts port-forward service/${SERVICE_NAME} --address 0.0.0.0 ${LOCAL_PORT}:${SERVICE_PORT} "&"
+  PORT_FORWARD_PID=$!
+  checkInteractiveMode
+
+  sleep 3
+  SERVER_AVAILABLE=true
+  print_info "Visit http://localhost:${LOCAL_PORT} to use this application"
+  print_debug "Make request from local port..."
+  executeCurl http://localhost:$LOCAL_PORT
+  if [ $? -ne 0 ]
+  then
+    print_error "Http server is not available"
+    SERVER_AVAILABLE=false
+  fi
+  checkInteractiveMode
   checkCleanupMode
+
+  if [ $SERVER_AVAILABLE = false ]; then
+    print_error "Poc completed with failure"
+    exit 1
+  fi
+
   print_done "Poc completed successfully"
   exit 0
 }

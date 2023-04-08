@@ -8,8 +8,8 @@
 ##########################
 #  K8S GLOBAL VARIABLES  #
 ##########################
-NAMESPACE=""
-LABELS=""
+K8S_NAMESPACE=""
+K8S_LABELS=""
 
 RESTART_TIMEOUT_SECS=300
 RESTART_INTERVAL_SECS=25   # Set interval (duration) in seconds
@@ -160,8 +160,8 @@ function kubectl::showAll() {
 }
 
 function kubectl::resetGlobalVariables() {
-  NAMESPACE=""
-  LABELS=""
+  K8S_NAMESPACE=""
+  K8S_LABELS=""
 }
 
 function kubectl::manageArguments() {
@@ -169,9 +169,9 @@ function kubectl::manageArguments() {
   OPTIND=1
   while getopts "n:l:" option; do
     case ${option} in
-      n) NAMESPACE=$OPTARG
+      n) K8S_NAMESPACE=$OPTARG
          ;;
-      l) LABELS=$OPTARG
+      l) K8S_LABELS=$OPTARG
          ;;
       ?) echo "Invalid option: $OPTARG" 1>&2
          ;;
@@ -208,8 +208,8 @@ function kubectl::showPods() {
   print_info "Show pods"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get pods ${LABELS:+-l $LABELS} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get pods ${K8S_LABELS:+-l $K8S_LABELS} \
     --output wide
   xtrace off
   checkInteractiveMode
@@ -219,7 +219,7 @@ function kubectl::showPodsInAllNamespaces() {
   print_info "Show pods"
   kubectl::manageArguments $@
   xtrace on
-  kubectl get pods --all-namespaces ${LABELS:+-l $LABELS} --output wide
+  kubectl get pods --all-namespaces ${K8S_LABELS:+-l $K8S_LABELS} --output wide
   xtrace off
   checkInteractiveMode
 }
@@ -227,16 +227,16 @@ function kubectl::showPodsInAllNamespaces() {
 function kubectl::getRunningPods() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po ${LABELS:+-l $LABELS} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} get po ${K8S_LABELS:+-l $K8S_LABELS} \
     --no-headers | grep Running | awk '{print $1}'
-  #kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po --no-headers --field-selector=status.phase=Running | awk '{print $1}'
+  #kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} get po --no-headers --field-selector=status.phase=Running | awk '{print $1}'
   xtrace off
 }
 
 function kubectl::getAllPods() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get po ${LABELS:+-l $LABELS} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} get po ${K8S_LABELS:+-l $K8S_LABELS} \
     --no-headers | awk '{print $1}'
   xtrace off
 }
@@ -244,7 +244,7 @@ function kubectl::getAllPods() {
 function kubectl::getPodNames() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get pods ${LABELS:+-l $LABELS} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} get pods ${K8S_LABELS:+-l $K8S_LABELS} \
     --no-headers -o custom-columns=":metadata.name"
   xtrace off
 }
@@ -252,8 +252,8 @@ function kubectl::getPodNames() {
 function kubectl::getPodStatus() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get pods ${LABELS:+-l $LABELS} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get pods ${K8S_LABELS:+-l $K8S_LABELS} \
     --no-headers -o custom-columns=":status.phase"
   xtrace off
 }
@@ -269,7 +269,7 @@ function kubectl::getRamLimitFromDeployment() {
   #kubectl get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.startTime}{"\n"}{end}'
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     get deploy $deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{..resources.limits.memory}{"\n"}'
   xtrace off
 }
@@ -279,7 +279,7 @@ function kubectl::getCpuLimitFromDeployment() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     get deploy $deployment -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{..resources.limits.cpu}{"\n"}'
   xtrace off
 }
@@ -289,7 +289,7 @@ function kubectl::getResourceLimitFromPod() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     get pod $pod -o yaml | grep limits: -A 5
   xtrace off
 }
@@ -298,7 +298,7 @@ function kubectl::getRestartCountByPod() {
   pod=$1
   shift
   kubectl::manageArguments $@
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     get pod $pod --no-headers \
     -o custom-columns=":status.containerStatuses[0].restartCount"
   xtrace off
@@ -307,8 +307,8 @@ function kubectl::getRestartCountByPod() {
 function kubectl::getFirstPodName() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get pods ${LABELS:+-l $LABELS} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get pods ${K8S_LABELS:+-l $K8S_LABELS} \
     -o jsonpath="{.items[0].metadata.name}"
   xtrace off
 }
@@ -316,8 +316,8 @@ function kubectl::getFirstPodName() {
 function kubectl::waitForPodsByLabel() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    wait pods ${LABELS:+-l $LABELS} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    wait pods ${K8S_LABELS:+-l $K8S_LABELS} \
     --for=condition=Ready
     #--timeout=30s
   xtrace off
@@ -329,7 +329,7 @@ function kubectl::waitForReadyPod() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} wait \
     --for=condition=ready pod $pod --timeout=45s
   xtrace off
 }
@@ -340,7 +340,7 @@ function kubectl::deletePod() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} delete pod $pod
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} delete pod $pod
   xtrace off
   checkInteractiveMode
 }
@@ -350,7 +350,7 @@ function kubectl::forceDeletePod() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} delete pod $pod --force --grace-period=0
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} delete pod $pod --force --grace-period=0
   xtrace off
 }
 
@@ -359,8 +359,8 @@ function kubectl::showLogs() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} logs $pod
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} wait --for=condition=ready pod $pod
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} logs $pod
   xtrace off
   checkInteractiveMode
 }
@@ -370,8 +370,8 @@ function kubectl::showLogsNoTimeout() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod --timeout=1s
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} logs $pod
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} wait --for=condition=ready pod $pod --timeout=1s
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} logs $pod
   xtrace off
   checkInteractiveMode
 }
@@ -383,8 +383,8 @@ function kubectl::showLogsByContainer() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} wait --for=condition=ready pod $pod
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} logs $pod -c $container
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} wait --for=condition=ready pod $pod
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} logs $pod -c $container
   xtrace off
   checkInteractiveMode
 }
@@ -436,8 +436,8 @@ function kubectl::showReplicaSets() {
   print_info "Show replicasets"
   kubectl::manageArguments $@
   xtrace on
-  #kubectl ${NAMESPACE:+--namespace $NAMESPACE} get rs ${LABELS:+-l $LABELS} -o wide
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get rs ${LABELS:+-l $LABELS}
+  #kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} get rs ${K8S_LABELS:+-l $K8S_LABELS} -o wide
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} get rs ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -446,7 +446,7 @@ function kubectl::showReplicaSetsInAllNamespaces() {
   print_info "Show replicasets"
   kubectl::manageArguments $@
   xtrace on
-  kubectl get rs --all-namespaces ${LABELS:+-l $LABELS}
+  kubectl get rs --all-namespaces ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -456,7 +456,7 @@ function kubectl::getReplicasFromReplicaSet() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get rs $replicaSet -o jsonpath="{.spec.replicas}"
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} get rs $replicaSet -o jsonpath="{.spec.replicas}"
   xtrace off
 }
 
@@ -466,7 +466,7 @@ function kubectl::getLastReplicaSetEventsFromDeployment() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} describe rs $deployment | tail -2
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} describe rs $deployment | tail -2
   xtrace off
 }
 
@@ -477,7 +477,7 @@ function kubectl::scaleReplicaSet() {
   print_info "Scale replicas to $replicas"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     scale replicaset $replicaSet --replicas=$replicas
   xtrace off
   checkInteractiveMode
@@ -491,8 +491,8 @@ function kubectl::showDeployments() {
   print_info "Show deployments"
   kubectl::manageArguments $@
   xtrace on
-  #kubectl ${NAMESPACE:+--namespace $NAMESPACE} get deploy ${LABELS:+-l $LABELS} -o wide
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get deploy ${LABELS:+-l $LABELS}
+  #kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} get deploy ${K8S_LABELS:+-l $K8S_LABELS} -o wide
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} get deploy ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -501,7 +501,7 @@ function kubectl::showDeploymentsInAllNamespaces() {
   print_info "Show deployments"
   kubectl::manageArguments $@
   xtrace on
-  kubectl get deploy --all-namespaces ${LABELS:+-l $LABELS}
+  kubectl get deploy --all-namespaces ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -511,7 +511,7 @@ function kubectl::getReplicasFromDeployment() {
   kubectl::manageArguments $@
   shift
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     get deploy $deploy -o jsonpath="{.spec.replicas}"
   xtrace off
 }
@@ -524,7 +524,7 @@ function kubectl::scaleDeployment() {
   print_info "Scale replicas to $replicas"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     scale deployment $deploy --replicas=$replicas
   xtrace off
   checkInteractiveMode
@@ -535,7 +535,7 @@ function kubectl::waitForDeployment() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     wait --for=condition=available deployment $deploy
   xtrace off
   checkInteractiveMode
@@ -547,7 +547,7 @@ function kubectl::showRolloutStatusFromDeployment() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     rollout status deployment $deploy
   xtrace off
   checkInteractiveMode
@@ -559,7 +559,7 @@ function kubectl::showRolloutHistoryFromDeployment() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     rollout history deployment $deploy
     # --revision=$2
   xtrace off
@@ -573,7 +573,7 @@ function kubectl::annotateDeploymentChangeCause() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     annotate deployment $deploy \
     kubernetes.io/change-cause="$message"
   xtrace off
@@ -586,7 +586,7 @@ function kubectl::rollbackDeployment() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     rollout undo deployment $deploy
     # --to-revision=$2
   xtrace off
@@ -601,8 +601,8 @@ function kubectl::showServices() {
   print_info "Show services"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get svc ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get svc ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -611,7 +611,7 @@ function kubectl::showServicesInAllNamespaces() {
   print_info "Show services"
   kubectl::manageArguments $@
   xtrace on
-  kubectl get svc --all-namespaces ${LABELS:+-l $LABELS}
+  kubectl get svc --all-namespaces ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -622,9 +622,8 @@ function kubectl::showEndpointsByService() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get endpoints $service \
-    ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get endpoints $service ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -633,8 +632,8 @@ function kubectl::showEndpointsByLabels() {
   print_info "Show endpoints filtered by service"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get endpoints ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get endpoints ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -646,7 +645,7 @@ function kubectl::getPortByService() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     get svc $service --no-headers \
     -o custom-columns=":spec.ports[?(@.targetPort == '$targetPort')].port"
   xtrace off
@@ -659,7 +658,7 @@ function kubectl::getNodePortByService() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     get svc $service --no-headers \
     -o custom-columns=":spec.ports[?(@.targetPort == '$targetPort')].nodePort"
   xtrace off
@@ -673,8 +672,8 @@ function kubectl::showIngresses() {
   print_info "Show ingresses"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get ingress ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get ingress ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -685,8 +684,8 @@ function kubectl::showIngressesDescription() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    describe ingress $ingress ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    describe ingress $ingress ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -697,7 +696,7 @@ function kubectl::showIngressesDescription() {
 
 function kubectl::showPersistentVolumes() {
   xtrace on
-  kubectl get pv ${LABELS:+-l $LABELS}
+  kubectl get pv ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -705,8 +704,8 @@ function kubectl::showPersistentVolumes() {
 function kubectl::showPersistentVolumeClaims() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get pvc ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get pvc ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -719,8 +718,8 @@ function kubectl::showConfigMaps() {
   print_info "Show configmaps"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get cm ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get cm ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -731,8 +730,8 @@ function kubectl::showConfigMapDescription() {
   print_info "Show configmap description"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    describe cm $configmap ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    describe cm $configmap ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -780,8 +779,8 @@ function kubectl::showSecrets() {
   print_info "Show secrets"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get secrets ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get secrets ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -792,8 +791,8 @@ function kubectl::showSecretDescription() {
   print_info "Show secret description"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    describe secrets $secret ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    describe secrets $secret ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -805,7 +804,7 @@ function kubectl::decodeSecretByKey() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     get secret $secret \
     -o custom-columns=":data['${secretKey}']" | base64 --decode
   xtrace off
@@ -826,8 +825,8 @@ function kubectl::showRoles() {
   print_info "Show roles"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get roles ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get roles ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -838,8 +837,8 @@ function kubectl::showRoleDescription() {
   print_info "Show role description"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    describe role $role ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    describe role $role ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -848,8 +847,8 @@ function kubectl::showRoleBindings() {
   print_info "Show rolebindings"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get rolebindings ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get rolebindings ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -860,8 +859,8 @@ function kubectl::showRoleBindingDescription() {
   print_info "Show rolebinding description"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    describe rolebinding $role ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    describe rolebinding $role ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -870,8 +869,8 @@ function kubectl::showClusterRoles() {
   print_info "Show cluster roles"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get clusterroles ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get clusterroles ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -882,8 +881,8 @@ function kubectl::showClusterRoleDescription() {
   print_info "Show clusterrole description"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    describe clusterrole $role ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    describe clusterrole $role ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -892,8 +891,8 @@ function kubectl::showClusterRoleBindings() {
   print_info "Show rolebindings"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    get clusterrolebindings ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    get clusterrolebindings ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -904,8 +903,8 @@ function kubectl::showClusterRoleBindingDescription() {
   print_info "Show rolebinding description"
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    describe clusterrolebinding $role ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    describe clusterrolebinding $role ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
   checkInteractiveMode
 }
@@ -917,7 +916,7 @@ function kubectl::showClusterRoleBindingDescription() {
 function kubectl::getHorizontalPodAutoscaler() {
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} get hpa ${LABELS:+-l $LABELS}
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} get hpa ${K8S_LABELS:+-l $K8S_LABELS}
   xtrace off
 }
 
@@ -979,8 +978,8 @@ function kubectl::checkPodMetrics() {
       xtrace on
   fi
 
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} \
-    top pods ${LABELS:+-l $LABELS} --containers 2> /dev/null
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
+    top pods ${K8S_LABELS:+-l $K8S_LABELS} --containers 2> /dev/null
 
   result=$?
   xtrace off
@@ -1065,8 +1064,8 @@ function kubectl::showLivenessProbe() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} describe pod $pod \
-    ${LABELS:+-l $LABELS} | grep Liveness:
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} describe pod $pod \
+    ${K8S_LABELS:+-l $K8S_LABELS} | grep Liveness:
   xtrace off
   checkInteractiveMode
 }
@@ -1076,8 +1075,8 @@ function kubectl::showReadinessProbe() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} describe pod $pod \
-    ${LABELS:+-l $LABELS} | grep Readiness:
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} describe pod $pod \
+    ${K8S_LABELS:+-l $K8S_LABELS} | grep Readiness:
   xtrace off
   checkInteractiveMode
 }
@@ -1087,8 +1086,8 @@ function kubectl::showStartupProbe() {
   shift
   kubectl::manageArguments $@
   xtrace on
-  kubectl ${NAMESPACE:+--namespace $NAMESPACE} describe pod $pod \
-    ${LABELS:+-l $LABELS} | grep Startup:
+  kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} describe pod $pod \
+    ${K8S_LABELS:+-l $K8S_LABELS} | grep Startup:
   xtrace off
   checkInteractiveMode
 }
