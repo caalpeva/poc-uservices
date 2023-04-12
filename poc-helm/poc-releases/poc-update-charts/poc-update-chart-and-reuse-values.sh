@@ -69,8 +69,8 @@ function main() {
   helm::installChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
     --set env.character=Chayote,env.sleepTime=3s
-    #--dry-run
     --wait
+    #--dry-run
 
   print_info "List chart releases"
   helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
