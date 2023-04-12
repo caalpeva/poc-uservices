@@ -16,9 +16,9 @@ CHARTS_DIRECTORY="${DIR}/charts"
 
 NAMESPACE="poc-charts"
 
-CHART_NAME="tomcat"
+CHART_NAME="loop-message"
 CHART_RELEASE="poc-$CHART_NAME"
-SERVICE_NAME=$CHART_RELEASE
+POD_NAME=$CHART_RELEASE
 
 LABELS="app.kubernetes.io/name=$CHART_NAME,app.kubernetes.io/instance=$CHART_RELEASE"
 LOCAL_PORT=8080
@@ -56,9 +56,9 @@ function main() {
   checkArguments $@
   initialize
 
-  print_box "UPDATE AND ROLLBACK CHART" \
+  print_box "UPGRADE CHART AND REUSE VALUES" \
     "" \
-    " - Proof of concept about chat update and rollback"
+    " - Proof of concept about chat upgradation and reuse values."
   checkInteractiveMode
 
   kubectl::showNodes
@@ -68,8 +68,9 @@ function main() {
 
   helm::installChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
-    --set persistence.size=12Gi
-    #--wait
+    --set env.character=Chayote,env.sleepTime=3s
+    #--dry-run
+    --wait
 
   print_info "List chart releases"
   helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
@@ -78,9 +79,12 @@ function main() {
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
   kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
   kubectl::showPods -n $NAMESPACE -l $LABELS
-  kubectl::showServices -n $NAMESPACE -l $LABELS
-  kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
 
+  print_info "Wait for a few seconds to show logs..." && sleep 5
+  RUNNING_PODS=($(kubectl::getRunningPods -n $NAMESPACE -l $LABELS))
+  kubectl::showLogs ${RUNNING_PODS[0]} -n $NAMESPACE -l $LABELS
+
+  print_info "Upgrade chart reusing values"
   helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE \
     --version 10.6.3 \
@@ -93,14 +97,17 @@ function main() {
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
   kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
   kubectl::showPods -n $NAMESPACE -l $LABELS
-  kubectl::showServices -n $NAMESPACE -l $LABELS
-  kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
 
-  print_info "Check chart upgradation"
+  print_info "Wait for a few seconds to show logs again..." && sleep 5
+  RUNNING_PODS=($(kubectl::getRunningPods -n $NAMESPACE -l $LABELS))
+  kubectl::showLogs ${RUNNING_PODS[0]} -n $NAMESPACE -l $LABELS
+
+  print_info "Check chart upgrade"
   print_debug "Note that the --reuse-values flag keep the last custom values."
   checkInteractiveMode
 
-  helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
+  print_info "Upgrade chart resetting values"
+  helm::upgradeChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE \
     --version 10.6.4 \
     --reset-values
@@ -112,32 +119,14 @@ function main() {
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
   kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
   kubectl::showPods -n $NAMESPACE -l $LABELS
-  kubectl::showServices -n $NAMESPACE -l $LABELS
-  kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
 
-  print_info "Check chart upgradation again"
+  print_info "Wait for a few seconds to show logs again..." && sleep 5
+  RUNNING_PODS=($(kubectl::getRunningPods -n $NAMESPACE -l $LABELS))
+  kubectl::showLogs ${RUNNING_PODS[0]} -n $NAMESPACE -l $LABELS
+
+  print_info "Check chart upgrade again"
   print_debug "Note that the --reset-values flag reset the values to the ones built into the chart."
-  checkInteractiveMode
-
-  helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
-    --namespace $NAMESPACE \
-    --version 10.6.5 \
-    --reset-values \
-    --force
-
-  helm::historyChart $CHART_RELEASE \
-    --namespace $NAMESPACE
-  helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
-
-  kubectl::showDeployments -n $NAMESPACE -l $LABELS
-  kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
-  kubectl::showPods -n $NAMESPACE -l $LABELS
-  kubectl::showServices -n $NAMESPACE -l $LABELS
-  kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
-
-  print_info "Check chart upgradation again"
-  print_debug "Note that if it don’t specify any values during the upgradation of a release"
-  print_debug "then the default configuration will override the current configuration."
+  print_debug "Note that it uses a second replicaset that groups the new pod that are updated."
   checkInteractiveMode
 
   checkCleanupMode

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "loop-message.fullname" . }}
+  labels:
+    {{- include "loop-message.labels" . | nindent 4 }}
+data:
+  CHARACTER: {{ .Values.env.character | quote }}
+  SLEEP_TIME: {{ .Values.env.sleepTime | quote}}
