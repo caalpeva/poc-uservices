@@ -68,7 +68,7 @@ function main() {
 
   helm::installChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
-    --set env.character=Chayote,env.sleepTime=3s
+    --set env.character=Chayote,env.sleepTime=3s \
     --wait
     #--dry-run
 
@@ -84,11 +84,11 @@ function main() {
   RUNNING_PODS=($(kubectl::getRunningPods -n $NAMESPACE -l $LABELS))
   kubectl::showLogs ${RUNNING_PODS[0]} -n $NAMESPACE -l $LABELS
 
-  print_info "Upgrade chart reusing values"
   helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE \
     --version 10.6.3 \
     --reuse-values
+    #--set env.character=Chayote,env.sleepTime=3s
 
   helm::historyChart $CHART_RELEASE \
       --namespace $NAMESPACE
@@ -106,7 +106,6 @@ function main() {
   print_debug "Note that the --reuse-values flag keep the last custom values."
   checkInteractiveMode
 
-  print_info "Upgrade chart resetting values"
   helm::upgradeChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE \
     --version 10.6.4 \
