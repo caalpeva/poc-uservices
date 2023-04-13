@@ -54,7 +54,7 @@ function cleanup() {
   print_debug "Cleaning environment..."
   if [ -n "$PORT_FORWARD_PID" ]; then
     print_info "Kill the execution of the port-forward command"
-    evalCommand -9 $PORT_FORWARD_PID
+    evalCommand kill -9 $PORT_FORWARD_PID
   fi
   helm::uninstallChart $CHART_RELEASE --namespace $NAMESPACE
   kubectl delete ns $NAMESPACE
@@ -84,7 +84,7 @@ function main() {
 
   helm::installChart $CHART_RELEASE "$TMP_DIRECTORY/$CHART_FILENAME" \
     --namespace $NAMESPACE --create-namespace \
-    --wait
+    --wait --timeout 3m30s
 
   print_info "Show chart instance"
   helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE

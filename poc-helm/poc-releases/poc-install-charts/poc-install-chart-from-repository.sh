@@ -73,7 +73,7 @@ function main() {
     --namespace $NAMESPACE --create-namespace \
     #--wait --timeout 3m30s
 
-  print_info "Show chart instance"
+  print_info "Show chart instance" && sleep 2
   helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
@@ -82,7 +82,7 @@ function main() {
   kubectl::showServices -n $NAMESPACE -l $LABELS
   kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
 
-  print_info "Forward local port to container port"
+  print_info "Forward local port to container port" && sleep 2
   POD_NAME=$(kubectl get pods --namespace poc-charts -l "$LABELS" -o jsonpath="{.items[0].metadata.name}")
   CONTAINER_PORT=$(kubectl get pod --namespace poc-charts $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
   evalCommand kubectl --namespace poc-charts port-forward $POD_NAME ${LOCAL_PORT}:$CONTAINER_PORT "&"

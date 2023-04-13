@@ -14,6 +14,8 @@ source "${DIR}/../../utils/helm.src"
 
 TMP_DIRECTORY="${DIR}/tmp"
 
+CHARTS_DIRECTORY="${DIR}/charts"
+
 REGISTRY_CONTAINER_NAME="poc-registry-for-chart-storage"
 
 REGISTRY_URL="localhost:5000"
@@ -80,7 +82,7 @@ function main() {
   print_info "Check containers status again..."
   docker::showContainersByPrefix ${REGISTRY_CONTAINER_NAME}
 
-  helm::packageChart $CHART_NAME \
+  helm::packageChart "$CHARTS_DIRECTORY/$CHART_NAME" \
     --version $CHART_VERSION \
     --destination $TMP_DIRECTORY
 

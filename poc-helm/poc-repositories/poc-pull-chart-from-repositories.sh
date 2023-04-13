@@ -11,7 +11,11 @@ source "${DIR}/../utils/helm.src"
 # VARIABLES #
 #############
 
-CHART_FILTER="tomcat"
+TMP_DIRECTORY="${DIR}/tmp"
+
+CHARTS_DIRECTORY="${DIR}/charts"
+
+CHART_NAME="mysql"
 
 #############
 # FUNCTIONS #
@@ -21,6 +25,10 @@ function initialize() {
   print_info "Preparing poc environment..."
   setTerminalSignals
   cleanup
+  print_debug "Creating temporal directory..."
+  if [ ! -d ${TMP_DIRECTORY} ]; then
+    evalCommand mkdir ${TMP_DIRECTORY}
+  fi
 }
 
 function handleTermSignal() {
@@ -35,6 +43,7 @@ function cleanup() {
   helm::removeRepo stable
   helm::removeRepo incubator
   helm::removeRepo bitnami
+  evalCommand rm -rf ${TMP_DIRECTORY}
 }
 
 function main() {
@@ -43,39 +52,26 @@ function main() {
 
   initialize
 
-  print_box "HELM CHART REPOSITORIES" \
+  print_box "PULL CHART FROM REPOSITORY" \
     "" \
-    " - Similar to the docker hub, which is a hosting platform for docker images." \
-    "   The most popular Helm Chart package hosting platform is Artifact Hub." \
-    "   There are many Chart repositories on Artifact Hub."
+    " - Proof of concept about chart pulling from repository."
   checkInteractiveMode
-
-  helm::showSearchUsage
-  helm::searchChartsFromHub $CHART_FILTER
 
   print_info "Add a repository reference"
-  helm::addRepo stable https://charts.helm.sh/stable
-  checkInteractiveMode
-
-  helm::listRepos
-  helm::searchChartsFromRepos $CHART_FILTER
-
-  print_info "Add more repository references"
-  helm::addRepo incubator https://charts.helm.sh/incubator
   helm::addRepo bitnami	https://charts.bitnami.com/bitnami
   checkInteractiveMode
 
   helm::listRepos
-  helm::searchChartsFromRepos $CHART_FILTER
-
   helm::updateRepos
-  helm::searchChartsFromRepos $CHART_FILTER
+  helm::searchChartsFromRepos $CHART_NAME
 
-  print_info "Remove repository"
-  helm::removeRepo incubator
+  print_info "Pull chart from local registry"
+  helm::pullChart "bitnami/$CHART_NAME" \
+    --destination $TMP_DIRECTORY
+
+  print_info "Check that the chart archive has been downloaded"
+  evalCommand ls -l $TMP_DIRECTORY
   checkInteractiveMode
-
-  helm::listRepos
 
   checkCleanupMode
   print_done "Poc completed successfully "
