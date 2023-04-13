@@ -72,8 +72,7 @@ function main() {
     --wait
     #--dry-run
 
-  print_info "List chart releases"
-  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
@@ -90,8 +89,7 @@ function main() {
     --reuse-values
     #--set env.character=Chayote,env.sleepTime=3s
 
-  helm::historyChart $CHART_RELEASE \
-      --namespace $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
@@ -111,8 +109,7 @@ function main() {
     --version 10.6.4 \
     --reset-values
 
-  helm::historyChart $CHART_RELEASE \
-    --namespace $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
