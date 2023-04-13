@@ -1,4 +1,0 @@
-persistence:
-  size: 12Gi      # Overwrite persistent volume default size (8Gi)
-service:
-  type: NodePort

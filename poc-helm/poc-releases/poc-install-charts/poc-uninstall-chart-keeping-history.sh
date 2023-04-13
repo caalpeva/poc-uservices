@@ -13,10 +13,12 @@ source "${DIR}/../../utils/helm.src"
 #############
 
 CHARTS_DIRECTORY="${DIR}/charts"
+CONFIGURATION_FILE1=${DIR}/config/custom-values.yaml
+CONFIGURATION_FILE2=${DIR}/config/custom-values2.yaml
 
 NAMESPACE="poc-charts"
 
-CHART_NAME="tomcat"
+CHART_NAME="nginx"
 CHART_RELEASE="poc-$CHART_NAME"
 SERVICE_NAME=$CHART_RELEASE
 
@@ -66,12 +68,11 @@ function main() {
   print_info "Before installing the chart, find out what values can be set."
   helm::showDefaultLimitedChartValues 25 "${CHARTS_DIRECTORY}/$CHART_NAME"
 
-  helm::installChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
+  helm::installChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
     #--wait --timeout 3m30s
 
-  print_info "List chart releases"
-  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
@@ -80,13 +81,12 @@ function main() {
   kubectl::showServices -n $NAMESPACE -l $LABELS
   kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
 
-  helm::upgradeChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
+  helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE \
     --version 10.6.3 \
-    --values ${DIR}/custom-values.yaml
+    --values $CONFIGURATION_FILE1
 
-  print_info "List chart releases"
-  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
@@ -94,19 +94,17 @@ function main() {
   kubectl::showPods -n $NAMESPACE -l $LABELS
   kubectl::showServices -n $NAMESPACE -l $LABELS
   kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
-  kubectl::showSecrets -n $NAMESPACE -l $LABELS
 
   print_info "Check chart upgrade"
-  print_debug "Note that service type has changed to nodePort."
+  print_debug "Note that service type and port has changed to NodePort and 95."
   checkInteractiveMode
 
-  helm::upgradeChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
+  helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE \
     --version 10.6.4 \
-    -f custom-values2.yaml
+    -f $CONFIGURATION_FILE2
 
-  print_info "List chart releases"
-  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
@@ -114,31 +112,42 @@ function main() {
   kubectl::showPods -n $NAMESPACE -l $LABELS
   kubectl::showServices -n $NAMESPACE -l $LABELS
   kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
-  kubectl::showSecrets -n $NAMESPACE -l $LABELS
 
   print_info "Check chart upgrade again"
-  print_debug "Note that service type has changed to nodePort."
+  print_debug "Note that service type and port has changed to ClusterIP and 99."
   checkInteractiveMode
 
-  helm::historyChart $CHART_RELEASE \
-    --namespace $NAMESPACE
+  helm::uninstallChart $CHART_RELEASE -n $NAMESPACE --keep-history
 
-  hellm::uninstallChart --keep-history
+  print_info "List chart releases after uninstallation keeping history"
+  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
 
-  kubectl::showSecrets -n $NAMESPACE -l $LABELS
+  print_info "Check chart uninstallation keeping history"
+  print_debug "Note that the chart is uninstalled but the history is kept"
+  checkInteractiveMode
 
-  helm::rollbackChart $CHART_RELEASE 1 \
-    --namespace $NAMESPACE
+  helm::rollbackChart $CHART_RELEASE 2 --namespace $NAMESPACE
+
+  print_info "List chart releases after rollback"
+  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
+  helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
   kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
   kubectl::showPods -n $NAMESPACE -l $LABELS
   kubectl::showServices -n $NAMESPACE -l $LABELS
   kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
-  kubectl::showSecrets -n $NAMESPACE -l $LABELS
 
-  print_info "Check chart rollback"
-  print_debug "Note that service type has changed to ClusterIP again."
+  helm::uninstallChart $CHART_RELEASE -n $NAMESPACE
+
+  print_info "List chart releases after uninstallation"
+  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
+
+  print_info "Check chart uninstallation"
+  print_debug "Note that the chart is uninstalled and the history is cleared"
   checkInteractiveMode
 
   checkCleanupMode

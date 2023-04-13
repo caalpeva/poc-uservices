@@ -1,0 +1,3 @@
+service:
+  type: ClusterIP  # Overwrite default service type
+  port: 99        # Overwrite default port
