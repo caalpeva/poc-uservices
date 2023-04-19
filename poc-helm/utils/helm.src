@@ -121,6 +121,12 @@ function helm::installChartSilently() {
   checkInteractiveMode
 }
 
+function helm::getReleaseFromChartInstallation() {
+  xtrace on
+  echo $(helm install $@ | grep NAME: | awk '{print $2}')
+  xtrace off
+}
+
 function helm::getChartReleases() {
   print_info "List chart releases"
   xtrace on

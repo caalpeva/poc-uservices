@@ -18,9 +18,7 @@ NAMESPACE="poc-charts"
 
 CHART_NAME="nginx"
 CHART_RELEASE="poc-$CHART_NAME"
-SERVICE_NAME=$CHART_RELEASE
 
-LABELS="app.kubernetes.io/name=$CHART_NAME,app.kubernetes.io/instance=$CHART_RELEASE"
 LOCAL_PORT=8080
 
 #############
@@ -43,6 +41,10 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
+  if [ -n "$PORT_FORWARD_PID" ]; then
+    print_info "Kill the execution of the port-forward command"
+    evalCommand kill -9 $PORT_FORWARD_PID
+  fi
   helm::uninstallChart $CHART_RELEASE --namespace $NAMESPACE
   kubectl delete ns $NAMESPACE
 }
@@ -52,9 +54,9 @@ function main() {
   checkArguments $@
   initialize
 
-  print_box "INSTALL CHART WITH CUSTOM VALUES" \
+  print_box "INSTALL CHART WITH NAME GENERATED" \
     "" \
-    " - Proof of concept about chart installation with custom values"
+    " - Proof of concept about chart installation with name generated"
   checkInteractiveMode
 
   kubectl::showNodes
@@ -62,16 +64,19 @@ function main() {
   print_info "Before installing the chart, find out what values can be set."
   helm::showDefaultLimitedChartValues 25 "${CHARTS_DIRECTORY}/$CHART_NAME"
 
-  helm::installChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
+  print_info "Install chart"
+  CHART_RELEASE=$(helm::getReleaseFromChartInstallation "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
-    --set service.type=NodePort,service.port=95 \
-    --wait
-    #--dry-run
+    --generate-name #--name-template="nginx-{{randAlpha 3 | lower}}{{randNumeric 5}}"
+    )
 
   print_info "List chart releases"
   helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
   helm::getReleaseStatus $CHART_RELEASE -n $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
+
+  LABELS="app.kubernetes.io/name=$CHART_NAME,app.kubernetes.io/instance=$CHART_RELEASE"
+  SERVICE_NAME=$CHART_RELEASE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
   kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
@@ -80,15 +85,19 @@ function main() {
   kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
 
   print_info "Extract port from service"
-  NODE_PORT=$(kubectl get --namespace $NAMESPACE -o jsonpath="{.spec.ports[0].nodePort}" services ${SERVICE_NAME})
-  NODE_IP=$(kubectl get nodes --namespace poc-charts -o jsonpath="{.items[0].status.addresses[0].address}")
+  SERVICE_PORT=$(kubectl::getPortByService ${SERVICE_NAME} http -n $NAMESPACE)
+  checkInteractiveMode
+
+  print_info "Forward local port to service port"
+  evalCommand kubectl --namespace poc-charts port-forward service/${SERVICE_NAME} --address 0.0.0.0 ${LOCAL_PORT}:${SERVICE_PORT} "&"
+  PORT_FORWARD_PID=$!
   checkInteractiveMode
 
   sleep 3
   SERVER_AVAILABLE=true
-  print_info "Visit http://$NODE_IP:$NODE_PORT to use this application"
-  print_debug "Make requests from local port..."
-  executeCurl http://$NODE_IP:$NODE_PORT
+  print_info "Visit http://localhost:${LOCAL_PORT} to use this application"
+  print_debug "Make request from local port..."
+  executeCurl http://localhost:$LOCAL_PORT
   if [ $? -ne 0 ]
   then
     print_error "Http server is not available"
