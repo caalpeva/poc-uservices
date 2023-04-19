@@ -15,6 +15,7 @@ source "${DIR}/../../utils/helm.src"
 CHARTS_DIRECTORY="${DIR}/charts"
 CONFIGURATION_FILE1=${DIR}/config/custom-values.yaml
 CONFIGURATION_FILE2=${DIR}/config/custom-values2.yaml
+CONFIGURATION_FILE3=${DIR}/config/custom-values3.yaml
 
 NAMESPACE="poc-charts"
 
@@ -70,7 +71,7 @@ function main() {
 
   helm::installChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
-    --set env.character=Avestruz,env.sleepTime=2s
+    -f $CONFIGURATION_FILE1 \
     #--wait
 
   helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
@@ -87,7 +88,7 @@ function main() {
   helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE \
     --version 10.6.3 \
-    -f $CONFIGURATION_FILE1
+    -f $CONFIGURATION_FILE2
 
   helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
@@ -108,9 +109,9 @@ function main() {
   helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE \
     --version 10.6.4 \
-    --values $CONFIGURATION_FILE2
+    --values $CONFIGURATION_FILE3
 
-  helm::historyChartSil $CHART_RELEASE --namespace $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS

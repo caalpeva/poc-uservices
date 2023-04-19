@@ -13,6 +13,9 @@ source "${DIR}/../../utils/helm.src"
 #############
 
 CHARTS_DIRECTORY="${DIR}/charts"
+CONFIGURATION_FILE1=${DIR}/config/custom-values.yaml
+CONFIGURATION_FILE2=${DIR}/config/custom-values2.yaml
+CONFIGURATION_FILE3=${DIR}/config/custom-values3.yaml
 
 NAMESPACE="poc-charts"
 
@@ -68,7 +71,7 @@ function main() {
 
   helm::installChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
-    --set env.character=Chayote,env.sleepTime=3s \
+    -f $CONFIGURATION_FILE1 \
     --wait
     #--dry-run
 
@@ -87,7 +90,6 @@ function main() {
     --namespace $NAMESPACE \
     --version 10.6.3 \
     --reuse-values
-    #--set env.character=Chayote,env.sleepTime=3s
 
   helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE

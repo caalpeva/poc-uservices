@@ -53,5 +53,5 @@ tolerations: []
 affinity: {}
 
 env:
-  character: "un Pimiento."
+  character: "un Tejón."
   sleepTime: "2s"

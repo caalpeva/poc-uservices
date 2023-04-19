@@ -13,7 +13,6 @@ source "${DIR}/../../utils/helm.src"
 #############
 
 CHARTS_DIRECTORY="${DIR}/charts"
-CONFIGURATION_FILE=${DIR}/config/custom-values.yaml
 
 NAMESPACE="poc-charts"
 
@@ -65,7 +64,7 @@ function main() {
 
   helm::installChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
-    --values $CONFIGURATION_FILE \
+    --set service.type=NodePort,service.port=95 \
     --wait
     #--dry-run
 
