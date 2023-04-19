@@ -123,7 +123,7 @@ function helm::installChartSilently() {
 
 function helm::getReleaseFromChartInstallation() {
   xtrace on
-  echo $(helm install $@ | grep NAME: | awk '{print $2}')
+  helm install $@ | grep NAME: | awk '{print $2}'
   xtrace off
 }
 
