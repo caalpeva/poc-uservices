@@ -1,2 +1,3 @@
-persistence:
-  size: 12Gi      # Overwrite persistent volume default size (8Gi)
+env:
+  character: "una Gineta"
+  sleepTime: 3s

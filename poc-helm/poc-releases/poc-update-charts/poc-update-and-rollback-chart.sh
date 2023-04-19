@@ -13,10 +13,12 @@ source "${DIR}/../../utils/helm.src"
 #############
 
 CHARTS_DIRECTORY="${DIR}/charts"
+CONFIGURATION_FILE1=${DIR}/config/custom-values.yaml
+CONFIGURATION_FILE2=${DIR}/config/custom-values2.yaml
 
 NAMESPACE="poc-charts"
 
-CHART_NAME="tomcat"
+CHART_NAME="loop-message"
 CHART_RELEASE="poc-$CHART_NAME"
 SERVICE_NAME=$CHART_RELEASE
 
@@ -56,9 +58,9 @@ function main() {
   checkArguments $@
   initialize
 
-  print_box "UPDATE AND ROLLBACK CHART" \
+  print_box "UPGRATE AND ROLLBACK CHART" \
     "" \
-    " - Proof of concept about chat update and rollback"
+    " - Proof of concept about chat upgrate and rollback"
   checkInteractiveMode
 
   kubectl::showNodes
@@ -66,54 +68,82 @@ function main() {
   print_info "Before installing the chart, find out what values can be set."
   helm::showDefaultLimitedChartValues 25 "${CHARTS_DIRECTORY}/$CHART_NAME"
 
-  helm::installChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
+  helm::installChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
-    --values ${DIR}/custom-values.yaml \
+    --set env.character=Avestruz,env.sleepTime=2s
     #--wait
 
-  print_info "List chart releases"
-  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
   kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
   kubectl::showPods -n $NAMESPACE -l $LABELS
-  kubectl::showServices -n $NAMESPACE -l $LABELS
-  kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
 
-  helm::upgradeChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
+  print_info "Wait for a few seconds to show logs..." && sleep 5
+  RUNNING_PODS=($(kubectl::getRunningPods -n $NAMESPACE -l $LABELS))
+  kubectl::showLogs ${RUNNING_PODS[0]} -n $NAMESPACE -l $LABELS
+
+  helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE \
     --version 10.6.3 \
-    -f custom-values2.yaml
+    -f $CONFIGURATION_FILE1
 
-  print_info "List chart releases"
-  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
   helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
   kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
   kubectl::showPods -n $NAMESPACE -l $LABELS
-  kubectl::showServices -n $NAMESPACE -l $LABELS
-  kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
+
+  print_info "Wait for a few seconds to show logs..." && sleep 5
+  RUNNING_PODS=($(kubectl::getRunningPods -n $NAMESPACE -l $LABELS))
+  kubectl::showLogs ${RUNNING_PODS[0]} -n $NAMESPACE -l $LABELS
 
   print_info "Check chart upgrade"
-  print_debug "Note that service type has changed to nodePort."
+  print_debug "Note that environment variables have changed."
+  print_debug "Note that it uses a second replicaset that groups the new pod that are updated."
   checkInteractiveMode
 
-  helm::historyChart $CHART_RELEASE \
-    --namespace $NAMESPACE
+  helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
+    --namespace $NAMESPACE \
+    --version 10.6.4 \
+    --values $CONFIGURATION_FILE2
 
-  helm::rollbackChart $CHART_RELEASE 1 \
-    --namespace $NAMESPACE
+  helm::historyChartSil $CHART_RELEASE --namespace $NAMESPACE
+  helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
 
   kubectl::showDeployments -n $NAMESPACE -l $LABELS
   kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
   kubectl::showPods -n $NAMESPACE -l $LABELS
-  kubectl::showServices -n $NAMESPACE -l $LABELS
-  kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
+
+  print_info "Wait for a few seconds to show logs..." && sleep 5
+  RUNNING_PODS=($(kubectl::getRunningPods -n $NAMESPACE -l $LABELS))
+  kubectl::showLogs ${RUNNING_PODS[0]} -n $NAMESPACE -l $LABELS
+
+  print_info "Check chart upgrade again"
+  print_debug "Note that environment variables have changed again."
+  print_debug "Note that it uses a third replicaset that groups the new pod that are updated."
+  checkInteractiveMode
+
+  helm::rollbackChart $CHART_RELEASE 2 --namespace $NAMESPACE
+
+  print_info "List chart releases after rollback"
+  helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
+  helm::historyChart $CHART_RELEASE --namespace $NAMESPACE
+  helm::getCustomValues $CHART_RELEASE -n $NAMESPACE
+
+  kubectl::showDeployments -n $NAMESPACE -l $LABELS
+  kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
+  kubectl::showPods -n $NAMESPACE -l $LABELS
+
+  print_info "Wait for a few seconds to show logs..." && sleep 5
+  RUNNING_PODS=($(kubectl::getRunningPods -n $NAMESPACE -l $LABELS))
+  kubectl::showLogs ${RUNNING_PODS[0]} -n $NAMESPACE -l $LABELS
 
   print_info "Check chart rollback"
-  print_debug "Note that service type has changed to ClusterIP again."
+  print_debug "Note that a version is rolled back to a previous revision"
+  print_debug "Check that the environment variables are correct in that revision."
   checkInteractiveMode
 
   checkCleanupMode

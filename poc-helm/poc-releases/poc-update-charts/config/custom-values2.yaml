@@ -1,4 +1,3 @@
-persistence:
-  size: 12Gi      # Overwrite persistent volume default size (8Gi)
-service:
-  type: NodePort
+env:
+  character: "un Pelicano"
+  sleepTime: 2s

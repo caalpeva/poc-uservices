@@ -104,7 +104,7 @@ function main() {
   print_debug "Note that the --reuse-values flag keep the last custom values."
   checkInteractiveMode
 
-  helm::upgradeChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
+  helm::upgradeChartSilently $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE \
     --version 10.6.4 \
     --reset-values
