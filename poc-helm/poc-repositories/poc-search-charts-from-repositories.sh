@@ -66,7 +66,7 @@ function main() {
   checkInteractiveMode
 
   helm::listRepos
-  helm::searchChartsFromRepos $CHART_FILTER
+  helm::searchChartsFromRepos $CHART_FILTER #--versions 
 
   helm::updateRepos
   helm::searchChartsFromRepos $CHART_FILTER

@@ -25,7 +25,7 @@ function helm::showSearchUsage() {
 function helm::searchChartsFromHub() {
   print_info "Search helm charts from Artifact Hub"
   xtrace on
-  helm search hub $1
+  helm search hub $@
   xtrace off
   checkInteractiveMode
 }
@@ -33,7 +33,7 @@ function helm::searchChartsFromHub() {
 function helm::searchChartsFromRepos() {
   print_info "Search helm charts from repositories"
   xtrace on
-  helm search repo $1
+  helm search repo $@
   xtrace off
   checkInteractiveMode
 }
@@ -203,6 +203,20 @@ function helm::uninstallChart() {
   print_info "Uninstall chart release"
   xtrace on
   helm uninstall $@
+  xtrace off
+}
+
+function helm::listChartDependencies() {
+  print_info "List chart dependencies"
+  xtrace on
+  helm dependency list $@
+  xtrace off
+}
+
+function helm::updateChartDependencies() {
+  print_info "Update chart dependencies"
+  xtrace on
+  helm dependency update $@
   xtrace off
 }
 
