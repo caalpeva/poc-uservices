@@ -81,7 +81,7 @@ function main() {
 
   helm::installChart $CHART_RELEASE "${CHARTS_DIRECTORY}/$CHART_NAME" \
     --namespace $NAMESPACE --create-namespace \
-    #--wait
+    --wait
 
   print_info "Show chart instance"
   helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
