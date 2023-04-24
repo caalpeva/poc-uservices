@@ -68,6 +68,7 @@ function main() {
   print_info "Pull chart from local registry"
   helm::pullChart "bitnami/$CHART_NAME" \
     --destination $TMP_DIRECTORY
+    # --version x.x.x
 
   print_info "Check that the chart archive has been downloaded"
   evalCommand ls -l $TMP_DIRECTORY
