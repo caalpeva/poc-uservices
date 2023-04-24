@@ -1,0 +1,12 @@
+START TRANSACTION;
+USE CYCLING;
+
+INSERT INTO TEAM(NAME) VALUES("ITrek-Segafredo");
+SET @last_id_in_team = LAST_INSERT_ID();
+
+INSERT INTO RIDER(NAME, SURNAME, TEAM_ID) VALUES("Enric", "Mas", 1);
+INSERT INTO RIDER(NAME, SURNAME, TEAM_ID) VALUES("Richard", "Carapaz", 3);
+INSERT INTO RIDER(NAME, SURNAME, TEAM_ID) VALUES("Richie", "Port", @last_id_in_team);
+INSERT INTO RIDER(NAME, SURNAME, TEAM_ID) VALUES("Wilco", "Kelderman", @last_id_in_team);
+
+COMMIT;

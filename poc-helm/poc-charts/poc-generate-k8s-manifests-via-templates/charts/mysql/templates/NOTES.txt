@@ -21,7 +21,7 @@ To connect to your database:
 
 1. Run an Ubuntu pod that you can use as a client:
 
-    kubectl run -i --tty ubuntu --image=ubuntu:16.04 --restart=Never -- bash -il
+    kubectl --namespace {{ .Release.Namespace }} run -i --tty ubuntu --image=ubuntu:16.04 --restart=Never -- bash -il
 
 2. Install the mysql client:
 
@@ -40,9 +40,8 @@ To connect to your database directly from outside the K8s cluster:
     MYSQL_PORT={{ .Values.service.port }}
 
     # Execute the following command to route the connection:
-    kubectl port-forward svc/{{ template "mysql.fullname" . }} {{ .Values.service.port }}
+    kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ template "mysql.fullname" . }} {{ .Values.service.port }}
 
     {{- end }}
 
     mysql -h ${MYSQL_HOST} -P${MYSQL_PORT} -u root -p${MYSQL_ROOT_PASSWORD}
-    

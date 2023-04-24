@@ -80,6 +80,16 @@ function helm::lintChart() {
   xtrace off
 }
 
+function helm::templateFiles() {
+  chart=$1
+  shift
+  print_info "Render chart templates locally and display the output"
+  xtrace on
+  helm template $chart --show-only $*
+  xtrace off
+  checkInteractiveMode
+}
+
 function helm::packageChart() {
   print_info "Package a chart directory into a chart archive"
   xtrace on
