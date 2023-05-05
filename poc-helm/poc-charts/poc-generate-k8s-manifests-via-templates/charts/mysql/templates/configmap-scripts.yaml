@@ -4,7 +4,7 @@ metadata:
   name: {{ template "mysql.fullname" . }}-initialization
   namespace: {{ .Release.Namespace }}
 data:
-{{- range $path, $_ :=  .Files.Glob  "scripts/initial/**.sql" }}
-  {{ $path | trimPrefix "scripts/initial/" }}: |-
+{{- range $path, $_ :=  .Files.Glob  "resources/scripts/**.sql" }}
+  {{ $path | trimPrefix "resources/scripts/" }}: |-
 {{ $.Files.Get $path | indent 4 }}
 {{- end }}

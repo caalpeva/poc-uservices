@@ -13,7 +13,6 @@ source "${DIR}/../../utils/helm.src"
 #############
 
 CHARTS_DIRECTORY="${DIR}/charts"
-TMP_DIRECTORY="${DIR}/tmp"
 
 NAMESPACE="poc-charts"
 
@@ -36,10 +35,6 @@ function initialize() {
   setTerminalSignals
   check_mandatory_command_installed tree
   cleanup
-  print_debug "Creating temporal directory..."
-  if [ ! -d ${TMP_DIRECTORY} ]; then
-    evalCommand mkdir ${TMP_DIRECTORY}
-  fi
 }
 
 function handleTermSignal() {
@@ -57,7 +52,6 @@ function cleanup() {
   fi
   helm::uninstallChart $CHART_RELEASE --namespace $NAMESPACE
   kubectl delete ns $NAMESPACE
-  evalCommand rm -rf ${TMP_DIRECTORY}
 }
 
 function showDatabase {
@@ -90,7 +84,10 @@ function main() {
   kubectl::showNodes
 
   helm::templateFiles "${CHARTS_DIRECTORY}/$CHART_NAME" \
-    "templates/configmap-scripts-initial.yaml"
+    "templates/configmap-scripts.yaml"
+
+  helm::templateFiles "${CHARTS_DIRECTORY}/$CHART_NAME" \
+    "templates/secrets.yaml"
 
   helm::templateFiles "${CHARTS_DIRECTORY}/$CHART_NAME" \
     "templates/deployment.yaml"

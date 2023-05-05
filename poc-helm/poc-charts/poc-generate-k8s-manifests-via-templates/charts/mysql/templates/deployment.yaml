@@ -238,6 +238,9 @@ spec:
       - name: migrations
         configMap:
           name: {{ template "mysql.fullname" . }}-initialization
+          items:
+            - key: init-db.sql
+              path: init-db.sql
       {{- if .Values.ssl.enabled }}
       - name: certificates
         secret:
