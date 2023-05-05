@@ -807,6 +807,7 @@ function kubectl::decodeSecretByKey() {
   kubectl ${K8S_NAMESPACE:+--namespace $K8S_NAMESPACE} \
     get secret $secret \
     -o custom-columns=":data['${secretKey}']" | base64 --decode
+    #-o jsonpath="{.data.${secretKey}}" | base64 --decode
   xtrace off
 }
 

@@ -12,19 +12,19 @@ source "${DIR}/../../utils/helm.src"
 # VARIABLES #
 #############
 
-CHARTS_DIRECTORY="${DIR}/charts"
-
 NAMESPACE="poc-charts"
+
+CHARTS_DIRECTORY="${DIR}/charts"
+TEMPLATE_DIRECTORY="${DIR}/charts/${CHART_NAME}/templates"
 
 CHART_NAME="mysql"
 CHART_RELEASE="poc-$CHART_NAME"
 SERVICE_NAME=$CHART_RELEASE
-
-TEMPLATE_DIRECTORY="${DIR}/charts/${CHART_NAME}/templates"
+SECRET_NAME=$CHART_RELEASE
 
 MYSQL_DATABASE="CYCLING"
 
-LABELS="app.kubernetes.io/name=$CHART_NAME,app.kubernetes.io/instance=$CHART_RELEASE"
+LOCAL_PORT=3306
 
 #############
 # FUNCTIONS #
@@ -58,11 +58,11 @@ function showDatabase {
   POD_NAME=$1
   MYSQL_ROOT_PASSWORD=$2
   xtrace on
-  docker -n $NAMESPACE exec $POD_NAME \
+  kubectl -n $NAMESPACE exec $POD_NAME -- \
     mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
     --table -e "select * from TEAM"
 
-  docker -n $NAMESPACE exec $POD_NAME \
+  kubectl -n $NAMESPACE exec $POD_NAME -- \
     mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
     --table -e "select * from RIDER"
   xtrace off
@@ -70,6 +70,18 @@ function showDatabase {
 
   checkInteractiveMode
 }
+
+function updateDatabase {
+  xtrace on
+  kubectl -n $NAMESPACE exec $1 -- \
+    mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
+    -e "source /opt/update.sql"
+  xtrace off
+  sleep 1
+
+  checkInteractiveMode
+}
+
 
 function main() {
   print_debug "$(basename $0) [PID = $$]"
@@ -99,17 +111,25 @@ function main() {
   print_info "Show chart instance"
   helm::showChartReleasesByPrefix $CHART_RELEASE -n $NAMESPACE
 
-  kubectl::showDeployments -n $NAMESPACE -l $LABELS
-  kubectl::showReplicaSets -n $NAMESPACE -l $LABELS
-  kubectl::showPods -n $NAMESPACE -l $LABELS
-  kubectl::showServices -n $NAMESPACE -l $LABELS
+  kubectl::showDeployments -n $NAMESPACE
+  kubectl::showReplicaSets -n $NAMESPACE
+  kubectl::showPods -n $NAMESPACE
+  kubectl::showServices -n $NAMESPACE
   kubectl::showEndpointsByService $SERVICE_NAME -n $NAMESPACE
 
-  MYSQL_ROOT_PASSWORD=$(kubectl get secret --namespace poc-charts poc-mysql -o jsonpath="{.data.mysql-root-password}" | base64 --decode)
-  POD_NAME=$(kubectl get pods --namespace poc-charts -l "$LABELS" -o jsonpath="{.items[0].metadata.name}")
+  print_info "Decode mysql-root-password value"
+  MYSQL_ROOT_PASSWORD=$(kubectl::decodeSecretByKey ${SECRET_NAME} "mysql-root-password" -n $NAMESPACE)
+  echo $MYSQL_ROOT_PASSWORD
 
+  POD_NAME=$(kubectl get pods --namespace poc-charts -o jsonpath="{.items[0].metadata.name}")
   print_info "Show database"
-  showDatabase $POD_NAME $MYSQL_ROOT_PASSWORD
+  showDatabase ${POD_NAME} ${MYSQL_ROOT_PASSWORD}
+
+  print_info "Update database"
+  updateDatabase ${POD_NAME} ${MYSQL_ROOT_PASSWORD}
+
+  print_info "Show database after update data"
+  showDatabase ${POD_NAME} ${MYSQL_ROOT_PASSWORD}
 
   checkCleanupMode
   print_done "Poc completed successfully"

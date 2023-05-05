@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "mysql.fullname" . }}-initialization
+  name: {{ template "mysql.fullname" . }}-scripts
   namespace: {{ .Release.Namespace }}
 data:
 {{- range $path, $_ :=  .Files.Glob  "resources/scripts/**.sql" }}
