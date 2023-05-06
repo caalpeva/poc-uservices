@@ -47,10 +47,6 @@ function handleTermSignal() {
 
 function cleanup() {
   print_debug "Cleaning environment..."
-  if [ -n "$PORT_FORWARD_PID" ]; then
-    print_info "Kill the execution of the port-forward command"
-    evalCommand kill -9 $PORT_FORWARD_PID
-  fi
   helm::uninstallChart $CHART_RELEASE --namespace $NAMESPACE
   kubectl delete ns $NAMESPACE
   evalCommand rm -rf ${TMP_DIRECTORY}

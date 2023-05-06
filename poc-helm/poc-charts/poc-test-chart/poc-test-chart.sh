@@ -50,6 +50,8 @@ function cleanup() {
   fi
   helm::uninstallChart $CHART_RELEASE --namespace $NAMESPACE
   kubectl delete ns $NAMESPACE
+  evalCommand rm -rf "${CHARTS_DIRECTORY}/$CHART_NAME/charts"
+  evalCommand rm -rf "${CHARTS_DIRECTORY}/$CHART_NAME/Chart.lock"
 }
 
 function main() {
@@ -63,6 +65,8 @@ function main() {
   checkInteractiveMode
 
   kubectl::showNodes
+
+  helm::updateChartDependencies "${CHARTS_DIRECTORY}/$CHART_NAME"
 
   helm::templateFiles "${CHARTS_DIRECTORY}/$CHART_NAME" \
     "templates/tests/test-connection.yaml"
@@ -109,7 +113,6 @@ function main() {
     exit 1
   fi
 
-  checkCleanupMode
   print_done "Poc completed successfully"
   exit 0
 }
