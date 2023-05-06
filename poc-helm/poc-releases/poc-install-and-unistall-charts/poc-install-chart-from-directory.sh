@@ -4,7 +4,7 @@ DIR=$(dirname $(readlink -f $0))
 
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../../utils/uservices-utils.src"
+source "${DIR}/../../../utils/uservices.src"
 source "${DIR}/../../../poc-k8s/utils/kubectl.src"
 source "${DIR}/../../utils/helm.src"
 

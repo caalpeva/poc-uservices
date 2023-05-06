@@ -4,7 +4,7 @@ DIR=$(dirname $(readlink -f $0))
 
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/print-utils.src"
 source "${DIR}/../../../dependencies/downloads/poc-bash-master/includes/trace-utils.src"
-source "${DIR}/../../../utils/uservices-utils.src"
+source "${DIR}/../../../utils/uservices.src"
 source "${DIR}/../../../poc-k8s/utils/kubectl.src"
 source "${DIR}/../../utils/helm.src"
 
@@ -22,7 +22,7 @@ CHART_RELEASE="poc-$CHART_NAME"
 SERVICE_NAME=$CHART_RELEASE
 SECRET_NAME=$CHART_RELEASE
 
-MYSQL_DATABASE="CYCLING"
+MYSQL_DATABASE="TENNIS"
 
 LOCAL_PORT=3306
 
@@ -60,11 +60,11 @@ function showDatabase {
   xtrace on
   kubectl -n $NAMESPACE exec $POD_NAME -- \
     mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
-    --table -e "select * from TEAM"
+    --table -e "select * from COUNTRIES"
 
   kubectl -n $NAMESPACE exec $POD_NAME -- \
     mysql -uroot -p${MYSQL_ROOT_PASSWORD} ${MYSQL_DATABASE} \
-    --table -e "select * from RIDER"
+    --table -e "select * from PLAYERS"
   xtrace off
   sleep 1
 

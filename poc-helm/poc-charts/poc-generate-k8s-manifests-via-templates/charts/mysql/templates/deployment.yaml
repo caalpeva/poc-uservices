@@ -240,12 +240,14 @@ spec:
       - name: initializations
         configMap:
           name: {{ template "mysql.fullname" . }}-scripts
+          # To indicate a specific file
           items:
-            - key: init-db.sql
-              path: init-db.sql
+            - key: init.sql
+              path: init.sql
       - name: updates
         configMap:
           name: {{ template "mysql.fullname" . }}-scripts
+          # To indicate a specific file
           items:
             - key: update.sql
               path: update.sql

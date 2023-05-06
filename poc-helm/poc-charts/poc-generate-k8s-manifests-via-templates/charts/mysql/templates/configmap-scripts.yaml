@@ -1,10 +1,13 @@
+{{- $hasFiles := .Files.Glob "resources/database/**.sql" }}
+{{ if $hasFiles }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "mysql.fullname" . }}-scripts
   namespace: {{ .Release.Namespace }}
 data:
-{{- range $path, $_ :=  .Files.Glob  "resources/scripts/**.sql" }}
-  {{ $path | trimPrefix "resources/scripts/" }}: |-
+{{- range $path, $_ :=  .Files.Glob  "resources/database/**.sql" }}
+  {{ $path | trimPrefix "resources/database/" }}: |-
 {{ $.Files.Get $path | indent 4 }}
+{{- end }}
 {{- end }}
