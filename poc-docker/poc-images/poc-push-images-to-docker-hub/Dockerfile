@@ -10,6 +10,10 @@ RUN apt-get update && \
 RUN apt-get update && \
     apt-get install -y curl
 
+# install mysql client
+RUN apt-get update && \
+    apt-get install mysql-client -y
+
 # install network utils
 # RUN apt-get update && \
 #    apt-get install -y net-tools && \
