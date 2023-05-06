@@ -246,6 +246,14 @@ function helm::pushChart() {
   checkInteractiveMode
 }
 
+function helm::testChart() {
+  print_info "Testing chart..."
+  xtrace on
+  helm test $@
+  xtrace off
+  checkInteractiveMode
+}
+
 ##############################
 #  AUXILIARY HELM METHODS  #
 ##############################
