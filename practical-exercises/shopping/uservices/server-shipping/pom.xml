@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.3.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>team.boolbee.poc</groupId>
+	<artifactId>server-shipping</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>poc-spring-5.x-07-boot-ws-restful</name>
+	<description>Demo project for Spring Boot</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<docker.container.registry>docker.io</docker.container.registry>
+		<docker.push.repository>kalpeva</docker.push.repository>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.47</version>
+		</dependency>
+	</dependencies>
+
+<!--	clean package spring-boot:run-->
+	<build>
+		<finalName>${project.name}-${project.version}</finalName>
+ 		<filters>
+ 			<filter>databases/${databaseType}/database.properties</filter>
+ 		</filters>
+ 		<resources>
+ 			<resource>
+ 				<directory>src/main/resources</directory>
+ 				<filtering>true</filtering>
+ 			</resource>
+ 		</resources>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<!--mvn docker:build -Ddocker.verbose-->
+				<!--mvn -Ddocker.username=<username> -Ddocker.password=<password> docker:push-->
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.40.2</version>
+				<configuration>
+					<registry>${docker.container.registry}</registry>
+					<images>
+						<image>
+							<name>${docker.push.repository}/${project.artifactId}</name>
+							<build>
+								<contextDir>${project.basedir}</contextDir>
+								<dockerFile>Dockerfile</dockerFile>
+								<filter>@</filter>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+							</build>
+						</image>
+					</images>
+				</configuration>
+				<executions>
+					<execution>
+						<id>docker-build</id>
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+						<!--<configuration>
+                            <filter>${project.artifactId}</filter>
+                        </configuration>-->
+					</execution>
+					<execution>
+						<id>docker-push</id>
+						<phase>install</phase>
+						<goals>
+							<goal>push</goal>
+						</goals>
+						<configuration>
+							<filter>${project.artifactId}</filter>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<profiles>
+		<profile>
+			<id>hsqldb</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<databaseType>hsqldb</databaseType>
+				<!--<maven.test.skip>true</maven.test.skip>-->
+			</properties>
+		</profile>
+		<profile>
+			<id>mysql</id>
+			<properties>
+				<databaseType>mysql</databaseType>
+				<!--<maven.test.skip>true</maven.test.skip>-->
+			</properties> 			
+		</profile>
+	</profiles>
+
+</project>
