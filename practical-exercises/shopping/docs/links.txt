@@ -1,5 +1,0 @@
-https://www.linkedin.com/pulse/saga-pattern-microservices-omar-ismail
-https://www.netmentor.es/entrada/patron-saga
-https://www.vinsguru.com/orchestration-saga-pattern-with-spring-boot/
-https://docs.aws.amazon.com/prescriptive-guidance/latest/modernization-data-persistence/saga-pattern.html
-https://medium.com/aws-lambda-serverless-developer-guide-with-hands/saga-pattern-for-orchestrate-distributed-transactions-using-aws-step-functions-2513db0de84e
