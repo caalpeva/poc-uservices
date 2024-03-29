@@ -15,6 +15,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>de.audioattack.io</groupId>
+            <artifactId>console</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <finalName>${project.name}-${project.version}</finalName>
         <plugins>
@@ -29,15 +37,30 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version> <!-- Ajusta la versión según la necesites -->
                 <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                     <archive>
-                        <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-                        </archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>team.boolbee.poc.JavaPassFromConsole</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>assemble-all</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
- 
+
 </project>

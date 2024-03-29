@@ -1,7 +1,7 @@
 version: '3'
 services:
   java:
-    container_name: poc_java
+    container_name: poc_java_remote_debug
     image: poc-java-remote-debug:1.0
     stdin_open: true # docker run -i
     tty: true        # docker run -t

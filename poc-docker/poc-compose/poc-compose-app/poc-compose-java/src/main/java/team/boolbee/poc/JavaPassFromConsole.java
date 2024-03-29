@@ -1,26 +1,26 @@
 package team.boolbee.poc;
 
-import java.io.*;
+import de.audioattack.io.ConsoleCreator;
+import de.audioattack.io.Console;
 import java.util.Arrays;
 
 public class JavaPassFromConsole {
     public static void main (String[] args) {
-        System.out.println("Esto es una prueba");
-        Console c = System.console();
-        String login = c.readLine("Enter your login: ");
-        char[] oldPassword = c.readPassword("Enter your old password: ");
-        System.out.println("Esto es una prueba2");
+        Console console = ConsoleCreator.console();
+        String login = console.readLine("Enter your login: ");
+        char[] oldPassword = console.readPassword("Enter your old password: ");
+
         if (verify(login, oldPassword)) {
             boolean match =false;
             while(!match) {
-                char[] newPassword1 = c.readPassword("Enter your new password: ");
-                char[] newPassword2 = c.readPassword("Enter new password again: ");
+                char[] newPassword1 = console.readPassword("Enter your new password: ");
+                char[] newPassword2 = console.readPassword("Enter new password again: ");
                 match = Arrays.equals(newPassword1, newPassword2);
                 if (match) {
                     change(login, newPassword1);
-                    c.format("Password for %s changed.%n", login);
+                    console.format("Password for %s changed.%n", login);
                 } else {
-                    c.format("Passwords don't match. Try again.%n");
+                    console.format("Passwords don't match. Try again.%n");
                 }
                 Arrays.fill(newPassword1, ' ');
                 Arrays.fill(newPassword2, ' ');
