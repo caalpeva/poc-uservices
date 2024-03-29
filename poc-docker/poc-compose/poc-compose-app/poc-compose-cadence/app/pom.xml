@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>team.boolbee.poc</groupId>
-    <artifactId>poc-cadence-greeting</artifactId>
+    <artifactId>poc-cadence</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
