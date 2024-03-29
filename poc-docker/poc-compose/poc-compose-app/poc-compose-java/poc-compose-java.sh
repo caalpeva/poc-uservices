@@ -9,10 +9,9 @@ source "${DIR}/../../../../utils/uservices.src"
 source "${DIR}/../../../utils/docker.src"
 source "${DIR}/../../../utils/docker-compose.src"
 
-IMAGE_PREFIX="poc-java-remote-debug"
+PROJECT_NAME="poc_java_remote_debug"
+IMAGE_PREFIX=$PROJECT_NAME
 IMAGE="$IMAGE_PREFIX:1.0"
-
-PROJECT_NAME="poc_java"
 
 function initialize() {
   print_info "Preparing poc environment..."
@@ -59,10 +58,11 @@ function main {
   print_info "Check containers status..."
   docker_compose::psWithProjectName $PROJECT_NAME
 
-  print_info "Check container connections"
-  print_debug "Interactive with IDE to create remote debug connection on port 8000 to container"
-  print_debug "Attach container via docker attach $PROJECT_NAME"
+  print_info "Add remote JVM debugging configuration from IDE"
+  print_debug "localhost and port = 8000"
   checkInteractiveMode
+  print_info "Attach $PROJECT_NAME container via docker"
+  docker::attachContainer $PROJECT_NAME
 
   checkCleanupMode
   print_done "Poc completed successfully "
