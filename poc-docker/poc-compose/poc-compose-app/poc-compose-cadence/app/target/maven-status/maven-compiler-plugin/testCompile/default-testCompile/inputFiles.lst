@@ -1,0 +1,4 @@
+/home/sorsha/workspace/poc-uservices/poc-docker/poc-compose/poc-compose-app/poc-compose-cadence/app-multi/poc-cadence-greeting/src/test/java/team/boolbee/poc/cadence/entities/workflows/TripBookingSagaWorkflowTest.java
+/home/sorsha/workspace/poc-uservices/poc-docker/poc-compose/poc-compose-app/poc-compose-cadence/app-multi/poc-cadence-greeting/src/test/java/team/boolbee/poc/cadence/entities/activities/GreetingActivitiesReplayTest.java
+/home/sorsha/workspace/poc-uservices/poc-docker/poc-compose/poc-compose-app/poc-compose-cadence/app-multi/poc-cadence-greeting/src/test/java/team/boolbee/poc/cadence/entities/activities/GreetingActivitiesWithDelayTest.java
+/home/sorsha/workspace/poc-uservices/poc-docker/poc-compose/poc-compose-app/poc-compose-cadence/app-multi/poc-cadence-greeting/src/test/java/team/boolbee/poc/cadence/entities/activities/GreetingActivitiesTest.java
