@@ -1,6 +1,9 @@
-FROM openjdk:8
+FROM openjdk:11
 COPY ./target/poc-remote-debug-1.0-SNAPSHOT-jar-with-dependencies.jar /tmp
 WORKDIR /tmp
 EXPOSE 5005
-ENV JAVA_TOOL_OPTIONS -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005
+# JDK 5-8
+#ENV JAVA_TOOL_OPTIONS -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005
+# JDK 9 or later
+ENV JAVA_TOOL_OPTIONS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 CMD ["java", "-jar", "poc-remote-debug-1.0-SNAPSHOT-jar-with-dependencies.jar"]
