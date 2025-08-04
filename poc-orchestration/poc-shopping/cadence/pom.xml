@@ -4,12 +4,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.example</groupId>
-    <artifactId>poc-cadence</artifactId>
+    <groupId>poc.orchestration</groupId>
+    <artifactId>poc-orchestration</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>cadence</artifactId>
+  <artifactId>poc-cadence</artifactId>
+  <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
     <module>activities</module>
@@ -20,6 +22,7 @@
     <module>activities/activities-inventory</module>
     <module>activities/activities-shipping</module>
     <module>activities/activities-notification</module>
+    <module>core</module>
   </modules>
 
   <properties>
