@@ -20,6 +20,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
+		<serverPort>8085</serverPort>
 		<maven.test.skip>true</maven.test.skip>
 	</properties>
 

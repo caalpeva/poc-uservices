@@ -5,5 +5,5 @@ MAINTAINER kalpeva@gmail.com
 COPY ./target /tmp
 WORKDIR /tmp
 
-EXPOSE 8888
+EXPOSE @serverPort@
 CMD ["java", "-jar", "@project.artifactId@-@project.version@-fat.@project.packaging@"]

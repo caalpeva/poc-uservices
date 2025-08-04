@@ -9,7 +9,7 @@ import static io.vertx.core.http.HttpMethod.POST;
 
 public class MainVerticle extends AbstractVerticle {
 
-  public static final int PORT = 8888;
+  public static final int PORT = 9090;
 
 /*
   @Override
