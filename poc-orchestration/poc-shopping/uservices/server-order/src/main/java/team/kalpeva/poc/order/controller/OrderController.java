@@ -14,6 +14,7 @@ import team.kalpeva.poc.order.model.Order;
 import team.kalpeva.poc.order.model.OrderRequest;
 import team.kalpeva.poc.order.model.OrderResponse;
 
+import team.kalpeva.poc.order.model.OrderStatus;
 import team.kalpeva.poc.order.service.OrderService;
 
 @RestController
@@ -29,15 +30,17 @@ public class OrderController {
 	}
 
 	@PostMapping("/create")
-	public OrderResponse save() {
-		return save(null);
-	}
-
-	@PostMapping("/create")
 	public OrderResponse save(@RequestBody OrderRequest request) {
-		Order order = new Order();
-		order.setReference(String.valueOf(UUID.randomUUID()));
-		orderService.save(new Order());
-		return null;
+		Order order = Order.builder()
+				.reference(String.valueOf(UUID.randomUUID()))
+				.userId(request.getUserId())
+				.build();
+		orderService.save(order);
+
+		return OrderResponse.builder()
+				.orderId(order.getReference())
+				.status(OrderStatus.PAYMENT_APPROVED)
+				.userId(order.getUserId())
+				.build();
 	}
 }

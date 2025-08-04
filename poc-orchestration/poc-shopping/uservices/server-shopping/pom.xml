@@ -4,9 +4,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-   <groupId>poc.orchestration</groupId>
-   <artifactId>uservices</artifactId>
-   <version>1.0-SNAPSHOT</version>
+    <groupId>poc.orchestration</groupId>
+    <artifactId>uservices</artifactId>
+    <version>1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>server-shopping</artifactId>
@@ -14,10 +14,6 @@
   <packaging>jar</packaging>
 
   <properties>
-    <docker.container.registry>docker.io</docker.container.registry>
-    <docker.push.repository>kalpeva</docker.push.repository>
-    <docker.username>${docker.username}</docker.username>
-    <docker.password>${docker.password}</docker.password>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -104,24 +100,6 @@
   <build>
     <finalName>${project.name}-${project.version}</finalName>
     <plugins>
-      <!--<plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>properties-maven-plugin</artifactId>
-        <version>1.0.0</version>
-        <executions>
-            <execution>
-                <phase>initialize</phase>
-                <goals>
-                    <goal>read-project-properties</goal>
-                </goals>
-                <configuration>
-                    <files>
-                        <file>${user.home}/.m2/credentials.properties</file>
-                    </files>
-                </configuration>
-            </execution>
-        </executions>
-      </plugin>-->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
@@ -175,77 +153,10 @@
           </arguments>
         </configuration>
       </plugin>
-
       <plugin>
-      <!--mvn docker:build -Ddocker.verbose-->
-      <!--mvn -Ddocker.username=<username> -Ddocker.password=<password> docker:push-->
-      <!--mvn clean install -Ddocker.username=<username> -Ddocker.password=<password> -->
-      <!-- mvn docker:push -X | grep -i username -->
-      <!-- mvn help:effective-settings -->
           <groupId>io.fabric8</groupId>
           <artifactId>docker-maven-plugin</artifactId>
-          <version>0.40.2</version>
-          <configuration>
-              <registry>${docker.container.registry}</registry>
-              <images>
-                  <image>
-                      <name>${docker.push.repository}/${project.artifactId}</name>
-                      <build>
-                          <contextDir>${project.basedir}</contextDir>
-                          <dockerFile>Dockerfile</dockerFile>
-                          <filter>@</filter>
-                          <tags>
-                              <tag>latest</tag>
-                              <tag>${project.version}</tag>
-                          </tags>
-                      </build>
-                  </image>
-              </images>
-              <authConfig>
-                  <username>${docker.username}</username>
-                  <password>${docker.password}</password>
-              </authConfig>
-          </configuration>
-          <executions>
-              <!-- <execution>
-                  <id>docker-remove-latest</id>
-                  <phase>initialize</phase>
-                  <goals>
-                      <goal>remove</goal>
-                  </goals>
-                  <configuration>
-                      <images>
-                          <image>
-                              <name>${docker.push.repository}/${project.artifactId}:latest</name>
-                          </image>
-                      </images>
-                  </configuration>
-              </execution> -->
-              <execution>
-                  <id>docker-build</id>
-                  <phase>package</phase>
-                  <goals>
-                      <goal>build</goal>
-                  </goals>
-                  <!--<configuration>
-                      <filter>${project.artifactId}</filter>
-                  </configuration>-->
-              </execution>
-              <execution>
-                  <id>docker-push</id>
-                  <phase>install</phase>
-                  <goals>
-                      <!--<goal>stop</goal>-->
-                      <!--<goal>build</goal>-->
-                      <goal>push</goal>
-                      <!--<goal>remove</goal>-->
-                  </goals>
-                  <!--<configuration>
-                      <filter>${project.artifactId}</filter>
-                  </configuration>-->
-              </execution>
-          </executions>
-        </plugin>
+      </plugin>
       </plugins>
   </build>
 

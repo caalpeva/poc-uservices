@@ -75,50 +75,8 @@
 			</plugin>
 
 			<plugin>
-				<!--mvn docker:build -Ddocker.verbose-->
-				<!--mvn -Ddocker.username=<username> -Ddocker.password=<password> docker:push-->
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.40.2</version>
-				<configuration>
-					<registry>${docker.container.registry}</registry>
-					<images>
-						<image>
-							<name>${docker.push.repository}/${project.artifactId}</name>
-							<build>
-								<contextDir>${project.basedir}</contextDir>
-								<dockerFile>Dockerfile</dockerFile>
-								<filter>@</filter>
-								<tags>
-									<tag>latest</tag>
-									<tag>${project.version}</tag>
-								</tags>
-							</build>
-						</image>
-					</images>
-				</configuration>
-				<executions>
-					<execution>
-						<id>docker-build</id>
-						<phase>package</phase>
-						<goals>
-							<goal>build</goal>
-						</goals>
-						<!--<configuration>
-                            <filter>${project.artifactId}</filter>
-                        </configuration>-->
-					</execution>
-					<execution>
-						<id>docker-push</id>
-						<phase>install</phase>
-						<goals>
-							<goal>push</goal>
-						</goals>
-						<configuration>
-							<filter>${project.artifactId}</filter>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

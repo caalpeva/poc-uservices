@@ -14,35 +14,101 @@
   </modules>
 
   <properties>
+    <docker.container.registry>docker.io</docker.container.registry>
+    <docker.push.repository>kalpeva</docker.push.repository>
+    <docker.username>${docker.username}</docker.username>
+    <docker.password>${docker.password}</docker.password>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <build>
-  <plugins>
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-invoker-plugin</artifactId>
-      <version>3.2.2</version>
-      <configuration>
-        <projectsDirectory>${project.basedir}</projectsDirectory>
-        <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-        <pomIncludes>
-          <pomInclude>*/pom.xml</pomInclude>
-        </pomIncludes>
-      </configuration>
-      <executions>
-        <execution>
-          <id>integration-test</id>
-          <goals>
-            <goal>install</goal>
-          </goals>
-          <phase>integration-test</phase>
-        </execution>
-      </executions>
-    </plugin>
-  </plugins>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <version>3.2.2</version>
+        <configuration>
+          <projectsDirectory>${project.basedir}</projectsDirectory>
+          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+          <pomIncludes>
+            <pomInclude>*/pom.xml</pomInclude>
+          </pomIncludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>install</goal>
+            </goals>
+            <phase>integration-test</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <!--mvn docker:build -Ddocker.verbose-->
+          <!--mvn -Ddocker.username=<username> -Ddocker.password=<password> docker:push-->
+          <!--mvn clean install -Ddocker.username=<username> -Ddocker.password=<password> -->
+          <!-- mvn docker:push -X | grep -i username -->
+          <!-- mvn help:effective-pom -->
+          <!-- mvn help:effective-settings -->
+          <groupId>io.fabric8</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
+          <version>0.40.2</version>
+          <configuration>
+            <authConfig>
+              <username>${docker.username}</username>
+              <password>${docker.password}</password>
+            </authConfig>
+            <registry>${docker.container.registry}</registry>
+            <images>
+              <image>
+                <name>${docker.push.repository}/${project.artifactId}</name>
+                <build>
+                  <contextDir>${project.basedir}</contextDir>
+                  <dockerFile>Dockerfile</dockerFile>
+                  <filter>@</filter>
+                  <tags>
+                    <tag>latest</tag>
+                    <tag>${project.version}</tag>
+                  </tags>
+                </build>
+              </image>
+            </images>
+          </configuration>
+          <executions>
+            <execution>
+              <id>docker-build</id>
+              <phase>package</phase>
+              <goals>
+                <goal>build</goal>
+              </goals>
+              <!--<configuration>
+                <filter>${project.artifactId}</filter>
+              </configuration>-->
+            </execution>
+            <execution>
+              <id>docker-push</id>
+              <phase>install</phase>
+              <goals>
+                <!--<goal>stop</goal>-->
+                <!--<goal>build</goal>-->
+                <goal>push</goal>
+                <!--<goal>remove</goal>-->
+              </goals>
+              <!--<configuration>
+                <filter>${project.artifactId}</filter>
+              </configuration>-->
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
   </build>
 
 </project>
