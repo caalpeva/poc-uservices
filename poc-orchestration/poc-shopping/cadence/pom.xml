@@ -7,22 +7,15 @@
     <groupId>poc.orchestration</groupId>
     <artifactId>poc-orchestration</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>poc-cadence</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+
   <modules>
+    <module>core</module>
     <module>activities</module>
     <module>workflows</module>
-    <module>workflows/workflow-purchase</module>
-    <module>activities/activities-order</module>
-    <module>activities/activities-payment</module>
-    <module>activities/activities-inventory</module>
-    <module>activities/activities-shipping</module>
-    <module>activities/activities-notification</module>
-    <module>core</module>
   </modules>
 
   <properties>

@@ -12,6 +12,14 @@
   <artifactId>activities</artifactId>
   <packaging>pom</packaging>
 
+  <modules>
+    <module>activities-order</module>
+    <module>activities-payment</module>
+    <module>activities-inventory</module>
+    <module>activities-shipping</module>
+    <module>activities-notification</module>
+  </modules>
+
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>

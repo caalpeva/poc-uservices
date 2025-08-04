@@ -1,10 +1,10 @@
 package team.kalpeva.poc.order.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @ToString
 public class OrderRequest {

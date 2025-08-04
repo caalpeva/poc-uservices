@@ -160,4 +160,31 @@
       </plugins>
   </build>
 
+  <!-- mvn clean install -Pdocker-push -Ddocker.username=<username> -Ddocker.password=<password> -->
+  <profiles>
+    <profile>
+      <id>docker-push</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>push-image</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>push</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
