@@ -7,3 +7,4 @@ WORKDIR /tmp
 
 EXPOSE @serverPort@
 CMD ["java", "-jar", "@project.artifactId@-@project.version@.@project.packaging@"]
+

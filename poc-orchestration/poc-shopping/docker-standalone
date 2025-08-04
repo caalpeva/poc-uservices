@@ -1,0 +1,28 @@
+# Stage 1: Build con Maven
+FROM maven:3.8.7-openjdk-11 AS build
+
+WORKDIR /app
+
+# Copiar pom.xml y descargar dependencias (caching)
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copiar el resto del código
+COPY src ./src
+
+# Construir el jar empaquetado con Spring Boot
+RUN mvn clean package -DskipTests
+
+# Stage 2: Imagen ligera para ejecutar la app
+FROM openjdk:11-jre-slim
+
+WORKDIR /app
+
+# Copiar jar generado desde la etapa anterior
+COPY --from=build /app/target/*.jar app.jar
+
+# Puerto expuesto (puedes parametrizar)
+EXPOSE 8080
+
+# Comando para arrancar la app
+ENTRYPOINT ["java", "-jar", "app.jar"]

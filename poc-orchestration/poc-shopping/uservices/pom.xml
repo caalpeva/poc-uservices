@@ -58,9 +58,14 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
           <version>${spring.boot.version}</version>
-          <!-- configuración común para el plugin -->
+          <executions>
+            <execution>
+              <goals>
+                <goal>repackage</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
-        <!-- Otros plugins comunes -->
       </plugins>
     </pluginManagement>
   </build>
