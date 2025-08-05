@@ -49,6 +49,21 @@
         <artifactId>springdoc-openapi-ui</artifactId>
         <version>1.6.15</version>
       </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.38</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.25</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.3</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -74,6 +89,7 @@
           <!-- mvn docker:push -X | grep -i username -->
           <!-- mvn help:effective-pom -->
           <!-- mvn help:effective-settings -->
+          <!-- mvn help:evaluate -Dexpression=docker.file.path -q -DforceStdout -->
           <groupId>io.fabric8</groupId>
           <artifactId>docker-maven-plugin</artifactId>
           <version>0.40.2</version>

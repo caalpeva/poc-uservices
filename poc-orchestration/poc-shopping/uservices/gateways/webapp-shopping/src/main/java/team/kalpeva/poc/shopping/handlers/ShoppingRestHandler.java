@@ -1,9 +1,9 @@
-package team.kalpeva.poc.shopping.comm.handlers;
+package team.kalpeva.poc.shopping.handlers;
 
 import io.vertx.ext.web.RequestBody;
 import io.vertx.ext.web.RoutingContext;
 
-public interface OrderRestHandler {
+public interface ShoppingRestHandler {
 
     default String extractRequestBodyAsTextPlain(RoutingContext context) {
         if (context != null) {
