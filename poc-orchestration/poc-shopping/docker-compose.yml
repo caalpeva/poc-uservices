@@ -53,33 +53,33 @@ services:
       - prometheus
     ports:
       - '3000:3000'
-  server-shopping:
-    image: kalpeva/server-shopping:latest
+  webapp-shopping:
+    image: kalpeva/api-shopping:latest
     user: "1000"
     ports:
       - '7090:8080'
-  server-order:
-    image: kalpeva/server-order:latest
+  api-order:
+    image: kalpeva/api-order:latest
     user: "1000"
     ports:
       - '7091:8080'
-  server-inventory:
-    image: kalpeva/server-inventory:latest
+  api-inventory:
+    image: kalpeva/api-inventory:latest
     user: "1000"
     ports:
       - '7092:8080'
-  server-payment:
-    image: kalpeva/server-payment:latest
+  api-payment:
+    image: kalpeva/api-payment:latest
     user: "1000"
     ports:
       - '7093:8085'
-  server-shipping:
-    image: kalpeva/server-shipping:latest
+  api-shipping:
+    image: kalpeva/api-shipping:latest
     user: "1000"
     ports:
       - '7094:8080'
-  server-notification:
-    image: kalpeva/server-notification:latest
+  api-notification:
+    image: kalpeva/api-notification:latest
     user: "1000"
     ports:
       - '7095:9090'
