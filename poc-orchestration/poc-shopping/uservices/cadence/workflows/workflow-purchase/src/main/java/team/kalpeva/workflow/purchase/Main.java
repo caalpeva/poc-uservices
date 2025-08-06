@@ -9,7 +9,7 @@ public class Main {
 
   public static void main(String[] args) {
     CadenceManager cadenceManager = new CadenceManager();
-    cadenceManager.registerDomain(CADENCE_DOMAIN);
+    //cadenceManager.registerDomain(CADENCE_DOMAIN);
     cadenceManager.startWorker(cadenceManager.createDefaultWorkflowClient(CADENCE_DOMAIN),
             TASKLIST,
             PurchaseWorkflow.class);

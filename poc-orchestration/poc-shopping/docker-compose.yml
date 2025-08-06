@@ -1,9 +1,17 @@
 version: '3'
 services:
   cassandra:
-    image: cassandra:3.11
+    image: cassandra:4.1.1
     ports:
       - "9042:9042"
+    environment:
+      - "MAX_HEAP_SIZE=256M"
+      - "HEAP_NEWSIZE=128M"
+    healthcheck:
+      test: ["CMD", "cqlsh", "-u cassandra", "-p cassandra" ,"-e describe keyspaces"]
+      interval: 15s
+      timeout: 30s
+      retries: 10
   prometheus:
     image: prom/prometheus:latest
     volumes:
@@ -16,7 +24,7 @@ services:
     image: prom/node-exporter
     ports:
       - '9100:9100'
-  cadence-server:
+  cadence:
     image: ubercadence/server:master-auto-setup
     ports:
      - "8000:8000"
@@ -28,6 +36,7 @@ services:
      - "7935:7935"
      - "7939:7939"
      - "7833:7833"
+     - "7936:7936"
     environment:
       - "CASSANDRA_SEEDS=cassandra"
       - "PROMETHEUS_ENDPOINT_0=0.0.0.0:8000"
@@ -35,19 +44,25 @@ services:
       - "PROMETHEUS_ENDPOINT_2=0.0.0.0:8002"
       - "PROMETHEUS_ENDPOINT_3=0.0.0.0:8003"
       - "DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development.yaml"
+      - "FRONTEND_PPROF_PORT=7936"
+      - "LOG_LEVEL=debug"
     depends_on:
-      - cassandra
-      - prometheus
+      cassandra:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
   cadence-web:
     image: ubercadence/web:latest
     environment:
-      - "CADENCE_TCHANNEL_PEERS=cadence-server:7933"
+      - "CADENCE_GRPC_PEERS=cadence:7833"
     ports:
-      - "8089:8088"
+      - "8188:8088"
     depends_on:
-      - cadence-server
+      - cadence
   grafana:
     image: grafana/grafana
+    volumes:
+      - ./grafana:/etc/grafana
     user: "1000"
     depends_on:
       - prometheus
@@ -55,39 +70,29 @@ services:
       - '3000:3000'
   webapp-shopping:
     image: kalpeva/api-shopping:latest
-    user: "1000"
     ports:
-      - '7090:8080'
+      - '7090:9090'
   api-order:
     image: kalpeva/api-order:latest
-    user: "1000"
     ports:
       - '7091:8080'
   api-inventory:
     image: kalpeva/api-inventory:latest
-    user: "1000"
     ports:
       - '7092:8080'
   api-payment:
     image: kalpeva/api-payment:latest
-    user: "1000"
     ports:
       - '7093:8085'
   api-shipping:
     image: kalpeva/api-shipping:latest
-    user: "1000"
     ports:
       - '7094:8080'
   api-notification:
     image: kalpeva/api-notification:latest
-    user: "1000"
     ports:
       - '7095:9090'
   activities-inventory:
     image: kalpeva/activities-inventory:latest
-    user: "1000"
   workflow-purchase:
     image: kalpeva/workflow-purchase:latest
-    user: "1000"
-
-

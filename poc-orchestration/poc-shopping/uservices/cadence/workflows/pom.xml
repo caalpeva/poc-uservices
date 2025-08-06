@@ -10,12 +10,12 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
+  <artifactId>workflows</artifactId>
+  <packaging>pom</packaging>
+
   <modules>
     <module>workflow-purchase</module>
   </modules>
-
-  <artifactId>workflows</artifactId>
-  <packaging>pom</packaging>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
