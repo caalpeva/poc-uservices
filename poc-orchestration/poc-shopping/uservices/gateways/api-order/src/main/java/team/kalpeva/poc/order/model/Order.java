@@ -1,6 +1,5 @@
 package team.kalpeva.poc.order.model;
 
-import jdk.nashorn.internal.objects.annotations.Constructor;
 import lombok.*;
 
 import java.util.Date;
