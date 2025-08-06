@@ -23,9 +23,13 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class CadenceManager {
-    private static Logger logger = LoggerFactory.getLogger(CadenceManager.class);
+    private Logger logger = LoggerFactory.getLogger(CadenceManager.class);
 
-    public static boolean registerDomain(String name) {
+    public CadenceManager() {
+
+    }
+
+    public boolean registerDomain(String name) {
         int retentionPeriodInDays = 1;
         IWorkflowService cadenceService = new WorkflowServiceTChannel(ClientOptions.defaultInstance());
         RegisterDomainRequest request = new RegisterDomainRequest();
@@ -46,13 +50,13 @@ public class CadenceManager {
         return false;
     }
 
-    public static WorkflowClient createDefaultWorkflowClient(String domain) {
+    public WorkflowClient createDefaultWorkflowClient(String domain) {
         return createWorkflowClient(domain,
                 //new Thrift2ProtoAdapter(IGrpcServiceStubs.newInstance()));
                 new WorkflowServiceTChannel(ClientOptions.defaultInstance()));
     }
 
-    public static WorkflowClient createWorkflowClient(String domain, IWorkflowService service) {
+    public WorkflowClient createWorkflowClient(String domain, IWorkflowService service) {
         return WorkflowClient.newInstance(
                 service,
                 WorkflowClientOptions.newBuilder()
@@ -60,12 +64,22 @@ public class CadenceManager {
                         .build());
     }
 
-    // Get worker to poll the task list.
-    public static void startOneWorker(WorkflowClient workflowClient,
+    public void startWorker(WorkflowClient workflowClient,
                                       String taskList,
-                                      Class<?>[] workflowImplementationTypes,
-                                      Object[] activitiesImplementations) {
-        //WorkerFactory factory = WorkerFactory.newInstance(workflowClient);
+                                      Class<?>...workflowImplementationTypes) {
+        startWorker(workflowClient, taskList, workflowImplementationTypes, null);
+    }
+
+    public void startWorker(WorkflowClient workflowClient,
+                            String taskList,
+                            Object...activitiesImplementations) {
+        startWorker(workflowClient, taskList, null, activitiesImplementations);
+    }
+
+    public void startWorker(WorkflowClient workflowClient,
+                            String taskList,
+                            Class<?>[] workflowImplementationTypes,
+                            Object[] activitiesImplementations) {
         WorkerFactory factory = WorkerFactory.newInstance(workflowClient,
                 WorkerFactoryOptions.newBuilder()
                         .setMaxWorkflowThreadCount(1000)
@@ -73,20 +87,25 @@ public class CadenceManager {
                         .setDisableStickyExecution(false)
                         .build());
 
-        //Worker worker = factory.newWorker(taskList);
         Worker worker = factory.newWorker(taskList,
                 WorkerOptions.newBuilder()
                         .setMaxConcurrentActivityExecutionSize(100)
                         .setMaxConcurrentWorkflowExecutionSize(100)
                         .build());
-        worker.registerWorkflowImplementationTypes(workflowImplementationTypes);
-        worker.registerActivitiesImplementations(activitiesImplementations);
+
+        if (workflowImplementationTypes != null) {
+            worker.registerWorkflowImplementationTypes(workflowImplementationTypes);
+        }
+
+        if (activitiesImplementations != null) {
+            worker.registerActivitiesImplementations(activitiesImplementations);
+        }
 
         // Start all workers created by this factory
         factory.start();
     }
 
-    public static String queryWorkflowExecution(String domain, String queryType, String workflowId, String runId) {
+    public String queryWorkflowExecution(String domain, String queryType, String workflowId, String runId) {
         WorkflowExecution workflowExecution = new WorkflowExecution();
         workflowExecution.setWorkflowId(workflowId);
         workflowExecution.setRunId(runId);
@@ -96,7 +115,7 @@ public class CadenceManager {
         return untypedWorkflow.query(queryType, String.class);
     }
 
-    public static String printWorkflowExecutionHistory(String domain, String queryType, String workflowId, String runId) {
+    public String printWorkflowExecutionHistory(String domain, String queryType, String workflowId, String runId) {
         WorkflowExecution workflowExecution = new WorkflowExecution();
         workflowExecution.setWorkflowId(workflowId);
         workflowExecution.setRunId(runId);
@@ -105,7 +124,7 @@ public class CadenceManager {
         return WorkflowExecutionUtils.prettyPrintHistory(cadenceService, domain, workflowExecution, true);
     }
 
-    public static SignaledWorkflowStatus signalAndWait(WorkflowClient workflowClient,
+    public SignaledWorkflowStatus signalAndWait(WorkflowClient workflowClient,
                                                        String domain,
                                                        String workflowId,
                                                        String runId,

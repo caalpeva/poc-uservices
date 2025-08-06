@@ -7,6 +7,7 @@
     <groupId>poc.orchestration</groupId>
     <artifactId>poc-orchestration</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>uservices</artifactId>
@@ -71,18 +72,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-maven-plugin</artifactId>
-          <version>${spring.boot.version}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>repackage</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <!--mvn docker:build -Ddocker.verbose-->
           <!--mvn -Ddocker.username=<username> -Ddocker.password=<password> docker:push-->
           <!--mvn clean install -Ddocker.username=<username> -Ddocker.password=<password> -->
@@ -119,24 +108,16 @@
               <id>docker-build</id>
               <phase>package</phase>
               <goals>
+                <goal>remove</goal>
                 <goal>build</goal>
               </goals>
-              <!--<configuration>
-                <filter>${project.artifactId}</filter>
-              </configuration>-->
             </execution>
             <execution>
               <id>docker-push</id>
               <phase>install</phase>
               <goals>
-                <!--<goal>stop</goal>-->
-                <!--<goal>build</goal>-->
                 <goal>push</goal>
-                <!--<goal>remove</goal>-->
               </goals>
-              <!--<configuration>
-                <filter>${project.artifactId}</filter>
-              </configuration>-->
             </execution>
           </executions>
         </plugin>

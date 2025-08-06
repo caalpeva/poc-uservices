@@ -7,6 +7,7 @@
     <groupId>poc.orchestration</groupId>
     <artifactId>uservices</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>webapp-shopping</artifactId>
@@ -75,6 +76,27 @@
       <artifactId>dagger-compiler</artifactId>
       <version>${dagger.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>poc.orchestration</groupId>
+      <artifactId>commons</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>poc.orchestration</groupId>
+      <artifactId>workflow-purchase</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>poc.orchestration</groupId>
+      <artifactId>activities-inventory</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>

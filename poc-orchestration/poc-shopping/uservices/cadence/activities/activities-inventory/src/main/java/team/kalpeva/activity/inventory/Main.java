@@ -1,4 +1,4 @@
-package team.kalpeva.workflow.purchase;
+package team.kalpeva.activity.inventory;
 
 import team.boolbee.poc.cadence.entities.CadenceManager;
 
@@ -11,7 +11,7 @@ public class Main {
     CadenceManager cadenceManager = new CadenceManager();
     cadenceManager.startWorker(cadenceManager.createDefaultWorkflowClient(CADENCE_DOMAIN),
             TASKLIST,
-            PurchaseWorkflow.class);
+            new InventoryActivityImpl());
 
     System.out.println("ACTIVITY STARTED!");
   }

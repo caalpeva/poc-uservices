@@ -13,6 +13,7 @@
 		<groupId>poc.orchestration</groupId>
 		<artifactId>uservices</artifactId>
 		<version>1.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>api-order</artifactId>

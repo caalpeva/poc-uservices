@@ -1,4 +1,4 @@
-package team.kalpeva.workflow.purchase;
+package team.kalpeva.activity.inventory;
 
 public class Main {
 

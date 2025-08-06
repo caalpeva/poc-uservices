@@ -5,8 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>poc.orchestration</groupId>
-    <artifactId>poc-cadence</artifactId>
+    <artifactId>cadence</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <modules>
