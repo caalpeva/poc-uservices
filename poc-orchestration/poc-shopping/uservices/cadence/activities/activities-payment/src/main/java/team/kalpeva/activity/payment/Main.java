@@ -1,4 +1,4 @@
-package team.kalpeva.activity.inventory;
+package team.kalpeva.activity.payment;
 
 public class Main {
 

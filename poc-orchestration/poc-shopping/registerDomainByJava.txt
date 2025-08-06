@@ -1,0 +1,32 @@
+import com.uber.cadence.domain.DomainDescription;
+import com.uber.cadence.domain.RegisterDomainRequest;
+import com.uber.cadence.serviceclient.WorkflowServiceTChannel;
+import com.uber.cadence.WorkflowService;
+import com.uber.cadence.ServiceException;
+
+public class CadenceDomainRegistrar {
+
+    public static void main(String[] args) {
+        String domainName = "my-domain";
+        int retentionDays = 1;
+
+        WorkflowService cadenceService = new WorkflowServiceTChannel();
+
+        RegisterDomainRequest request = new RegisterDomainRequest();
+        request.setName(domainName);
+        request.setWorkflowExecutionRetentionPeriodInDays(retentionDays);
+        request.setDescription("Registered from Java app");
+
+        try {
+            cadenceService.RegisterDomain(request);
+            System.out.println("✅ Dominio registrado exitosamente: " + domainName);
+        } catch (ServiceException e) {
+            if (e.getMessage().contains("Domain already exists")) {
+                System.out.println("ℹ️ El dominio ya existe: " + domainName);
+            } else {
+                System.err.println("❌ Error al registrar el dominio: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+}

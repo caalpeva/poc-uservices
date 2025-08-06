@@ -10,7 +10,7 @@ public class InventoryActivityImpl implements InventoryActivity {
 
     @Override
     public String composeGreeting(String greeting, String name) {
-        logger.info("From {}", Activity.getWorkflowExecution());
+        //logger.info("From {}", Activity.getWorkflowExecution());
         return greeting + " " + name + "!";
     }
 }

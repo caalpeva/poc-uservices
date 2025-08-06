@@ -5,7 +5,7 @@ import team.boolbee.poc.cadence.entities.CadenceManager;
 public class Main {
 
   private final static String CADENCE_DOMAIN = "poc-shopping";
-  private final static String TASKLIST = "tl-workflow-purchase-v1";
+  private final static String TASKLIST = "tl-activities-inventory-v1";
 
   public static void main(String[] args) {
     CadenceManager cadenceManager = new CadenceManager();

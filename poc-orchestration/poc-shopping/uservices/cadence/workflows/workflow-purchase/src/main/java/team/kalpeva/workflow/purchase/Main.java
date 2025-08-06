@@ -12,7 +12,7 @@ public class Main {
     //cadenceManager.registerDomain(CADENCE_DOMAIN);
     cadenceManager.startWorker(cadenceManager.createDefaultWorkflowClient(CADENCE_DOMAIN),
             TASKLIST,
-            PurchaseWorkflow.class);
+            PurchaseWorkflowImpl.class);
 
     System.out.println("ACTIVITY STARTED!");
   }

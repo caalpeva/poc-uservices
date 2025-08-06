@@ -1,12 +1,22 @@
 package team.kalpeva.workflow.purchase;
 
+import com.uber.cadence.activity.ActivityOptions;
 import team.kalpeva.activity.inventory.InventoryActivity;
 import com.uber.cadence.workflow.Workflow;
 
+import java.time.Duration;
+
 public class PurchaseWorkflowImpl implements PurchaseWorkflow {
 
+    private final static String ACTIVITY_TASKLIST = "tl-activities-inventory-v1";
+
+    private final ActivityOptions options = new ActivityOptions.Builder()
+            .setTaskList(ACTIVITY_TASKLIST)
+            .setScheduleToCloseTimeout(Duration.ofMinutes(5))
+            .build();
+
     private final InventoryActivity activities =
-            Workflow.newActivityStub(InventoryActivity.class);
+            Workflow.newActivityStub(InventoryActivity.class, options);
 
     @Override
     public String execute(String name) {

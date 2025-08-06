@@ -19,7 +19,7 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
-      - '9092:9090'
+      - '9090:9090'
   node-exporter:
     image: prom/node-exporter
     ports:
@@ -68,3 +68,31 @@ services:
       - prometheus
     ports:
       - '3000:3000'
+  webapp-shopping:
+    image: kalpeva/api-shopping:latest
+    ports:
+      - '7090:9090'
+  api-order:
+    image: kalpeva/api-order:latest
+    ports:
+      - '7091:8080'
+  api-inventory:
+    image: kalpeva/api-inventory:latest
+    ports:
+      - '7092:8080'
+  api-payment:
+    image: kalpeva/api-payment:latest
+    ports:
+      - '7093:8085'
+  api-shipping:
+    image: kalpeva/api-shipping:latest
+    ports:
+      - '7094:8080'
+  api-notification:
+    image: kalpeva/api-notification:latest
+    ports:
+      - '7095:9090'
+  activities-inventory:
+    image: kalpeva/activities-inventory:latest
+  workflow-purchase:
+    image: kalpeva/workflow-purchase:latest
