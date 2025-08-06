@@ -83,5 +83,11 @@ services:
     user: "1000"
     ports:
       - '7095:9090'
+  activities-inventory:
+    image: kalpeva/activities-inventory:latest
+    user: "1000"
+  workflow-purchase:
+    image: kalpeva/workflow-purchase:latest
+    user: "1000"
 
 

@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class CadenceManager {
-    private Logger logger = LoggerFactory.getLogger(CadenceManager.class);
+    private final static Logger logger = LoggerFactory.getLogger(CadenceManager.class);
 
     public CadenceManager() {
 

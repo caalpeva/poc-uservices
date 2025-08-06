@@ -16,9 +16,9 @@
 
   <properties>
     <serverPort>9090</serverPort>
-    <java.version>1.8</java.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <java.version>11</java.version>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
@@ -82,21 +82,18 @@
       <groupId>poc.orchestration</groupId>
       <artifactId>commons</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>poc.orchestration</groupId>
       <artifactId>workflow-purchase</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>poc.orchestration</groupId>
       <artifactId>activities-inventory</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>

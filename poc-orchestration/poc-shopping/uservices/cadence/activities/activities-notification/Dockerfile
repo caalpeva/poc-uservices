@@ -6,4 +6,4 @@ COPY ./target /tmp
 WORKDIR /tmp
 
 EXPOSE @serverPort@
-CMD ["java", "-jar", "@project.artifactId@-@project.version@-fat.@project.packaging@"]
+CMD ["java", "-jar", "@project.artifactId@-@project.version@.@project.packaging@"]
