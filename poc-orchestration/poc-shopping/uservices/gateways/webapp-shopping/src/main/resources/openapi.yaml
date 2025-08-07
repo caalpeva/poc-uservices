@@ -1,0 +1,85 @@
+openapi: 3.0.3
+info:
+  title: Order API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:9090/v1
+
+paths:
+  /orders:
+    post:
+      operationId: createOrder
+      summary: Crear una orden
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShoppingRequest'
+      responses:
+        '200':
+          description: Orden creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShoppingResponse'
+        '400':
+          description: Error de validación u otro error del cliente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Error no documentado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ShoppingRequest:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: "12345"
+        type:
+          type: string
+          example: "online"
+
+    ShoppingResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "Orden creada exitosamente."
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: "INVALID_ORDER"
+        message:
+          type: string
+          example: "El tipo de orden no es válido."
+        details:
+          type: object
+          additionalProperties: true
+          description: Información adicional opcional sobre el error

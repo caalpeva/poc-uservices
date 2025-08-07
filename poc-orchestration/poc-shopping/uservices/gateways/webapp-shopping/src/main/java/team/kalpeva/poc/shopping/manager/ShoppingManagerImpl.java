@@ -24,7 +24,7 @@ public class ShoppingManagerImpl implements ShoppingManager {
 
     @Override
     public Single<WorkflowResponse> manage(ShoppingRequest request) {
-        return Single.fromCallable(() -> {
+        /*return Single.fromCallable(() -> {
             WorkflowClient workflowClient = cadenceManager.createDefaultWorkflowClient(CADENCE_DOMAIN);
             PurchaseWorkflow workflow = workflowClient.newWorkflowStub(
                     PurchaseWorkflow.class,
@@ -33,6 +33,10 @@ public class ShoppingManagerImpl implements ShoppingManager {
                             .build());
             return workflow.execute("PERICO");
         }).map(message -> WorkflowResponse.builder()
+                .message("HOLA PERICOOOOOOOO")
+                .build());
+         */
+        return Single.just(WorkflowResponse.builder()
                 .message("HOLA PERICOOOOOOOO")
                 .build());
     }

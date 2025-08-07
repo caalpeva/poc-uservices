@@ -8,6 +8,7 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RequestBody;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.openapi.validation.ValidatedRequest;
 import lombok.extern.slf4j.Slf4j;
 import team.kalpeva.poc.shopping.manager.ShoppingManager;
 import team.kalpeva.poc.shopping.model.ShoppingRequest;
@@ -17,6 +18,8 @@ import team.kalpeva.poc.shopping.model.WorkflowResponse;
 import javax.inject.Inject;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import static io.vertx.ext.web.openapi.router.RouterBuilder.KEY_META_DATA_VALIDATED_REQUEST;
 
 @Slf4j
 public class ShoppingRestHandlerImpl implements Handler<RoutingContext> {
@@ -31,7 +34,10 @@ public class ShoppingRestHandlerImpl implements Handler<RoutingContext> {
     @Override
     public void handle(RoutingContext context) {
         log.info("Request received: {}", extractBodyFrom(context.body()));
-        executeSafely(() -> context.getBodyAsJson().mapTo(ShoppingRequest.class))
+        executeSafely(() -> {
+            ValidatedRequest validatedRequest = context.get(KEY_META_DATA_VALIDATED_REQUEST);
+            return validatedRequest.getBody().getJsonObject().mapTo(ShoppingRequest.class);
+        })
                 .flatMap(shoppingManager::manage)
                 .subscribe(complete(context), fail(context));
     }
@@ -77,9 +83,6 @@ public class ShoppingRestHandlerImpl implements Handler<RoutingContext> {
 
     private void createErrorResponse(RoutingContext context, Throwable throwable) {
         log.error("Fallo: ", throwable);
-        context.response()
-                .putHeader("Content-Type", "application/json")
-                .setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code())
-                .end("");
+        context.fail(throwable);
     }
 }
