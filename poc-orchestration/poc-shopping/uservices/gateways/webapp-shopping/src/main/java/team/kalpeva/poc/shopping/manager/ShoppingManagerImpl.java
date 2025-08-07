@@ -9,6 +9,7 @@ import team.kalpeva.poc.shopping.model.WorkflowResponse;
 import team.kalpeva.workflow.purchase.PurchaseWorkflow;
 
 import javax.inject.Inject;
+import java.time.Duration;
 
 public class ShoppingManagerImpl implements ShoppingManager {
 
@@ -30,6 +31,7 @@ public class ShoppingManagerImpl implements ShoppingManager {
                     PurchaseWorkflow.class,
                     new WorkflowOptions.Builder()
                             .setTaskList(TASKLIST)
+                            .setExecutionStartToCloseTimeout(Duration.ofSeconds(20))
                             .build());
             return workflow.execute("PERICO");
         }).map(message -> WorkflowResponse.builder()

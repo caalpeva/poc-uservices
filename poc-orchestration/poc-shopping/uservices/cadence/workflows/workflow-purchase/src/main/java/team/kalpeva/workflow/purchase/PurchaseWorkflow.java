@@ -4,6 +4,6 @@ import com.uber.cadence.workflow.WorkflowMethod;
 
 public interface PurchaseWorkflow {
 
-    @WorkflowMethod()
+    @WorkflowMethod(executionStartToCloseTimeoutSeconds = 20)
     String execute(String name);
 }

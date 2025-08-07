@@ -5,6 +5,7 @@ import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowClientOptions;
 import com.uber.cadence.client.WorkflowStub;
 import com.uber.cadence.converter.DataConverter;
+import com.uber.cadence.converter.JsonDataConverter;
 import com.uber.cadence.internal.common.WorkflowExecutionUtils;
 import com.uber.cadence.serviceclient.ClientOptions;
 import com.uber.cadence.serviceclient.IWorkflowService;
@@ -60,6 +61,7 @@ public class CadenceManager {
         return WorkflowClient.newInstance(
                 service,
                 WorkflowClientOptions.newBuilder()
+                        //.setDataConverter(JsonDataConverter.getInstance())
                         .setDomain(domain)
                         .build());
     }

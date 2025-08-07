@@ -2,6 +2,7 @@ package team.kalpeva.workflow.purchase;
 
 import com.uber.cadence.activity.ActivityOptions;
 import com.uber.cadence.workflow.Workflow;
+import team.kalpeva.activity.inventory.InventoryActivity;
 
 import java.time.Duration;
 
