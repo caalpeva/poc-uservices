@@ -11,8 +11,6 @@
   </parent>
 
   <artifactId>workflow-purchase</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>

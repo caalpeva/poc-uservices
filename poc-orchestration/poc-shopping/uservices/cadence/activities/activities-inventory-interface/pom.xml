@@ -5,22 +5,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>poc.orchestration</groupId>
-    <artifactId>cadence</artifactId>
+    <artifactId>activities</artifactId>
     <version>1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>activities</artifactId>
-  <packaging>pom</packaging>
-
-  <modules>
-    <module>activities-order</module>
-    <module>activities-payment</module>
-    <module>activities-inventory</module>
-    <module>activities-inventory-interface</module>
-    <module>activities-shipping</module>
-    <module>activities-notification</module>
-  </modules>
+  <artifactId>activities-inventory-interface</artifactId>
+  <version>1.0-SNAPSHOT</version>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
@@ -28,14 +19,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.uber.cadence</groupId>
-        <artifactId>cadence-client</artifactId>
-        <version>3.7.2</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
+  <dependencies>
+    <dependency>
+      <groupId>com.uber.cadence</groupId>
+      <artifactId>cadence-client</artifactId>
+    </dependency>
+  </dependencies>
 </project>
