@@ -28,4 +28,14 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.uber.cadence</groupId>
+        <artifactId>cadence-client</artifactId>
+        <version>3.7.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
 </project>

@@ -1,4 +1,4 @@
-package team.kalpeva.workflow.purchase;
+package team.kalpeva.workflow.pepe;
 
 import com.uber.cadence.workflow.WorkflowMethod;
 
