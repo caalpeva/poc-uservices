@@ -17,6 +17,7 @@
     <module>activities-order</module>
     <module>activities-payment</module>
     <module>activities-inventory</module>
+    <module>activities-inventory-interface</module>
     <module>activities-shipping</module>
     <module>activities-notification</module>
   </modules>
@@ -26,5 +27,15 @@
     <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.uber.cadence</groupId>
+        <artifactId>cadence-client</artifactId>
+        <version>3.7.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
 </project>

@@ -16,6 +16,7 @@
 
   <modules>
     <module>workflow-purchase</module>
+    <module>workflow-purchase2</module>
   </modules>
 
   <properties>

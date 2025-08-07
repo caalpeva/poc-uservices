@@ -9,7 +9,7 @@ public class InventoryActivityImpl implements InventoryActivity {
     private final static Logger logger = LoggerFactory.getLogger(InventoryActivityImpl.class);
 
     @Override
-    public String composeGreeting(String greeting, String name) {
+    public String calculate(String greeting, String name) {
         //logger.info("From {}", Activity.getWorkflowExecution());
         return greeting + " " + name + "!";
     }
