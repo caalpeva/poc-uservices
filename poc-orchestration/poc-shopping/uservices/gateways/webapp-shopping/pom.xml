@@ -25,7 +25,7 @@
     <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
-    <jackson.version>2.15.2</jackson.version>
+    <jackson.version>2.18.2</jackson.version>
     <vertx.version>5.0.4</vertx.version>
     <micrometer.version>1.15.4</micrometer.version>
     <dagger.version>2.51</dagger.version>
@@ -85,17 +85,17 @@
       <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-core</artifactId>
-          <version>2.15.2</version>
+          <version>${jackson.version}</version>
       </dependency>
       <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-databind</artifactId>
-          <version>2.15.2</version>
+          <version>${jackson.version}</version>
       </dependency>
       <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-annotations</artifactId>
-          <version>2.15.2</version>
+          <version>${jackson.version}</version>
       </dependency>
 
     <!-- Dagger core -->
@@ -121,27 +121,23 @@
       <groupId>poc.orchestration</groupId>
       <artifactId>workflow-purchase</artifactId>
       <version>1.0-SNAPSHOT</version>
-<!--
-        <exclusions>
-            <exclusion>
-                <groupId>poc.orchestration</groupId>
-                <artifactId>commons</artifactId>
-            </exclusion>
-            <exclusion>
-                <groupId>com.uber.cadence</groupId>
-                <artifactId>cadence-client</artifactId>
-            </exclusion>
-            <exclusion>
-                <groupId>poc.orchestration</groupId>
-                <artifactId>activities-inventory-interface</artifactId>
-            </exclusion>
-        </exclusions>-->
     </dependency>
-    <!--<dependency>
-      <groupId>poc.orchestration</groupId>
-      <artifactId>activities-inventory</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>-->
+    <dependency>
+      <groupId>com.auth0</groupId>
+      <artifactId>java-jwt</artifactId>
+      <version>3.10.2</version>
+      <exclusions>
+          <exclusion>
+              <groupId>com.fasterxml.jackson.core</groupId>
+              <artifactId>jackson-databind</artifactId>
+          </exclusion>
+          <exclusion>
+              <groupId>com.fasterxml.jackson.core</groupId>
+              <artifactId>jackson-annotations</artifactId>
+          </exclusion>
+      </exclusions>
+    </dependency>
+
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
