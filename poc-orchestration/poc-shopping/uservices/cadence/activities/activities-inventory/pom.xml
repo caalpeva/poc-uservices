@@ -10,41 +10,17 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
+  <groupId>poc.orchestration</groupId>
   <artifactId>activities-inventory</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
-      <version>1.9</version>
-    </dependency>
-    <dependency>
-      <groupId>com.uber.m3</groupId>
-      <artifactId>tally-core</artifactId>
-      <version>0.10.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.uber.m3</groupId>
-      <artifactId>tally-prometheus</artifactId>
-      <version>0.10.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient</artifactId>
-      <version>0.10.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_httpserver</artifactId>
-      <version>0.10.0</version>
-    </dependency>
     <dependency>
       <groupId>poc.orchestration</groupId>
       <artifactId>commons</artifactId>

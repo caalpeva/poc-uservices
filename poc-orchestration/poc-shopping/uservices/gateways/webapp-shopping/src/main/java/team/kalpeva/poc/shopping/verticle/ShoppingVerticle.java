@@ -3,22 +3,15 @@ package team.kalpeva.poc.shopping.verticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.openapi.router.RouterBuilder;
 import io.vertx.openapi.contract.OpenAPIContract;
 import lombok.extern.slf4j.Slf4j;
-import team.kalpeva.poc.shopping.handlers.GenericFailureHandler;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import static io.vertx.core.http.HttpMethod.POST;
-import static io.vertx.ext.web.openapi.router.RouterBuilder.KEY_META_DATA_VALIDATED_REQUEST;
 
 @Slf4j
 public class ShoppingVerticle extends AbstractVerticle {
@@ -41,9 +34,9 @@ public class ShoppingVerticle extends AbstractVerticle {
         OpenAPIContract.from(vertx, OPENAPI_PATH)
                 .compose(contract -> {
                     RouterBuilder routerBuilder = RouterBuilder.create(vertx, contract);
-                    routerBuilder.getRoute("createOrder")
-                            .addHandler(handler)
-                            .addFailureHandler(failureHandler);
+                    routerBuilder.createRouter().route("createOrder")
+                            .handler(handler)
+                            .failureHandler(failureHandler);
 
                     Router mainRouter = Router.router(vertx);
                     mainRouter.route("/v1/*").subRouter(routerBuilder.createRouter());

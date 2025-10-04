@@ -6,14 +6,11 @@ import team.kalpeva.poc.shopping.di.DaggerDiComponent;
 
 @Slf4j
 public class Main {
+
     public static void main (String[] args) {
         Vertx vertx = Vertx.vertx();
-        vertx.deployVerticle(DaggerDiComponent.create().mainVerticle(), res -> {
-            if (res.succeeded()) {
-                log.info("✅ Verticle deployed successfully, ID: {}", res.result());
-            } else {
-                log.error("❌ Failed to deploy verticle", res.cause());
-            }
-        });
+        vertx.deployVerticle(DaggerDiComponent.create().mainVerticle())
+                .onSuccess(id -> log.info("✅ Verticle deployed successfully, ID: {}", id))
+                .onFailure(throwable -> log.error("❌ Failed to deploy verticle", throwable.getCause()));
     }
 }

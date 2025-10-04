@@ -10,16 +10,18 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
+  <groupId>poc.orchestration</groupId>
   <artifactId>workflow-purchase</artifactId>
+  <version>1.0-SNAPSHOT</version>
 
   <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
-    <dependency>
+<!--    <dependency>
       <groupId>commons-configuration</groupId>
       <artifactId>commons-configuration</artifactId>
       <version>1.9</version>
@@ -43,10 +45,15 @@
       <groupId>io.prometheus</groupId>
       <artifactId>simpleclient_httpserver</artifactId>
       <version>0.10.0</version>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>poc.orchestration</groupId>
       <artifactId>commons</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>poc.orchestration</groupId>
+      <artifactId>workflow-purchase-interface</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>

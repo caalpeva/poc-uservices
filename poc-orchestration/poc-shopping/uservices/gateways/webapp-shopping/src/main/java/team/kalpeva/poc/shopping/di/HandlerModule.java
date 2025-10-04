@@ -2,7 +2,6 @@ package team.kalpeva.poc.shopping.di;
 
 import dagger.Module;
 import dagger.Provides;
-import io.vertx.core.cli.annotations.Name;
 import team.kalpeva.poc.shopping.handlers.GenericFailureHandler;
 import team.kalpeva.poc.shopping.handlers.ShoppingRestHandlerImpl;
 import team.kalpeva.poc.shopping.manager.ShoppingManager;

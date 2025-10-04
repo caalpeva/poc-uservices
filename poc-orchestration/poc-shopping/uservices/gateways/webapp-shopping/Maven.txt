@@ -1,0 +1,33 @@
+mvn dependency:tree -Dincludes=com.fasterxml.jackson.core
+mvn dependency:tree | grep "com.fasterxml.jackson.core"
+mvn dependency:tree | grep jackson
+mvn dependency:tree -Dverbose -Dincludes=com.fasterxml.jackson.core
+mvn dependency:tree -Dincludes=com.auth0:java-jwt
+mvn dependency:tree -pl webapp-shopping -am
+mvn dependency:list -pl webapp-shopping -am
+mvn dependency:tree -pl uservices/gateways/webapp-shopping -am
+mvn dependency:list -pl uservices/gateways/webapp-shopping -am
+mvn dependency:list -pl uservices/gateways/webapp-shopping -DincludeScope=compile
+jar tf ./target/webapp-shopping-1.3.0-SNAPSHOT-fat.jar | grep PrometheusMeterRegistry
+jar tf ./target/webapp-shopping-1.3.0-SNAPSHOT.jar | grep RecyclerPool
+mvn help:effective-pom
+mvn clean install -pl webapp-shopping -X
+mvn clean install -pl webapp-shopping -am -X
+mvn clean install -pl webapp-shopping -am
+
+sudo apt update
+sudo apt install openjdk-21-jdk -y
+sudo apt install maven -y
+sudo apt remove maven -y
+
+sudo update-alternatives --list java
+sudo update-alternatives --config java
+sudo update-alternatives --config javac
+
+hash -r Limpieza del hash de bash
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export M2_HOME=/home/sorsha/tools/apache-maven-3.9.11
+
+MAVEN funciona con la instalación de JAVA_HOME configurada,
+aunque haya instalada otra java en el sistema
+en los binarios /usr/bin/java y /usr/bin/javac.
