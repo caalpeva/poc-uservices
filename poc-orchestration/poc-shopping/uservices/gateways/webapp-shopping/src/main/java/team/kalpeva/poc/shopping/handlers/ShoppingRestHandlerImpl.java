@@ -8,7 +8,8 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RequestBody;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.rxjava3.ext.web.openapi.router.RouterBuilder;
+import io.vertx.ext.web.openapi.router.RouterBuilder;
+import io.vertx.openapi.validation.ValidatedRequest;
 import lombok.extern.slf4j.Slf4j;
 import team.kalpeva.poc.shopping.manager.ShoppingManager;
 import team.kalpeva.poc.shopping.model.ShoppingRequest;
@@ -18,6 +19,8 @@ import team.kalpeva.poc.shopping.model.WorkflowResponse;
 import javax.inject.Inject;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import static io.vertx.ext.web.openapi.router.RouterBuilder.KEY_META_DATA_VALIDATED_REQUEST;
 
 @Slf4j
 public class ShoppingRestHandlerImpl implements Handler<RoutingContext> {
@@ -35,6 +38,8 @@ public class ShoppingRestHandlerImpl implements Handler<RoutingContext> {
         executeSafely(() -> {
             JsonObject validatedRequest = context.get(RouterBuilder.KEY_META_DATA_VALIDATED_REQUEST);
             return validatedRequest.getJsonObject("body").mapTo(ShoppingRequest.class);
+            //ValidatedRequest validatedRequest = context.get(KEY_META_DATA_VALIDATED_REQUEST);
+            //return validatedRequest.getBody().getJsonObject().mapTo(ShoppingRequest.class);
         })
                 .flatMap(shoppingManager::manage)
                 .subscribe(complete(context), fail(context));

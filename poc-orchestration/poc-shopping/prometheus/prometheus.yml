@@ -1,0 +1,37 @@
+global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+    monitor: 'codelab-monitor'
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # --- Prometheus itself ---
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # --- Node Exporter (host metrics) ---
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # --- Cadence Metrics ---
+  - job_name: 'cadence'
+    static_configs:
+      - targets:
+          - 'cadence:8000'
+          - 'cadence:8001'
+          - 'cadence:8002'
+          - 'cadence:8003'
+
+  # --- Microservices APIs ---
+  - job_name: 'microservices'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets:
+          - 'webapp-shopping:9091'

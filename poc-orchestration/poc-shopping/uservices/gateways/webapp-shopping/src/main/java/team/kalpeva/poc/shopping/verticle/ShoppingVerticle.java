@@ -3,6 +3,7 @@ package team.kalpeva.poc.shopping.verticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
@@ -33,13 +34,16 @@ public class ShoppingVerticle extends AbstractVerticle {
     public void start(Promise<Void> startPromise) throws Exception {
         OpenAPIContract.from(vertx, OPENAPI_PATH)
                 .compose(contract -> {
-                    RouterBuilder routerBuilder = RouterBuilder.create(vertx, contract);
-                    routerBuilder.createRouter().route("createOrder")
+                    RouterBuilder openApiRouter = RouterBuilder.create(vertx, contract);
+
+                    openApiRouter.createRouter()
+                            .route(HttpMethod.POST, "/order")
                             .handler(handler)
-                            .failureHandler(failureHandler);
+                            .failureHandler(failureHandler)
+                            .setName("/v1/order");
 
                     Router mainRouter = Router.router(vertx);
-                    mainRouter.route("/v1/*").subRouter(routerBuilder.createRouter());
+                    mainRouter.route("/v1/*").subRouter(openApiRouter.createRouter());
                     mainRouter.route("/*").handler(StaticHandler.create("swagger-ui"));
                     mainRouter.get("/openapi.yaml").handler(ctx ->
                             ctx.response()

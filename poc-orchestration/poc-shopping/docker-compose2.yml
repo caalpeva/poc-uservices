@@ -72,6 +72,7 @@ services:
     image: kalpeva/api-shopping:latest
     ports:
       - '7090:9090'
+      - '9091:9091'
   api-order:
     image: kalpeva/api-order:latest
     ports:
