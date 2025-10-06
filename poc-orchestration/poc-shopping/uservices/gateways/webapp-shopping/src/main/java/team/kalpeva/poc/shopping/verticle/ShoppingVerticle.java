@@ -34,16 +34,14 @@ public class ShoppingVerticle extends AbstractVerticle {
     public void start(Promise<Void> startPromise) throws Exception {
         OpenAPIContract.from(vertx, OPENAPI_PATH)
                 .compose(contract -> {
-                    RouterBuilder openApiRouter = RouterBuilder.create(vertx, contract);
-
-                    openApiRouter.createRouter()
-                            .route(HttpMethod.POST, "/order")
+                    RouterBuilder builderRouter = RouterBuilder.create(vertx, contract);
+                    Router opeanApiRouter = builderRouter.createRouter();
+                    opeanApiRouter.route(HttpMethod.POST, "/order")
                             .handler(handler)
-                            .failureHandler(failureHandler)
-                            .setName("/v1/order");
+                            .failureHandler(failureHandler);
 
                     Router mainRouter = Router.router(vertx);
-                    mainRouter.route("/v1/*").subRouter(openApiRouter.createRouter());
+                    mainRouter.route("/v1/*").subRouter(opeanApiRouter);
                     mainRouter.route("/*").handler(StaticHandler.create("swagger-ui"));
                     mainRouter.get("/openapi.yaml").handler(ctx ->
                             ctx.response()
