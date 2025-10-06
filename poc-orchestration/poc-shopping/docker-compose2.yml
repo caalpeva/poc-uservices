@@ -69,7 +69,7 @@ services:
     ports:
       - '3000:3000'
   webapp-shopping:
-    image: kalpeva/api-shopping:latest
+    image: kalpeva/webapp-shopping:local
     ports:
       - '7090:9090'
       - '9091:9091'

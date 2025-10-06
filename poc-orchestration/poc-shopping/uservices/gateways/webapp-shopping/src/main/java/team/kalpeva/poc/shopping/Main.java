@@ -18,7 +18,9 @@ public class Main {
     public static void main (String[] args) {
         var vertxPrometheusOptions =  new VertxPrometheusOptions()
                 .setStartEmbeddedServer(true)
-                .setEmbeddedServerOptions(new HttpServerOptions().setPort(9091))
+                .setEmbeddedServerOptions(new HttpServerOptions()
+                        .setHost("0.0.0.0")
+                        .setPort(9091))
                 //.setEmbeddedServerEndpoint("/metrics/vertx")
                 .setEnabled(true);
 

@@ -30,8 +30,6 @@
     <micrometer.version>1.15.4</micrometer.version>
     <dagger.version>2.51</dagger.version>
     <junit-jupiter.version>5.9.1</junit-jupiter.version>
-    <main.verticle>team.kalpeva.poc.shopping.verticle.ShoppingVerticle</main.verticle>
-    <launcher.class>io.vertx.core.Launcher</launcher.class>
   </properties>
 
   <dependencies>
@@ -267,8 +265,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>${launcher.class}</Main-Class>
-                                        <Main-Verticle>${main.verticle}</Main-Verticle>
+                                        <Main-Class>team.kalpeva.poc.shopping.Main</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>

@@ -85,6 +85,7 @@
                   <filter>@</filter>
                   <tags>
                     <tag>latest</tag>
+                    <tag>local</tag>
                     <tag>${project.version}</tag>
                   </tags>
                 </build>
