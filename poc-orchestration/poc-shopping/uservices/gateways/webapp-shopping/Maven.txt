@@ -31,3 +31,38 @@ export M2_HOME=/home/sorsha/tools/apache-maven-3.9.11
 MAVEN funciona con la instalación de JAVA_HOME configurada,
 aunque haya instalada otra java en el sistema
 en los binarios /usr/bin/java y /usr/bin/javac.
+
+-----------------
+Ejemplo chulo
+version: "3.9"
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    restart: unless-stopped
+
+  microservice1:
+    image: quay.io/prometheus/busybox
+    container_name: microservice1
+    command: >
+      sh -c "while true; do echo 'my_metric{service=\"1\"} 1'; sleep 5; done | nc -l -p 8080 -q 1"
+    ports:
+      - "8081:8080"
+
+  microservice2:
+    image: quay.io/prometheus/busybox
+    container_name: microservice2
+    command: >
+      sh -c "while true; do echo 'my_metric{service=\"2\"} 2'; sleep 5; done | nc -l -p 8080 -q 1"
+    ports:
+      - "8082:8080"
+
+volumes:
+  prometheus_data:
+

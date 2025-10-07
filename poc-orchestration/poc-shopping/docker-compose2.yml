@@ -14,12 +14,15 @@ services:
       retries: 10
   prometheus:
     image: prom/prometheus:latest
+    user: root
     volumes:
-      - ./prometheus:/etc/prometheus
+      - ./prometheus/config:/etc/prometheus:ro
+      - prometheus_data:/prometheus/data
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
       - '9090:9090'
+    restart: unless-stopped
   node-exporter:
     image: prom/node-exporter
     ports:
@@ -97,3 +100,6 @@ services:
     image: kalpeva/activities-inventory:latest
   workflow-purchase:
     image: kalpeva/workflow-purchase:latest
+
+volumes:
+  prometheus_data:
